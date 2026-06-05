@@ -1,0 +1,31 @@
+using Learnup.Application.Features.Public.Courses;
+using Learnup.Application.Mediation;
+using Learnup.Application.Responses.Public.Courses;
+using Microsoft.AspNetCore.Mvc;
+
+namespace Learnup.API.Areas.Public.Controllers;
+
+public class CoursesController(IMediator mediator) : BasePublicController
+{
+    [HttpGet("language/{languageId:int}")]
+    public async Task<ActionResult<IReadOnlyList<CourseResponse>>> GetByLanguageId(
+        int languageId,
+        CancellationToken cancellationToken)
+    {
+        var courses = await mediator.Send(new GetCoursesByLanguageId(languageId), cancellationToken);
+
+        return Ok(courses);
+    }
+
+    [HttpGet("{id:int}")]
+    public async Task<ActionResult<CourseDetailResponse>> GetById(
+        int id,
+        CancellationToken cancellationToken)
+    {
+        var course = await mediator.Send(new GetCourseById(id), cancellationToken);
+
+        return course is null
+            ? NotFound()
+            : Ok(course);
+    }
+}

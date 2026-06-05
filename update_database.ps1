@@ -1,0 +1,1 @@
+﻿dotnet ef database --startup-project src/Learnup.API --project src/Learnup.Infrastructure update -- --environment $args[0]
