@@ -7,6 +7,7 @@ public class StoryItem
     public string Translation { get; private set; }
     public int Order { get; private set; }
     public string? VoiceId { get; private set; }
+    public List<StoryItemTimestamp> Timestamps { get; private set; }
     
     public int StoryId { get; private set; }
     public Story Story { get; private set; } = null!;
@@ -15,6 +16,7 @@ public class StoryItem
     {
         Content = string.Empty;
         Translation = string.Empty;
+        Timestamps = [];
     }
 
     public StoryItem(string content, string translation, int order)
@@ -22,10 +24,12 @@ public class StoryItem
         Content = content;
         Translation = translation;
         Order = order;
+        Timestamps = [];
     }
 
-    public void SetVoiceId(string voiceId)
+    public void SetVoice(string voiceId, IEnumerable<StoryItemTimestamp> timestamps)
     {
         VoiceId = voiceId;
+        Timestamps = timestamps.ToList();
     }
 }

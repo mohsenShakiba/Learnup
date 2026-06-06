@@ -27,5 +27,10 @@ public class StoryItemConfiguration : IEntityTypeConfiguration<StoryItem>
             .WithMany(s => s.Items)
             .HasForeignKey(si => si.StoryId)
             .OnDelete(DeleteBehavior.Cascade);
+
+        builder.HasMany(si => si.Timestamps)
+            .WithOne(t => t.StoryItem)
+            .HasForeignKey(timestamp => timestamp.StoryItemId)
+            .OnDelete(DeleteBehavior.Cascade);
     }
 }

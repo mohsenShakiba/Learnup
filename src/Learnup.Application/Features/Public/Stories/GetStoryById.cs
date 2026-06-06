@@ -18,6 +18,7 @@ internal sealed class GetStoryByIdHandler(ILearnupDbContext dbContext)
         var story = await dbContext.Stories
             .AsNoTracking()
             .Include(story => story.Items)
+            .ThenInclude(item => item.Timestamps)
             .FirstOrDefaultAsync(story => story.Id == request.Id, cancellationToken);
 
         return story?.ToResponse();

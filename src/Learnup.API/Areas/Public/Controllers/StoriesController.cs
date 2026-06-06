@@ -7,7 +7,7 @@ namespace Learnup.API.Areas.Public.Controllers;
 
 public class StoriesController(IMediator mediator) : BasePublicController
 {
-    [HttpGet("{id:int}")]
+    [HttpGet("{id:int}", Name = "GetStoryById")]
     public async Task<ActionResult<StoryResponse>> GetById(int id, CancellationToken cancellationToken)
     {
         var story = await mediator.Send(new GetStoryById(id), cancellationToken);
