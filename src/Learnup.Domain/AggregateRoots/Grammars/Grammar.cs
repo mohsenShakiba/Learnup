@@ -1,4 +1,4 @@
-﻿using Learnup.Domain.AggregateRoots.Lessons;
+using Learnup.Domain.AggregateRoots.Lessons;
 using Learnup.Domain.AggregateRoots.Vocabularies;
 
 namespace Learnup.Domain.AggregateRoots.Grammars;
@@ -13,13 +13,23 @@ public class Grammar
     public string Description { get; private set; }
     
     public int? ParentGrammarId { get; private set; }
-    public Grammar? ParentGrammar { get; private set; }
+    public Grammar? ParentGrammar { get; private set; } 
 
-    public IReadOnlyList<Grammar> PrerequisiteGrammars => _grammar.AsReadOnly();
-    private List<Grammar> _grammar = [];
+    public IReadOnlyList<Grammar> PrerequisiteGrammars => _prerequisiteGrammars.AsReadOnly();
+    private List<Grammar> _prerequisiteGrammars = [];
 
     public IReadOnlyList<GrammarLesson> Lessons => _lessons.AsReadOnly();
     private List<GrammarLesson> _lessons = [];
+
+    public Grammar(int id, string name, VocabLevel level, int order, TimeSpan estimatedTime, string description, int? parentGrammarId)
+    {
+        Id = id;
+        Name = name;
+        Level = level;
+        Order = order;
+        EstimatedTime = estimatedTime;
+        Description = description;
+    }
 
     public void AddLesson(GrammarLesson lesson)
     {
@@ -33,11 +43,11 @@ public class Grammar
 
     public void AddGrammar(Grammar grammar)
     {
-        _grammar.Add(grammar);
+        _prerequisiteGrammars.Add(grammar);
     }
 
     public void RemoveGrammar(Grammar grammar)
     {
-        _grammar.Remove(grammar);
+        _prerequisiteGrammars.Remove(grammar);
     }
 }

@@ -30,6 +30,7 @@ public static class DependencyInjection
         services.AddHttpClient();
         services.AddScoped<IVoiceProvider, KokoroVoiceProvider>();
         services.AddScoped<IVocabTranslationProvider, AiVocabTranslationProvider>();
+        services.AddScoped<IGrammarLoader, GrammarLoader>();
         services.AddScoped<IVocabLoader, VocabLoader>();
         services.AddScoped<IStoryLoader, StoryLoader>();
 

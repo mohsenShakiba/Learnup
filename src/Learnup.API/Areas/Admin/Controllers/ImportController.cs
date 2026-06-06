@@ -1,6 +1,7 @@
 using System.Text;
 using Learnup.API.Requests;
 using Learnup.API.Responses;
+using Learnup.Application.Features.Admin.Grammars;
 using Learnup.Application.ExternalServices;
 using Learnup.Application.Features.Admin;
 using Learnup.Application.Mediation;
@@ -61,6 +62,18 @@ public class ImportController(
             cancellationToken);
 
         return Ok(storyId);
+    }
+
+    [HttpPost("grammars")]
+    public async Task<ActionResult<int>> ImportGrammar(
+        [FromBody] ImportGrammarRequest request,
+        CancellationToken cancellationToken)
+    {
+        var grammarId = await mediator.Send(
+            new ImportGrammar(request.Grammar),
+            cancellationToken);
+
+        return Ok(grammarId);
     }
 
     private static async Task<List<string>> ReadWordsAsync(

@@ -28,7 +28,7 @@ public class GrammarLessonConfiguration : IEntityTypeConfiguration<GrammarLesson
             .HasMaxLength(100)
             .IsRequired();
 
-        builder.Property(gl => gl.HTMLTag)
+        builder.Property(gl => gl.HtmlTag)
             .IsRequired();
 
         builder.HasIndex("GrammarId", nameof(GrammarLesson.Order))

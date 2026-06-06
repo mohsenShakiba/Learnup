@@ -3,6 +3,7 @@ using System;
 using Learnup.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Learnup.Infrastructure.Migrations
 {
     [DbContext(typeof(LearnupDbContext))]
-    partial class LearnupDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260606155325_AddedGrammarAndLesson")]
+    partial class AddedGrammarAndLesson
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -99,9 +102,6 @@ namespace Learnup.Infrastructure.Migrations
                     b.Property<int>("GrammarId")
                         .HasColumnType("integer");
 
-                    b.Property<int>("GrammarId1")
-                        .HasColumnType("integer");
-
                     b.Property<int>("HtmlTag")
                         .HasColumnType("integer");
 
@@ -122,8 +122,6 @@ namespace Learnup.Infrastructure.Migrations
                         .HasColumnType("integer");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("GrammarId1");
 
                     b.HasIndex("GrammarId", "Order")
                         .IsUnique();
@@ -351,14 +349,6 @@ namespace Learnup.Infrastructure.Migrations
                         .HasForeignKey("GrammarId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.HasOne("Learnup.Domain.AggregateRoots.Grammars.Grammar", "Grammar")
-                        .WithMany()
-                        .HasForeignKey("GrammarId1")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Grammar");
                 });
 
             modelBuilder.Entity("Learnup.Domain.AggregateRoots.Lessons.Lesson", b =>
