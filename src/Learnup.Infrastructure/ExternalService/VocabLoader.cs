@@ -18,7 +18,7 @@ public class VocabLoader(LearnupDbContext dbContext) : IVocabLoader
             return 0;
         }
 
-        if (!Enum.IsDefined(typeof(VocalLevel), levelId))
+        if (!Enum.IsDefined(typeof(VocabLevel), levelId))
         {
             throw new ArgumentOutOfRangeException(nameof(levelId), levelId, "Unknown vocab level id.");
         }
@@ -31,7 +31,7 @@ public class VocabLoader(LearnupDbContext dbContext) : IVocabLoader
             throw new InvalidOperationException($"Language with id '{languageId}' was not found.");
         }
 
-        var level = (VocalLevel)levelId;
+        var level = (VocabLevel)levelId;
         var normalizedWords = words
             .Select(word => word.Trim())
             .Where(word => !string.IsNullOrWhiteSpace(word))

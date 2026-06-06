@@ -1,6 +1,6 @@
 ﻿namespace Learnup.Domain.AggregateRoots.Vocabularies;
 
-public enum VocalLevel
+public enum VocabLevel
 {
     Common = 0,
     A1 = 1,

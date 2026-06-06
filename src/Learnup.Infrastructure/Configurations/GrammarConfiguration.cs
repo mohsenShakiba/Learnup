@@ -15,5 +15,33 @@ public class GrammarConfiguration : IEntityTypeConfiguration<Grammar>
         builder.Property(g => g.Name)
             .HasMaxLength(200)
             .IsRequired();
+
+        builder.Property(g => g.Description)
+            .IsRequired();
+
+        builder.Property(g => g.Level)
+            .IsRequired();
+
+        builder.Property(g => g.Order)
+            .IsRequired();
+
+        builder.Property(g => g.EstimatedTime)
+            .IsRequired();
+
+        builder.HasMany(g => g.Lessons)
+            .WithOne()
+            .HasForeignKey("GrammarId")
+            .OnDelete(DeleteBehavior.Cascade);
+
+        builder.Navigation(g => g.Lessons)
+            .UsePropertyAccessMode(PropertyAccessMode.Field);
+
+        builder.HasOne(g => g.ParentGrammar)
+            .WithMany(g => g.PrerequisiteGrammars)
+            .HasForeignKey(g => g.ParentGrammarId)
+            .OnDelete(DeleteBehavior.SetNull);
+
+        builder.Navigation(g => g.PrerequisiteGrammars)
+            .UsePropertyAccessMode(PropertyAccessMode.Field);
     }
 }

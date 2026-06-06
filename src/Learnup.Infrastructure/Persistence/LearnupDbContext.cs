@@ -14,6 +14,7 @@ public class LearnupDbContext(DbContextOptions<LearnupDbContext> options)
 {
     public DbSet<Course> Courses => Set<Course>();
     public DbSet<Grammar> Grammars => Set<Grammar>();
+    public DbSet<GrammarLesson> GrammarLessons => Set<GrammarLesson>();
     public DbSet<Language> Languages => Set<Language>();
     public DbSet<Lesson> Lessons => Set<Lesson>();
     public DbSet<Story> Stories => Set<Story>();

@@ -8,6 +8,6 @@ public sealed record VocabResponse(
     string? Translation,
     string? VoiceId,
     string? Description,
-    VocalLevel Level,
+    VocabLevel Level,
     int? ParentVocabId,
     int LanguageId);
