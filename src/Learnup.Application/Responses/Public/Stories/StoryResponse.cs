@@ -11,4 +11,11 @@ public sealed record StoryItemResponse(
     string Content,
     string Translation,
     int Order,
-    string? VoiceId);
+    string? VoiceId,
+    IReadOnlyList<StoryItemTimestampResponse> Timestamps);
+
+public sealed record StoryItemTimestampResponse(
+    int Id,
+    string Word,
+    float Start,
+    float End);

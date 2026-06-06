@@ -2,6 +2,7 @@
 using Learnup.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -10,9 +11,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Learnup.Infrastructure.Migrations
 {
     [DbContext(typeof(LearnupDbContext))]
-    partial class LearnupDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260606164414_AddedStoryItemTimeStamp")]
+    partial class AddedStoryItemTimeStamp
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -230,6 +233,9 @@ namespace Learnup.Infrastructure.Migrations
                     b.Property<int>("StoryItemId")
                         .HasColumnType("integer");
 
+                    b.Property<int>("StoryItemId1")
+                        .HasColumnType("integer");
+
                     b.Property<string>("Word")
                         .IsRequired()
                         .HasMaxLength(200)
@@ -238,6 +244,8 @@ namespace Learnup.Infrastructure.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("StoryItemId");
+
+                    b.HasIndex("StoryItemId1");
 
                     b.ToTable("StoryItemTimestamp", (string)null);
                 });
@@ -378,9 +386,15 @@ namespace Learnup.Infrastructure.Migrations
 
             modelBuilder.Entity("Learnup.Domain.AggregateRoots.Stories.StoryItemTimestamp", b =>
                 {
-                    b.HasOne("Learnup.Domain.AggregateRoots.Stories.StoryItem", "StoryItem")
+                    b.HasOne("Learnup.Domain.AggregateRoots.Stories.StoryItem", null)
                         .WithMany("Timestamps")
                         .HasForeignKey("StoryItemId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Learnup.Domain.AggregateRoots.Stories.StoryItem", "StoryItem")
+                        .WithMany()
+                        .HasForeignKey("StoryItemId1")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 

@@ -24,6 +24,19 @@ public static class StoryMappings
             storyItem.Content,
             storyItem.Translation,
             storyItem.Order,
-            storyItem.VoiceId);
+            storyItem.VoiceId,
+            storyItem.Timestamps
+                .OrderBy(timestamp => timestamp.Start)
+                .Select(timestamp => timestamp.ToResponse())
+                .ToArray());
+    }
+
+    public static StoryItemTimestampResponse ToResponse(this StoryItemTimestamp timestamp)
+    {
+        return new StoryItemTimestampResponse(
+            timestamp.Id,
+            timestamp.Word,
+            timestamp.Start,
+            timestamp.End);
     }
 }

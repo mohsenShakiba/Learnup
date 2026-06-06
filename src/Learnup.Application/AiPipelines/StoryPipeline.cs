@@ -1,4 +1,4 @@
-﻿using Learnup.Application.ExternalServices;
+using Learnup.Application.ExternalServices;
 using Learnup.Application.Persistence;
 using Learnup.Domain.AggregateRoots.Stories;
 using Microsoft.EntityFrameworkCore;
@@ -23,14 +23,19 @@ public class StoryPipeline(ILearnupDbContext dbContext, IVoiceProvider voiceProv
                 try
                 {
                     var result = await voiceProvider.GetVoiceAsync(item.Content, cancellationToken);
-                    
-                    item.SetVoiceId(result.VoiceId);
+
+                    item.SetVoice(
+                        result.VoiceId,
+                        result.Captions.Select(caption => new StoryItemTimestamp(
+                            item.Id, 
+                            caption.Word,
+                            caption.Start,
+                            caption.End)));
                 }
                 catch
                 {
                     // do nothing
                 }
-
             }
 
             story.MarkAsCompleted();
