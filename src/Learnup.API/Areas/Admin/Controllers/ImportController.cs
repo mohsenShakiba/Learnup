@@ -13,7 +13,7 @@ public class ImportController(
     IVocabLoader vocabLoader,
     IMediator mediator) : BaseAdminController
 {
-    [HttpPost("vocabs")]
+    [HttpPost("vocabs", Name = "ImportVocabs")]
     [Consumes("multipart/form-data")]
     public async Task<ActionResult<ImportVocabsResponse>> ImportVocabs(
         [FromForm] ImportVocabsRequest request,
@@ -47,7 +47,7 @@ public class ImportController(
         return Ok(new ImportVocabsResponse(words.Count, importedCount));
     }
 
-    [HttpPost("stories")]
+    [HttpPost("stories", Name = "ImportStory")]
     public async Task<ActionResult<int>> ImportStory(
         [FromBody] ImportStoryRequest request,
         CancellationToken cancellationToken)

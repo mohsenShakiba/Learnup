@@ -7,7 +7,7 @@ namespace Learnup.API.Areas.Public.Controllers;
 
 public class VocabsController(IMediator mediator) : BasePublicController
 {
-    [HttpGet("{word}")]
+    [HttpGet("{word}", Name = "GetVocabByWord")]
     public async Task<ActionResult<VocabResponse>> GetByWord(
         string word,
         CancellationToken cancellationToken)

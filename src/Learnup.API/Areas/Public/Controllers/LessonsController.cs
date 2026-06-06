@@ -7,7 +7,7 @@ namespace Learnup.API.Areas.Public.Controllers;
 
 public class LessonsController(IMediator mediator) : BasePublicController
 {
-    [HttpGet("course/{courseId:int}")]
+    [HttpGet("course/{courseId:int}", Name = "GetLessonsByCourseId")]
     public async Task<ActionResult<IReadOnlyList<LessonResponse>>> GetByCourseId(
         int courseId,
         CancellationToken cancellationToken)
@@ -17,7 +17,7 @@ public class LessonsController(IMediator mediator) : BasePublicController
         return Ok(lessons);
     }
 
-    [HttpGet("{id:int}")]
+    [HttpGet("{id:int}", Name = "GetLessonById")]
     public async Task<ActionResult<LessonDetailResponse>> GetById(
         int id,
         CancellationToken cancellationToken)
