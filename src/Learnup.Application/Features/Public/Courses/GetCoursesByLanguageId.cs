@@ -22,7 +22,17 @@ internal sealed class GetCoursesByLanguageIdHandler(ILearnupDbContext dbContext)
             .Select(course => new CourseResponse(
                 course.Id,
                 course.Title,
+                course.Description,
                 course.Order,
+                course.CoverId,
+                dbContext.Lessons
+                    .Where(lesson => lesson.CourseId == course.Id)
+                    .SelectMany(lesson => lesson.Stories)
+                    .Count(),
+                dbContext.Lessons
+                    .Where(lesson => lesson.CourseId == course.Id)
+                    .SelectMany(lesson => lesson.Grammars)
+                    .Count(),
                 course.LanguageId))
             .ToListAsync(cancellationToken);
     }

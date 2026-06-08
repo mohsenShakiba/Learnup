@@ -1,3 +1,4 @@
+using Learnup.Application.Mappers;
 using Learnup.Application.Mediation;
 using Learnup.Application.Persistence;
 using Learnup.Application.Responses.Public.Lessons;
@@ -19,12 +20,7 @@ internal sealed class GetLessonsByCourseIdHandler(ILearnupDbContext dbContext)
             .Where(lesson => lesson.CourseId == request.CourseId)
             .OrderBy(lesson => lesson.Order)
             .ThenBy(lesson => lesson.Id)
-            .Select(lesson => new LessonResponse(
-                lesson.Id,
-                lesson.Title,
-                lesson.Order,
-                lesson.Status,
-                lesson.CourseId))
+            .Select(lesson => lesson.ToResponse())
             .ToListAsync(cancellationToken);
     }
 }

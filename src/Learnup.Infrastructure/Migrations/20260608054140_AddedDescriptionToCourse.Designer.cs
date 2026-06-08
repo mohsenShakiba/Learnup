@@ -3,6 +3,7 @@ using System;
 using Learnup.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Learnup.Infrastructure.Migrations
 {
     [DbContext(typeof(LearnupDbContext))]
-    partial class LearnupDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260608054140_AddedDescriptionToCourse")]
+    partial class AddedDescriptionToCourse
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -329,32 +332,6 @@ namespace Learnup.Infrastructure.Migrations
                     b.ToTable("UserGrammar", (string)null);
                 });
 
-            modelBuilder.Entity("Learnup.Domain.AggregateRoots.Users.UserLesson", b =>
-                {
-                    b.Property<int>("UserId")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("LessonId")
-                        .HasColumnType("integer");
-
-                    b.Property<DateTime?>("CompletedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<int?>("LessonId1")
-                        .HasColumnType("integer");
-
-                    b.Property<DateTime>("StartedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.HasKey("UserId", "LessonId");
-
-                    b.HasIndex("LessonId");
-
-                    b.HasIndex("LessonId1");
-
-                    b.ToTable("UserLesson", (string)null);
-                });
-
             modelBuilder.Entity("Learnup.Domain.AggregateRoots.Users.UserStory", b =>
                 {
                     b.Property<int>("UserId")
@@ -455,7 +432,7 @@ namespace Learnup.Infrastructure.Migrations
             modelBuilder.Entity("Learnup.Domain.AggregateRoots.Lessons.Lesson", b =>
                 {
                     b.HasOne("Learnup.Domain.AggregateRoots.Courses.Course", "Course")
-                        .WithMany("Lessons")
+                        .WithMany()
                         .HasForeignKey("CourseId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -580,29 +557,6 @@ namespace Learnup.Infrastructure.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("Learnup.Domain.AggregateRoots.Users.UserLesson", b =>
-                {
-                    b.HasOne("Learnup.Domain.AggregateRoots.Lessons.Lesson", "Lesson")
-                        .WithMany()
-                        .HasForeignKey("LessonId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("Learnup.Domain.AggregateRoots.Lessons.Lesson", null)
-                        .WithMany("Users")
-                        .HasForeignKey("LessonId1");
-
-                    b.HasOne("Learnup.Domain.AggregateRoots.Users.User", "User")
-                        .WithMany("Lessons")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Lesson");
-
-                    b.Navigation("User");
-                });
-
             modelBuilder.Entity("Learnup.Domain.AggregateRoots.Users.UserStory", b =>
                 {
                     b.HasOne("Learnup.Domain.AggregateRoots.Stories.Story", "Story")
@@ -659,18 +613,11 @@ namespace Learnup.Infrastructure.Migrations
                     b.Navigation("ParentVocab");
                 });
 
-            modelBuilder.Entity("Learnup.Domain.AggregateRoots.Courses.Course", b =>
-                {
-                    b.Navigation("Lessons");
-                });
-
             modelBuilder.Entity("Learnup.Domain.AggregateRoots.Lessons.Lesson", b =>
                 {
                     b.Navigation("Grammars");
 
                     b.Navigation("Stories");
-
-                    b.Navigation("Users");
 
                     b.Navigation("Vocabs");
                 });
@@ -688,8 +635,6 @@ namespace Learnup.Infrastructure.Migrations
             modelBuilder.Entity("Learnup.Domain.AggregateRoots.Users.User", b =>
                 {
                     b.Navigation("Grammars");
-
-                    b.Navigation("Lessons");
 
                     b.Navigation("Stories");
 

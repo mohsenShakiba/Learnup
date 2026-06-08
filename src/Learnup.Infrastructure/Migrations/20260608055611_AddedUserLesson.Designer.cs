@@ -3,6 +3,7 @@ using System;
 using Learnup.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Learnup.Infrastructure.Migrations
 {
     [DbContext(typeof(LearnupDbContext))]
-    partial class LearnupDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260608055611_AddedUserLesson")]
+    partial class AddedUserLesson
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -100,6 +103,9 @@ namespace Learnup.Infrastructure.Migrations
                     b.Property<int>("CourseId")
                         .HasColumnType("integer");
 
+                    b.Property<int?>("CourseId1")
+                        .HasColumnType("integer");
+
                     b.Property<int>("Order")
                         .HasColumnType("integer");
 
@@ -114,6 +120,8 @@ namespace Learnup.Infrastructure.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("CourseId");
+
+                    b.HasIndex("CourseId1");
 
                     b.ToTable("Lesson", (string)null);
                 });
@@ -340,17 +348,12 @@ namespace Learnup.Infrastructure.Migrations
                     b.Property<DateTime?>("CompletedAt")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<int?>("LessonId1")
-                        .HasColumnType("integer");
-
                     b.Property<DateTime>("StartedAt")
                         .HasColumnType("timestamp with time zone");
 
                     b.HasKey("UserId", "LessonId");
 
                     b.HasIndex("LessonId");
-
-                    b.HasIndex("LessonId1");
 
                     b.ToTable("UserLesson", (string)null);
                 });
@@ -455,10 +458,14 @@ namespace Learnup.Infrastructure.Migrations
             modelBuilder.Entity("Learnup.Domain.AggregateRoots.Lessons.Lesson", b =>
                 {
                     b.HasOne("Learnup.Domain.AggregateRoots.Courses.Course", "Course")
-                        .WithMany("Lessons")
+                        .WithMany()
                         .HasForeignKey("CourseId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.HasOne("Learnup.Domain.AggregateRoots.Courses.Course", null)
+                        .WithMany("Lessons")
+                        .HasForeignKey("CourseId1");
 
                     b.Navigation("Course");
                 });
@@ -588,10 +595,6 @@ namespace Learnup.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Learnup.Domain.AggregateRoots.Lessons.Lesson", null)
-                        .WithMany("Users")
-                        .HasForeignKey("LessonId1");
-
                     b.HasOne("Learnup.Domain.AggregateRoots.Users.User", "User")
                         .WithMany("Lessons")
                         .HasForeignKey("UserId")
@@ -669,8 +672,6 @@ namespace Learnup.Infrastructure.Migrations
                     b.Navigation("Grammars");
 
                     b.Navigation("Stories");
-
-                    b.Navigation("Users");
 
                     b.Navigation("Vocabs");
                 });

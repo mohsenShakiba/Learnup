@@ -24,7 +24,7 @@ public class LessonConfiguration : IEntityTypeConfiguration<Lesson>
             .IsRequired();
 
         builder.HasOne(l => l.Course)
-            .WithMany()
+            .WithMany(c => c.Lessons)
             .HasForeignKey(l => l.CourseId)
             .OnDelete(DeleteBehavior.Cascade);
 
@@ -39,6 +39,11 @@ public class LessonConfiguration : IEntityTypeConfiguration<Lesson>
             .OnDelete(DeleteBehavior.Cascade);
 
         builder.HasMany(l => l.Vocabs)
+            .WithOne(lv => lv.Lesson)
+            .HasForeignKey(lv => lv.LessonId)
+            .OnDelete(DeleteBehavior.Cascade);
+        
+        builder.HasMany(l => l.Users)
             .WithOne(lv => lv.Lesson)
             .HasForeignKey(lv => lv.LessonId)
             .OnDelete(DeleteBehavior.Cascade);

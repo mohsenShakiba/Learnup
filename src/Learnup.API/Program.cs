@@ -1,3 +1,4 @@
+using Atlas.API.SwaggerConfiguration;
 using Learnup.Application;
 using Learnup.API.HostedServices;
 using Learnup.Infrastructure;
@@ -5,6 +6,7 @@ using Learnup.Infrastructure;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddApplication();
+builder.Services.AddApplicationSwagger();
 builder.Services.AddInfrastructure(builder.Configuration);
 builder.Services.AddHostedService<AiProcessorHostedService>();
 builder.Services.AddControllers();

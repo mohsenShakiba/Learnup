@@ -1,4 +1,6 @@
-using Learnup.Domain.AggregateRoots.Lessons;
+using Learnup.Application.Responses.Public.Grammars;
+using Learnup.Application.Responses.Public.Stories;
+using Learnup.Application.Responses.Public.Vocabs;
 
 namespace Learnup.Application.Responses.Public.Lessons;
 
@@ -6,15 +8,13 @@ public sealed record LessonResponse(
     int Id,
     string Title,
     int Order,
-    LessonStatus Status,
     int CourseId);
 
 public sealed record LessonDetailResponse(
     int Id,
     string Title,
     int Order,
-    LessonStatus Status,
     int CourseId,
-    IReadOnlyList<int> StoryIds,
-    IReadOnlyList<int> GrammarIds,
-    IReadOnlyList<int> VocabIds);
+    IReadOnlyList<StoryResponse> Stories,
+    IReadOnlyList<GrammarResponse> Grammars,
+    IReadOnlyList<VocabResponse> Vocabs);
