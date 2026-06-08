@@ -29,8 +29,7 @@ public class GrammarConfiguration : IEntityTypeConfiguration<Grammar>
             .IsRequired();
 
         builder.HasMany(g => g.Lessons)
-            .WithOne()
-            .HasForeignKey("GrammarId")
+            .WithOne(g => g.Grammar)
             .OnDelete(DeleteBehavior.Cascade);
 
         builder.Navigation(g => g.Lessons)

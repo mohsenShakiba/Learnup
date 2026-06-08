@@ -38,9 +38,7 @@ internal sealed class GetUserCourseProgressHandler(ILearnupDbContext dbContext)
             .Where(userGrammar => userGrammar.UserId == request.UserId
                                   && userGrammar.CompletedAt != null
                                   && grammarIds.Contains(userGrammar.GrammarId))
-            .Select(userGrammar => new GrammarResponse(
-                userGrammar.Grammar.Id,
-                userGrammar.Grammar.Name))
+            .Select(userGrammar => userGrammar.Grammar.ToResponse())
             .ToListAsync(cancellationToken);
 
         var vocabs = await dbContext.UserVocabs

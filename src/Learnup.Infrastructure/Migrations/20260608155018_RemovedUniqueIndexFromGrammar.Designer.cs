@@ -3,6 +3,7 @@ using System;
 using Learnup.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Learnup.Infrastructure.Migrations
 {
     [DbContext(typeof(LearnupDbContext))]
-    partial class LearnupDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260608155018_RemovedUniqueIndexFromGrammar")]
+    partial class RemovedUniqueIndexFromGrammar
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -107,6 +110,9 @@ namespace Learnup.Infrastructure.Migrations
                     b.Property<int>("GrammarId")
                         .HasColumnType("integer");
 
+                    b.Property<int>("GrammarId1")
+                        .HasColumnType("integer");
+
                     b.Property<int>("HtmlTag")
                         .HasColumnType("integer");
 
@@ -128,7 +134,9 @@ namespace Learnup.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("GrammarId");
+                    b.HasIndex("GrammarId1");
+
+                    b.HasIndex("GrammarId", "Order");
 
                     b.ToTable("GrammarLesson", (string)null);
                 });
@@ -523,9 +531,15 @@ namespace Learnup.Infrastructure.Migrations
 
             modelBuilder.Entity("Learnup.Domain.AggregateRoots.Grammars.GrammarLesson", b =>
                 {
-                    b.HasOne("Learnup.Domain.AggregateRoots.Grammars.Grammar", "Grammar")
+                    b.HasOne("Learnup.Domain.AggregateRoots.Grammars.Grammar", null)
                         .WithMany("Lessons")
                         .HasForeignKey("GrammarId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Learnup.Domain.AggregateRoots.Grammars.Grammar", "Grammar")
+                        .WithMany()
+                        .HasForeignKey("GrammarId1")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 

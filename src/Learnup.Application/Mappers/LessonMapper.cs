@@ -1,3 +1,4 @@
+using Learnup.Application.Mappings;
 using Learnup.Application.Responses.Public.Grammars;
 using Learnup.Application.Responses.Public.Stories;
 using Learnup.Application.Responses.Public.Vocabs;
@@ -36,9 +37,6 @@ public static class LessonMapper
             item.Order,
             item.VoiceId,
             item.Timestamps.Select(t => new StoryItemTimestampResponse(t.Id, t.Word, t.Start, t.End)).ToList());
-
-    private static GrammarResponse ToResponse(this Domain.AggregateRoots.Grammars.Grammar grammar) =>
-        new(grammar.Id, grammar.Name);
 
     private static VocabResponse ToResponse(this Domain.AggregateRoots.Vocabularies.Vocab vocab) =>
         new(vocab.Id, vocab.Word, vocab.Translation, vocab.VoiceId, vocab.Description, vocab.Level, vocab.ParentVocabId, vocab.LanguageId);

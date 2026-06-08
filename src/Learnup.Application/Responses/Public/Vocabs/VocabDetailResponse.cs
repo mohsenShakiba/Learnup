@@ -8,7 +8,7 @@ public sealed record VocabDetailResponse(
     string? Translation,
     string? VoiceId,
     string? Description,
-    VocalLevel Level,
+    VocabLevel Level,
     VocabResponse? ParentVocab,
     int LanguageId,
     string LanguageName);

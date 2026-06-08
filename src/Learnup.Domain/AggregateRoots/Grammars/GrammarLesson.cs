@@ -18,9 +18,8 @@ public class GrammarLesson
 
     public int? VoiceId { get; private set; }
 
-    public GrammarLesson(int id, string title, HTMLTag htmlTag, string content, int order, string language, int? voiceId, int grammarId)
+    public GrammarLesson(string title, HTMLTag htmlTag, string content, int order, string language, int? voiceId, int grammarId)
     {
-        Id = id;
         Title = title;
         HtmlTag = htmlTag;
         Content = content;

@@ -12,6 +12,7 @@ public interface ILearnupDbContext
 {
     DbSet<Course> Courses { get; }
     DbSet<Grammar> Grammars { get; }
+    DbSet<GrammarLesson> GrammarLessons { get; }
     DbSet<Lesson> Lessons { get; }
     DbSet<Story> Stories { get; }
     DbSet<Vocab> Vocabs { get; }

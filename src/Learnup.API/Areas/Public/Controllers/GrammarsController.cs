@@ -18,4 +18,28 @@ public class GrammarsController(IMediator mediator) : BasePublicController
             ? NotFound()
             : Ok(grammar);
     }
+
+    [HttpGet]
+    public async Task<ActionResult<List<GrammarResponse>>> ListGrammars()
+    {
+        var query = new ListGrammars();
+        var response = await mediator.Send(query);
+        return Ok(response);
+    }
+
+    [HttpDelete("{grammarId:int}")]
+    public async Task<ActionResult> DeleteGrammar(int grammarId)
+    {
+        var command = new DeleteGrammar(grammarId);
+        await mediator.Send(command);
+        return Ok();
+    }
+
+    [HttpGet("lessons")]
+    public async Task<ActionResult<List<GrammarLessonResponse>>> ListLessons()
+    {
+        var query = new ListLessons();
+        var response = await mediator.Send(query);
+        return Ok(response);
+    }
 }

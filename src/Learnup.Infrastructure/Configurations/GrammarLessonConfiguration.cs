@@ -30,8 +30,5 @@ public class GrammarLessonConfiguration : IEntityTypeConfiguration<GrammarLesson
 
         builder.Property(gl => gl.HtmlTag)
             .IsRequired();
-
-        builder.HasIndex("GrammarId", nameof(GrammarLesson.Order))
-            .IsUnique();
     }
 }

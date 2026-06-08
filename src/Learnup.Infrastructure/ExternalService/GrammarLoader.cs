@@ -59,15 +59,15 @@ public class GrammarLoader(LearnupDbContext dbContext) : IGrammarLoader
 
         foreach (var lessonRequest in grammarRequest.Lessons.OrderBy(lesson => lesson.Order))
         {
-            grammar.AddLesson(new GrammarLesson(
-                0,
+            var lesson = new GrammarLesson(
                 lessonRequest.Title.Trim(),
                 lessonRequest.HtmlTag,
                 lessonRequest.Content.Trim(),
                 lessonRequest.Order,
                 lessonRequest.Language.Trim(),
                 lessonRequest.VoiceId,
-                grammar.Id));
+                grammar.Id);
+            grammar.AddLesson(lesson);
         }
 
         await dbContext.SaveChangesAsync(cancellationToken);
