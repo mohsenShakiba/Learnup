@@ -1,5 +1,6 @@
 using System.Reflection;
 using Learnup.Application.AiPipelines;
+using Learnup.Application.Authentication;
 using Learnup.Application.Mediation;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -10,6 +11,7 @@ public static class DependencyInjection
     public static IServiceCollection AddApplication(this IServiceCollection services)
     {
         services.AddScoped<IMediator, Mediator>();
+        services.AddScoped<IIdentityProvider, TestIdentityProvider>();
 
         services.AddAiProcessors(typeof(DependencyInjection).Assembly);
         

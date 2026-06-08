@@ -21,9 +21,8 @@ public class Grammar
     public IReadOnlyList<GrammarLesson> Lessons => _lessons.AsReadOnly();
     private List<GrammarLesson> _lessons = [];
 
-    public Grammar(int id, string name, VocabLevel level, int order, TimeSpan estimatedTime, string description, int? parentGrammarId)
+    public Grammar(string name, VocabLevel level, int order, TimeSpan estimatedTime, string description, int? parentGrammarId)
     {
-        Id = id;
         Name = name;
         Level = level;
         Order = order;

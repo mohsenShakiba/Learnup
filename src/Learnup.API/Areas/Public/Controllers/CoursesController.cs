@@ -18,7 +18,7 @@ public class CoursesController(IMediator mediator) : BasePublicController
     }
 
     [HttpGet("{id:int}", Name = "GetCourseById")]
-    public async Task<ActionResult<CourseDetailResponse>> GetById(
+    public async Task<ActionResult<CourseResponse>> GetById(
         int id,
         CancellationToken cancellationToken)
     {

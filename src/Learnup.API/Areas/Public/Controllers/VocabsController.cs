@@ -18,4 +18,16 @@ public class VocabsController(IMediator mediator) : BasePublicController
             ? NotFound()
             : Ok(vocab);
     }
+
+    [HttpGet("{word}/detail", Name = "GetVocabDetailByWord")]
+    public async Task<ActionResult<VocabDetailResponse>> GetDetailByWord(
+        string word,
+        CancellationToken cancellationToken)
+    {
+        var vocab = await mediator.Send(new GetVocabDetailByWord(word), cancellationToken);
+
+        return vocab is null
+            ? NotFound()
+            : Ok(vocab);
+    }
 }

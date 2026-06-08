@@ -3,6 +3,7 @@ using System;
 using Learnup.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Learnup.Infrastructure.Migrations
 {
     [DbContext(typeof(LearnupDbContext))]
-    partial class LearnupDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260608055611_AddedUserLesson")]
+    partial class AddedUserLesson
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -64,79 +67,14 @@ namespace Learnup.Infrastructure.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<TimeSpan>("EstimatedTime")
-                        .HasColumnType("interval");
-
-                    b.Property<int>("Level")
-                        .HasColumnType("integer");
-
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(200)
                         .HasColumnType("character varying(200)");
 
-                    b.Property<int>("Order")
-                        .HasColumnType("integer");
-
-                    b.Property<int?>("ParentGrammarId")
-                        .HasColumnType("integer");
-
                     b.HasKey("Id");
-
-                    b.HasIndex("ParentGrammarId");
 
                     b.ToTable("Grammar", (string)null);
-                });
-
-            modelBuilder.Entity("Learnup.Domain.AggregateRoots.Grammars.GrammarLesson", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Content")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<int>("GrammarId")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("GrammarId1")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("HtmlTag")
-                        .HasColumnType("integer");
-
-                    b.Property<string>("Language")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)");
-
-                    b.Property<int>("Order")
-                        .HasColumnType("integer");
-
-                    b.Property<string>("Title")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("character varying(200)");
-
-                    b.Property<int?>("VoiceId")
-                        .HasColumnType("integer");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("GrammarId1");
-
-                    b.HasIndex("GrammarId", "Order")
-                        .IsUnique();
-
-                    b.ToTable("GrammarLesson", (string)null);
                 });
 
             modelBuilder.Entity("Learnup.Domain.AggregateRoots.Languages.Language", b =>
@@ -165,6 +103,9 @@ namespace Learnup.Infrastructure.Migrations
                     b.Property<int>("CourseId")
                         .HasColumnType("integer");
 
+                    b.Property<int?>("CourseId1")
+                        .HasColumnType("integer");
+
                     b.Property<int>("Order")
                         .HasColumnType("integer");
 
@@ -179,6 +120,8 @@ namespace Learnup.Infrastructure.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("CourseId");
+
+                    b.HasIndex("CourseId1");
 
                     b.ToTable("Lesson", (string)null);
                 });
@@ -405,17 +348,12 @@ namespace Learnup.Infrastructure.Migrations
                     b.Property<DateTime?>("CompletedAt")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<int?>("LessonId1")
-                        .HasColumnType("integer");
-
                     b.Property<DateTime>("StartedAt")
                         .HasColumnType("timestamp with time zone");
 
                     b.HasKey("UserId", "LessonId");
 
                     b.HasIndex("LessonId");
-
-                    b.HasIndex("LessonId1");
 
                     b.ToTable("UserLesson", (string)null);
                 });
@@ -517,40 +455,17 @@ namespace Learnup.Infrastructure.Migrations
                     b.Navigation("Language");
                 });
 
-            modelBuilder.Entity("Learnup.Domain.AggregateRoots.Grammars.Grammar", b =>
-                {
-                    b.HasOne("Learnup.Domain.AggregateRoots.Grammars.Grammar", "ParentGrammar")
-                        .WithMany("PrerequisiteGrammars")
-                        .HasForeignKey("ParentGrammarId")
-                        .OnDelete(DeleteBehavior.SetNull);
-
-                    b.Navigation("ParentGrammar");
-                });
-
-            modelBuilder.Entity("Learnup.Domain.AggregateRoots.Grammars.GrammarLesson", b =>
-                {
-                    b.HasOne("Learnup.Domain.AggregateRoots.Grammars.Grammar", null)
-                        .WithMany("Lessons")
-                        .HasForeignKey("GrammarId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Learnup.Domain.AggregateRoots.Grammars.Grammar", "Grammar")
-                        .WithMany()
-                        .HasForeignKey("GrammarId1")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Grammar");
-                });
-
             modelBuilder.Entity("Learnup.Domain.AggregateRoots.Lessons.Lesson", b =>
                 {
                     b.HasOne("Learnup.Domain.AggregateRoots.Courses.Course", "Course")
-                        .WithMany("Lessons")
+                        .WithMany()
                         .HasForeignKey("CourseId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.HasOne("Learnup.Domain.AggregateRoots.Courses.Course", null)
+                        .WithMany("Lessons")
+                        .HasForeignKey("CourseId1");
 
                     b.Navigation("Course");
                 });
@@ -680,10 +595,6 @@ namespace Learnup.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Learnup.Domain.AggregateRoots.Lessons.Lesson", null)
-                        .WithMany("Users")
-                        .HasForeignKey("LessonId1");
-
                     b.HasOne("Learnup.Domain.AggregateRoots.Users.User", "User")
                         .WithMany("Lessons")
                         .HasForeignKey("UserId")
@@ -751,11 +662,9 @@ namespace Learnup.Infrastructure.Migrations
                     b.Navigation("ParentVocab");
                 });
 
-            modelBuilder.Entity("Learnup.Domain.AggregateRoots.Grammars.Grammar", b =>
+            modelBuilder.Entity("Learnup.Domain.AggregateRoots.Courses.Course", b =>
                 {
                     b.Navigation("Lessons");
-
-                    b.Navigation("PrerequisiteGrammars");
                 });
 
             modelBuilder.Entity("Learnup.Domain.AggregateRoots.Lessons.Lesson", b =>
@@ -763,8 +672,6 @@ namespace Learnup.Infrastructure.Migrations
                     b.Navigation("Grammars");
 
                     b.Navigation("Stories");
-
-                    b.Navigation("Users");
 
                     b.Navigation("Vocabs");
                 });

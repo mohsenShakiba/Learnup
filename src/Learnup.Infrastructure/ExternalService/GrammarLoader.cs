@@ -39,7 +39,6 @@ public class GrammarLoader(LearnupDbContext dbContext) : IGrammarLoader
         }
 
         var grammar = new Grammar(
-            0,
             grammarRequest.Name.Trim(),
             (VocabLevel)grammarRequest.LevelId,
             grammarRequest.Order,
