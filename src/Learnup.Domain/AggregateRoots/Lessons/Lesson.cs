@@ -11,6 +11,8 @@ public class Lesson
     public string Title { get; private set; }
     public int Order { get; private set; }
     public LessonStatus Status { get; private set; }
+    
+    public int? Duration { get; private set; }
 
     public List<LessonStory> Stories { get; private set; }
     public List<LessonGrammar> Grammars { get; private set; }

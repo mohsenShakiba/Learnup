@@ -8,7 +8,17 @@ public sealed record LessonResponse(
     int Id,
     string Title,
     int Order,
-    int CourseId);
+    int? CoverId,
+    int CourseId,
+    int StoriesCount,
+    int GrammarsCount,
+    int VocabsCount,
+    int CompletedStoriesCount,
+    int CompletedGrammarsCount,
+    int CompletedVocabsCount)
+{
+    public bool IsCompleted => CompletedStoriesCount == StoriesCount && CompletedGrammarsCount == GrammarsCount && CompletedVocabsCount == VocabsCount;
+}
 
 public sealed record LessonDetailResponse(
     int Id,

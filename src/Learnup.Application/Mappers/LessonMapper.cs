@@ -9,8 +9,23 @@ namespace Learnup.Application.Mappers;
 
 public static class LessonMapper
 {
-    public static LessonResponse ToResponse(this Lesson lesson) =>
-        new(lesson.Id, lesson.Title, lesson.Order, lesson.CourseId);
+    public static LessonResponse ToResponse(
+        this Lesson lesson,
+        HashSet<int> completedStoryIds,
+        HashSet<int> completedGrammarIds,
+        HashSet<int> completedVocabIds) =>
+        new(
+            lesson.Id,
+            lesson.Title,
+            lesson.Order,
+            lesson.Stories.FirstOrDefault()?.Story.CoverId,
+            lesson.CourseId,
+            lesson.Stories.Count,
+            lesson.Grammars.Count,
+            lesson.Vocabs.Count,
+            lesson.Stories.Count(ls => completedStoryIds.Contains(ls.StoryId)),
+            lesson.Grammars.Count(lg => completedGrammarIds.Contains(lg.GrammarId)),
+            lesson.Vocabs.Count(lv => completedVocabIds.Contains(lv.VocabId)));
 
     public static LessonDetailResponse ToDetailResponse(this Lesson lesson) =>
         new(
@@ -21,13 +36,6 @@ public static class LessonMapper
             lesson.Stories.Select(ls => ls.Story.ToResponse()).ToList(),
             lesson.Grammars.Select(lg => lg.Grammar.ToResponse()).ToList(),
             lesson.Vocabs.Select(lv => lv.Vocab.ToResponse()).ToList());
-
-    private static StoryResponse ToResponse(this Domain.AggregateRoots.Stories.Story story) =>
-        new(
-            story.Id,
-            story.Title,
-            story.CoverId,
-            story.Items.Select(i => i.ToResponse()).ToList());
 
     private static StoryItemResponse ToResponse(this Domain.AggregateRoots.Stories.StoryItem item) =>
         new(

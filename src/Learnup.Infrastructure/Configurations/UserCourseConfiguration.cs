@@ -15,19 +15,13 @@ public class UserCourseConfiguration : IEntityTypeConfiguration<UserCourse>
         builder.Property(uc => uc.FirstVisitedAt)
             .IsRequired();
 
-        builder.Property(uc => uc.LastVisitedAt)
-            .IsRequired();
-
-        builder.Property(uc => uc.VisitCount)
-            .IsRequired();
-
         builder.HasOne(uc => uc.User)
             .WithMany()
             .HasForeignKey(uc => uc.UserId)
             .OnDelete(DeleteBehavior.Cascade);
 
         builder.HasOne(uc => uc.Course)
-            .WithMany()
+            .WithMany(c => c.Users)
             .HasForeignKey(uc => uc.CourseId)
             .OnDelete(DeleteBehavior.Restrict);
     }

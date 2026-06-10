@@ -1,5 +1,6 @@
 ﻿using Learnup.Domain.AggregateRoots.Languages;
 using Learnup.Domain.AggregateRoots.Lessons;
+using Learnup.Domain.AggregateRoots.Users;
 
 namespace Learnup.Domain.AggregateRoots.Courses;
 
@@ -15,4 +16,5 @@ public class Course
     public Language Language { get; private set; } = null!;
 
     public List<Lesson> Lessons { get; private set; }
+    public List<UserCourse> Users { get; private set; }
 }

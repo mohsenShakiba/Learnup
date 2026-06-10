@@ -1,3 +1,4 @@
+using Learnup.Application.Authentication;
 using Learnup.Application.Mediation;
 using Learnup.Application.Persistence;
 using Learnup.Application.Responses.Public.Courses;
@@ -7,7 +8,7 @@ namespace Learnup.Application.Features.Public.Courses;
 
 public sealed record GetCoursesByLanguageId(int LanguageId) : IRequest<IReadOnlyList<CourseResponse>>;
 
-internal sealed class GetCoursesByLanguageIdHandler(ILearnupDbContext dbContext)
+internal sealed class GetCoursesByLanguageIdHandler(ILearnupDbContext dbContext, IIdentityProvider identityProvider)
     : IRequestHandler<GetCoursesByLanguageId, IReadOnlyList<CourseResponse>>
 {
     public async Task<IReadOnlyList<CourseResponse>> Handle(
@@ -33,7 +34,8 @@ internal sealed class GetCoursesByLanguageIdHandler(ILearnupDbContext dbContext)
                     .Where(lesson => lesson.CourseId == course.Id)
                     .SelectMany(lesson => lesson.Grammars)
                     .Count(),
-                course.LanguageId))
+                course.LanguageId,
+                course.Users.FirstOrDefault(u => u.UserId == identityProvider.UserId).FirstVisitedAt))
             .ToListAsync(cancellationToken);
     }
 }

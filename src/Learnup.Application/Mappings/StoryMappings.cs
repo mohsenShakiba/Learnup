@@ -11,6 +11,7 @@ public static class StoryMappings
             story.Id,
             story.Title,
             story.CoverId,
+            true,
             story.Items
                 .OrderBy(item => item.Order)
                 .Select(item => item.ToResponse())

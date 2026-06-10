@@ -11,6 +11,11 @@ public class UserCourse
     public Course Course { get; private set; } = null!;
 
     public DateTime FirstVisitedAt { get; private set; }
-    public DateTime LastVisitedAt { get; private set; }
-    public int VisitCount { get; private set; }
+
+    public UserCourse(int userId,  int courseId)
+    {
+        UserId = userId;
+        CourseId = courseId;
+        FirstVisitedAt = DateTime.UtcNow;
+    }
 }

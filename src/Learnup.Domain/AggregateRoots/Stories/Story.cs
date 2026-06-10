@@ -6,6 +6,7 @@ public class Story
     public string Title { get; private set; }
     public int? CoverId { get; private set; }
     public StoryStatus Status { get; private set; }
+    public int? Duration { get; private set; }
 
     public List<StoryItem> Items { get; private set; }
 

@@ -10,7 +10,12 @@ public sealed record CourseResponse(
     string? CoverId,
     int TotalLessonsCount,
     int CompletedLessonsCount,
-    int LanguageId);
+    int LanguageId, 
+    DateTime? LastVisitedAt)
+
+{
+    
+}
 
 
 public sealed record CourseLessonResponse(

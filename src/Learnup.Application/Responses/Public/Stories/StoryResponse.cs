@@ -4,6 +4,7 @@ public sealed record StoryResponse(
     int Id,
     string Title,
     int? CoverId,
+    bool IsCompleted,
     IReadOnlyList<StoryItemResponse> Items);
 
 public sealed record StoryItemResponse(
