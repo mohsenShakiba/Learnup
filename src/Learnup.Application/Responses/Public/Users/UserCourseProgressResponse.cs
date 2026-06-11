@@ -6,5 +6,4 @@ namespace Learnup.Application.Responses.Public.Users;
 
 public sealed record UserCourseProgressResponse(
     IReadOnlyList<GrammarResponse> Grammars,
-    IReadOnlyList<StoryResponse> Stories,
-    IReadOnlyList<VocabResponse> Vocabs);
+    IReadOnlyList<StoryResponse> Stories);

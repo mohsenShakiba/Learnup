@@ -1,3 +1,4 @@
+using Learnup.Application.Mappers;
 using Learnup.Application.Mediation;
 using Learnup.Application.Persistence;
 using Learnup.Application.Responses.Public.Vocabs;
@@ -21,18 +22,21 @@ internal sealed class GetVocabByWordHandler(ILearnupDbContext dbContext)
             return null;
         }
 
-        return await dbContext.Vocabs
+        var vocab = await dbContext.Vocabs
             .AsNoTracking()
             .Where(vocab => vocab.Word.ToLower() == word)
-            .Select(vocab => new VocabResponse(
-                vocab.Id,
-                vocab.Word,
-                vocab.Translation,
-                vocab.VoiceId,
-                vocab.Description,
-                vocab.Level,
-                vocab.ParentVocabId,
-                vocab.LanguageId))
             .FirstOrDefaultAsync(cancellationToken);
+
+        if (vocab is null)
+        {
+            return null;
+        }
+
+        var translations = await dbContext.VocabTransactions
+            .AsNoTracking()
+            .Where(translation => translation.VocabId == vocab.Id)
+            .ToListAsync(cancellationToken);
+
+        return vocab.ToResponse(translations.Select(translation => translation.ToResponse()).ToList());
     }
 }

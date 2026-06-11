@@ -23,7 +23,7 @@ public class UserLessonConfiguration : IEntityTypeConfiguration<UserLesson>
             .OnDelete(DeleteBehavior.Cascade);
 
         builder.HasOne(ul => ul.Lesson)
-            .WithMany()
+            .WithMany(l => l.Users)
             .HasForeignKey(ul => ul.LessonId)
             .OnDelete(DeleteBehavior.Restrict);
     }

@@ -3,6 +3,7 @@ using System;
 using Learnup.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Learnup.Infrastructure.Migrations
 {
     [DbContext(typeof(LearnupDbContext))]
-    partial class LearnupDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260611091600_AddedVocabTranslation")]
+    partial class AddedVocabTranslation
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -30,11 +33,6 @@ namespace Learnup.Infrastructure.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("Code")
-                        .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("character varying(20)");
-
                     b.Property<string>("CoverId")
                         .HasColumnType("text");
 
@@ -48,11 +46,6 @@ namespace Learnup.Infrastructure.Migrations
 
                     b.Property<int>("Order")
                         .HasColumnType("integer");
-
-                    b.Property<string>("Slug")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)");
 
                     b.Property<string>("Title")
                         .IsRequired()
@@ -409,12 +402,17 @@ namespace Learnup.Infrastructure.Migrations
                     b.Property<DateTime?>("CompletedAt")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<int?>("LessonId1")
+                        .HasColumnType("integer");
+
                     b.Property<DateTime>("StartedAt")
                         .HasColumnType("timestamp with time zone");
 
                     b.HasKey("UserId", "LessonId");
 
                     b.HasIndex("LessonId");
+
+                    b.HasIndex("LessonId1");
 
                     b.ToTable("UserLesson", (string)null);
                 });
@@ -711,10 +709,14 @@ namespace Learnup.Infrastructure.Migrations
             modelBuilder.Entity("Learnup.Domain.AggregateRoots.Users.UserLesson", b =>
                 {
                     b.HasOne("Learnup.Domain.AggregateRoots.Lessons.Lesson", "Lesson")
-                        .WithMany("Users")
+                        .WithMany()
                         .HasForeignKey("LessonId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
+
+                    b.HasOne("Learnup.Domain.AggregateRoots.Lessons.Lesson", null)
+                        .WithMany("Users")
+                        .HasForeignKey("LessonId1");
 
                     b.HasOne("Learnup.Domain.AggregateRoots.Users.User", "User")
                         .WithMany("Lessons")

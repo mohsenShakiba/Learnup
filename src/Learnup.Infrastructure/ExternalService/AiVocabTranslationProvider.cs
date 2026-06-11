@@ -52,7 +52,11 @@ public class AiVocabTranslationProvider(IConfiguration configuration, ILogger<Ai
                 throw new InvalidOperationException("Invalid response from LmStudio");
             }
 
-            return new TranslationResult(result.Translation, result.Description, result.ParentWord);
+            return new TranslationResult(
+                result.Translation,
+                result.Description,
+                result.ParentWord,
+                result.Transactions ?? []);
         }
         catch (Exception e)
         {
@@ -61,5 +65,9 @@ public class AiVocabTranslationProvider(IConfiguration configuration, ILogger<Ai
         }
     }
 
-    private record Response(string Translation, string? Description, List<string>? Examples, string? ParentWord);
+    private record Response(
+        string Translation,
+        string? Description,
+        string? ParentWord,
+        List<VocabTransactionResult>? Transactions);
 }

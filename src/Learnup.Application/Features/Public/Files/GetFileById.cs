@@ -31,6 +31,7 @@ internal sealed class GetFileByIdHandler(IConfiguration configuration)
         var directoryRoot = Path.EndsInDirectorySeparator(directoryPath)
             ? directoryPath
             : directoryPath + Path.DirectorySeparatorChar;
+        
         var filePath = Path.GetFullPath(Path.Combine(directoryPath, fileId));
 
         if (!filePath.StartsWith(directoryRoot, StringComparison.OrdinalIgnoreCase)

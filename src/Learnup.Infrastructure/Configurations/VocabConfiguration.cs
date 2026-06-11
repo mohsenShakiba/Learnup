@@ -15,6 +15,10 @@ public class VocabConfiguration : IEntityTypeConfiguration<Vocab>
         builder.Property(v => v.Word)
             .HasMaxLength(200)
             .IsRequired();
+        
+        builder.Property(v => v.ParentVocab)
+            .HasMaxLength(200)
+            .IsRequired();
 
         builder.Property(v => v.Translation)
             .HasMaxLength(500)
@@ -31,9 +35,6 @@ public class VocabConfiguration : IEntityTypeConfiguration<Vocab>
             .HasForeignKey(v => v.LanguageId)
             .OnDelete(DeleteBehavior.Restrict);
 
-        builder.HasOne(v => v.ParentVocab)
-            .WithMany()
-            .HasForeignKey(v => v.ParentVocabId)
-            .OnDelete(DeleteBehavior.Restrict);
+  
     }
 }

@@ -12,4 +12,11 @@ public class UserLesson
 
     public DateTime StartedAt { get; private set; }
     public DateTime? CompletedAt { get; private set; }
+
+    public UserLesson(int userId, int lessonId)
+    {
+        UserId = userId;
+        LessonId = lessonId;
+        StartedAt = DateTime.UtcNow;
+    }
 }

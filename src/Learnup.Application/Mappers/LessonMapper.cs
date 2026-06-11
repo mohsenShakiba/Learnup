@@ -18,7 +18,6 @@ public static class LessonMapper
             lesson.Id,
             lesson.Title,
             lesson.Order,
-            lesson.Stories.FirstOrDefault()?.Story.CoverId,
             lesson.CourseId,
             lesson.Stories.Count,
             lesson.Grammars.Count,
@@ -27,7 +26,9 @@ public static class LessonMapper
             lesson.Grammars.Count(lg => completedGrammarIds.Contains(lg.GrammarId)),
             lesson.Vocabs.Count(lv => completedVocabIds.Contains(lv.VocabId)));
 
-    public static LessonDetailResponse ToDetailResponse(this Lesson lesson) =>
+    public static LessonDetailResponse ToDetailResponse(
+        this Lesson lesson,
+        IReadOnlyDictionary<int, IReadOnlyList<VocabTranslationResponse>> vocabTranslations) =>
         new(
             lesson.Id,
             lesson.Title,
@@ -35,7 +36,12 @@ public static class LessonMapper
             lesson.CourseId,
             lesson.Stories.Select(ls => ls.Story.ToResponse()).ToList(),
             lesson.Grammars.Select(lg => lg.Grammar.ToResponse()).ToList(),
-            lesson.Vocabs.Select(lv => lv.Vocab.ToResponse()).ToList());
+            lesson.Vocabs
+                .Select(lv => lv.Vocab.ToResponse(
+                    vocabTranslations.TryGetValue(lv.VocabId, out var translations)
+                        ? translations
+                        : []))
+                .ToList());
 
     private static StoryItemResponse ToResponse(this Domain.AggregateRoots.Stories.StoryItem item) =>
         new(
@@ -46,6 +52,4 @@ public static class LessonMapper
             item.VoiceId,
             item.Timestamps.Select(t => new StoryItemTimestampResponse(t.Id, t.Word, t.Start, t.End)).ToList());
 
-    private static VocabResponse ToResponse(this Domain.AggregateRoots.Vocabularies.Vocab vocab) =>
-        new(vocab.Id, vocab.Word, vocab.Translation, vocab.VoiceId, vocab.Description, vocab.Level, vocab.ParentVocabId, vocab.LanguageId);
 }

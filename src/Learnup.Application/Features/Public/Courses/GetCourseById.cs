@@ -32,13 +32,15 @@ internal sealed class GetCourseByIdHandler(ILearnupDbContext dbContext, IIdentit
             .Where(course => course.Id == request.Id)
             .Select(course => new CourseResponse(
                     course.Id,
+                    course.Code,
+                    course.Slug,
                     course.Title,
                     course.Description,
                     course.Order,
-                    course.CoverId,
                     course.Lessons.Count,
                     course.Lessons.SelectMany(l => l.Users.Where(u => u.UserId == identityProvider.UserId)).Count(),
                     course.LanguageId,
+                    course.CoverId,
                     course.Users.FirstOrDefault(u => u.UserId == identityProvider.UserId).FirstVisitedAt
                 )
             )

@@ -10,9 +10,9 @@ public class Vocab
     public string? VoiceId { get; private set; }
     public string? Description { get; private set; }
     public VocabLevel Level { get; private set; }
+    public VocabStatus Status { get; private set; }
     
-    public int? ParentVocabId { get; private set; }
-    public Vocab? ParentVocab { get; private set; }
+    public string? ParentVocab { get; private set; }
     
     public int LanguageId { get; private set; }
     public Language Language { get; private set; } = null!;
@@ -23,12 +23,23 @@ public class Vocab
         Level = level;
         LanguageId = languageId;
         Translation = translation;
+        Status = VocabStatus.Pending;
     }
 
-    public void SetTranslation(string translation, string? description, int? parentId)
+    public void SetTranslation(string translation, string? description, string? parentVocab)
     {
         Translation = translation.Trim();
         Description = description?.Trim();
-        ParentVocabId = parentId;
+        ParentVocab = parentVocab;
+    }
+
+    public void SetVoice(string voiceId)
+    {
+        VoiceId = voiceId.Trim();
+    }
+
+    public void MarkAsPublished()
+    {
+        Status = VocabStatus.Published;
     }
 }

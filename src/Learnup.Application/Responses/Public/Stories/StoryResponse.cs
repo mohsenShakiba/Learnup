@@ -3,7 +3,7 @@ namespace Learnup.Application.Responses.Public.Stories;
 public sealed record StoryResponse(
     int Id,
     string Title,
-    int? CoverId,
+    string? CoverId,
     bool IsCompleted,
     IReadOnlyList<StoryItemResponse> Items);
 

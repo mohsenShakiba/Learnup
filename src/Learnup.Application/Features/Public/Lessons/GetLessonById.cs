@@ -1,14 +1,17 @@
+using Learnup.Application.Authentication;
 using Learnup.Application.Mappers;
 using Learnup.Application.Mediation;
 using Learnup.Application.Persistence;
 using Learnup.Application.Responses.Public.Lessons;
+using Learnup.Application.Responses.Public.Vocabs;
+using Learnup.Domain.AggregateRoots.Users;
 using Microsoft.EntityFrameworkCore;
 
 namespace Learnup.Application.Features.Public.Lessons;
 
 public sealed record GetLessonById(int Id) : IRequest<LessonDetailResponse?>;
 
-internal sealed class GetLessonByIdHandler(ILearnupDbContext dbContext)
+internal sealed class GetLessonByIdHandler(ILearnupDbContext dbContext, IIdentityProvider identityProvider)
     : IRequestHandler<GetLessonById, LessonDetailResponse?>
 {
     public async Task<LessonDetailResponse?> Handle(
@@ -23,6 +26,39 @@ internal sealed class GetLessonByIdHandler(ILearnupDbContext dbContext)
             .Where(l => l.Id == request.Id)
             .FirstOrDefaultAsync(cancellationToken);
 
-        return lesson?.ToDetailResponse();
+        if (lesson is null)
+        {
+            return null;
+        }
+
+        var userLessonExists = await dbContext.UserLessons
+            .AsNoTracking()
+            .AnyAsync(
+                userLesson => userLesson.UserId == identityProvider.UserId
+                    && userLesson.LessonId == request.Id,
+                cancellationToken);
+
+        if (!userLessonExists)
+        {
+            dbContext.UserLessons.Add(new UserLesson(identityProvider.UserId, request.Id));
+
+            await dbContext.SaveChangesAsync(cancellationToken);
+        }
+
+        var vocabIds = lesson.Vocabs.Select(lv => lv.VocabId).ToHashSet();
+        var translations = await dbContext.VocabTransactions
+            .AsNoTracking()
+            .Where(translation => vocabIds.Contains(translation.VocabId))
+            .ToListAsync(cancellationToken);
+
+        var translationsByVocabId = translations
+            .GroupBy(translation => translation.VocabId)
+            .ToDictionary(
+                group => group.Key,
+                group => (IReadOnlyList<VocabTranslationResponse>)group
+                    .Select(translation => translation.ToResponse())
+                    .ToList());
+
+        return lesson.ToDetailResponse(translationsByVocabId);
     }
 }

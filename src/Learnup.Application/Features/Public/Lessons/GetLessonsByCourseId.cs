@@ -18,7 +18,7 @@ internal sealed class GetLessonsByCourseIdHandler(ILearnupDbContext dbContext, I
     {
         var lessons = await dbContext.Lessons
             .AsNoTracking()
-            .Include(l => l.Stories).ThenInclude(ls => ls.Story)
+            .Include(l => l.Stories)
             .Include(l => l.Grammars)
             .Include(l => l.Vocabs)
             .Where(l => l.CourseId == request.CourseId)

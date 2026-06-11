@@ -7,6 +7,8 @@ namespace Learnup.Domain.AggregateRoots.Courses;
 public class Course
 {
     public int Id { get; private set; }
+    public string Code { get; private set; }
+    public string Slug { get; private set; }
     public string Title { get; private set; }
     public string Description { get; private set; }
     public int Order { get; private set; }

@@ -1,3 +1,4 @@
+using Learnup.Application.Mappers;
 using Learnup.Application.Mediation;
 using Learnup.Application.Persistence;
 using Learnup.Application.Responses.Public.Vocabs;
@@ -19,29 +20,31 @@ internal sealed class GetVocabDetailByWordHandler(ILearnupDbContext dbContext)
         if (string.IsNullOrWhiteSpace(word))
             return null;
 
-        return await dbContext.Vocabs
+        var vocab = await dbContext.Vocabs
             .AsNoTracking()
             .Include(v => v.Language)
-            .Include(v => v.ParentVocab)
             .Where(v => v.Word.ToLower() == word)
-            .Select(v => new VocabDetailResponse(
-                v.Id,
-                v.Word,
-                v.Translation,
-                v.VoiceId,
-                v.Description,
-                v.Level,
-                v.ParentVocab == null ? null : new VocabResponse(
-                    v.ParentVocab.Id,
-                    v.ParentVocab.Word,
-                    v.ParentVocab.Translation,
-                    v.ParentVocab.VoiceId,
-                    v.ParentVocab.Description,
-                    v.ParentVocab.Level,
-                    v.ParentVocab.ParentVocabId,
-                    v.ParentVocab.LanguageId),
-                v.LanguageId,
-                v.Language.Name))
             .FirstOrDefaultAsync(cancellationToken);
+
+        if (vocab is null)
+        {
+            return null;
+        }
+
+        var translations = await dbContext.VocabTransactions
+            .AsNoTracking()
+            .Where(translation => translation.VocabId == vocab.Id)
+            .ToListAsync(cancellationToken);
+
+        return new VocabDetailResponse(
+            vocab.Id,
+            vocab.Word,
+            vocab.Translation,
+            vocab.VoiceId,
+            vocab.Description,
+            vocab.Level,
+            vocab.LanguageId,
+            vocab.Language.Name,
+            translations.Select(translation => translation.ToResponse()).ToList());
     }
 }

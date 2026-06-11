@@ -12,6 +12,14 @@ public class CourseConfiguration : IEntityTypeConfiguration<Course>
 
         builder.HasKey(c => c.Id);
 
+        builder.Property(c => c.Slug)
+            .HasMaxLength(50)
+            .IsRequired();
+
+        builder.Property(c => c.Code)
+            .HasMaxLength(20)
+            .IsRequired();
+        
         builder.Property(c => c.Title)
             .HasMaxLength(200)
             .IsRequired();

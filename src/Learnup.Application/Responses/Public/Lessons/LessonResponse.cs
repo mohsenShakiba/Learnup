@@ -8,7 +8,6 @@ public sealed record LessonResponse(
     int Id,
     string Title,
     int Order,
-    int? CoverId,
     int CourseId,
     int StoriesCount,
     int GrammarsCount,

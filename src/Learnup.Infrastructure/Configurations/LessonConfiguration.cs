@@ -43,9 +43,5 @@ public class LessonConfiguration : IEntityTypeConfiguration<Lesson>
             .HasForeignKey(lv => lv.LessonId)
             .OnDelete(DeleteBehavior.Cascade);
         
-        builder.HasMany(l => l.Users)
-            .WithOne(lv => lv.Lesson)
-            .HasForeignKey(lv => lv.LessonId)
-            .OnDelete(DeleteBehavior.Cascade);
     }
 }
