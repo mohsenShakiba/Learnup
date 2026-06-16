@@ -17,7 +17,7 @@ public class VocabPipeline(
     {
         var vocabCandidates = await dbContext.Vocabs
             .Where(v => v.Status == VocabStatus.Pending)
-            .Take(10)
+            .Take(1)
             .ToListAsync(cancellationToken);
 
         foreach (var vocab in vocabCandidates)
@@ -56,7 +56,7 @@ public class VocabPipeline(
                 {
                     var sw = Stopwatch.StartNew();
 
-                    var voice = await voiceProvider.GetVoiceAsync(vocab.Word, cancellationToken);
+                    var voice = await voiceProvider.GetVoiceAsync(vocab.Word, new VoiceOptions(VoiceIds.Bella, 0.8), cancellationToken);
 
                     vocab.SetVoice(voice.VoiceId);
 
@@ -69,9 +69,8 @@ public class VocabPipeline(
             }
 
             vocab.MarkAsPublished();
+            await dbContext.SaveChangesAsync(cancellationToken);
         }
-
-        await dbContext.SaveChangesAsync(cancellationToken);
     }
 
     private VocabTransaction? ToVocabTransaction(int vocabId, VocabTransactionResult result)

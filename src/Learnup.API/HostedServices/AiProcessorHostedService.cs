@@ -11,27 +11,30 @@ public class AiProcessorHostedService(
         using var scope = serviceScopeFactory.CreateScope();
         var processors = scope.ServiceProvider.GetServices<IPipeline>().ToArray();
 
-        foreach (var processor in processors)
+        while (stoppingToken.IsCancellationRequested == false)
         {
-            if (stoppingToken.IsCancellationRequested)
+            foreach (var processor in processors)
             {
-                break;
-            }
+                if (stoppingToken.IsCancellationRequested)
+                {
+                    break;
+                }
 
-            try
-            {
-                await processor.ProcessAsync(stoppingToken);
-            }
-            catch (OperationCanceledException) when (stoppingToken.IsCancellationRequested)
-            {
-                throw;
-            }
-            catch (Exception exception)
-            {
-                logger.LogError(
-                    exception,
-                    "AI processor {ProcessorType} failed.",
-                    processor.GetType().Name);
+                try
+                {
+                    await processor.ProcessAsync(stoppingToken);
+                }
+                catch (OperationCanceledException) when (stoppingToken.IsCancellationRequested)
+                {
+                    throw;
+                }
+                catch (Exception exception)
+                {
+                    logger.LogError(
+                        exception,
+                        "AI processor {ProcessorType} failed.",
+                        processor.GetType().Name);
+                }
             }
         }
     }

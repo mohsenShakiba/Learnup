@@ -22,7 +22,7 @@ public class StoryPipeline(ILearnupDbContext dbContext, IVoiceProvider voiceProv
             {
                 try
                 {
-                    var result = await voiceProvider.GetVoiceAsync(item.Content, cancellationToken);
+                    var result = await voiceProvider.GetVoiceAsync(item.Content, new VoiceOptions(VoiceIds.Heart, 0.8), cancellationToken: cancellationToken);
 
                     item.SetVoice(
                         result.VoiceId,

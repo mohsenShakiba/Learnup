@@ -11,7 +11,7 @@ namespace Learnup.Infrastructure.ExternalService;
 public class KokoroVoiceProvider(IHttpClientFactory httpClientFactory, IConfiguration configuration, ILogger<KokoroVoiceProvider> logger)
     : IVoiceProvider
 {
-    public async Task<VoiceResult> GetVoiceAsync(string content, CancellationToken cancellationToken = default)
+    public async Task<VoiceResult> GetVoiceAsync(string content, VoiceOptions? options, CancellationToken cancellationToken = default)
     {
         try
         {
@@ -29,7 +29,8 @@ public class KokoroVoiceProvider(IHttpClientFactory httpClientFactory, IConfigur
             {
                 model = "kokoro",
                 input = content,
-                voice = "af_heart",
+                voice = options?.VoiceId ?? "af_bella",
+                speed = options?.PlaybackSpeed ?? 1.0,
                 response_format = "wav",
             }, cancellationToken: cancellationToken);
 
