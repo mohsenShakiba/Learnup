@@ -25,4 +25,17 @@ public class VocabTranslation
         Status = VocabStatus.Pending;
         Translation = string.Empty;
     }
+
+    public void SetTranslation(
+        string translation,
+        string? description,
+        string example,
+        string exampleTranslation)
+    {
+        Translation = translation.Trim();
+        Description = description?.Trim();
+        Example = example.Trim();
+        ExampleTranslation = exampleTranslation.Trim();
+        Status = VocabStatus.Published;
+    }
 }

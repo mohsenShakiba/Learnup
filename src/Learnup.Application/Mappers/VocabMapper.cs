@@ -24,6 +24,6 @@ public static class VocabMapper
             translation.Translation,
             translation.Description,
             translation.Type,
-            translation.Example,
-            translation.ExampleTranslation);
+            translation.Example ?? string.Empty,
+            translation.ExampleTranslation ?? string.Empty);
 }

@@ -16,10 +16,6 @@ public class VocabConfiguration : IEntityTypeConfiguration<Vocab>
             .HasMaxLength(200)
             .IsRequired();
         
-        builder.Property(v => v.ParentVocab)
-            .HasMaxLength(200)
-            .IsRequired();
-
         builder.Property(v => v.Translation)
             .HasMaxLength(500)
             .IsRequired();

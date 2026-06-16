@@ -13,15 +13,16 @@ public static class VocabTranslationPrompt
                * Identify whether the word is commonly used as a **Noun**, **Verb**, or both.
                * Do not include rare, archaic, or highly unlikely parts of speech (e.g., "ticket" as a verb, "buy" as a noun).
                * For type you can use any of the following: Noun, Verb, Adjective, Adverb.
+               * If there are multiple meanings, choose discard the unlikely ones, and provide all common translations with a description.
                
                Return JSON only. No markdown, explanations, or additional text.
                Schema:
-               {
+               [{
                  "Translation": "string",
                  "Description": "string | null",
                  "ParentWord": "string | null",
                  "Types": ["Noun" | "Verb" | "Adjective" | "Adverb"] 
-               }
+               }]
                """;
     }
 }

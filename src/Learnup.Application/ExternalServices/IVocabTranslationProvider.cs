@@ -1,8 +1,14 @@
 namespace Learnup.Application.ExternalServices;
 
+using Learnup.Domain.AggregateRoots.Vocabularies;
+
 public interface IVocabTranslationProvider
 {
     Task<TranslationResult> GetTranslationAsync(string content, CancellationToken cancellationToken = default);
+    Task<VocabTransactionResult> GetVocabTranslationAsync(
+        string word,
+        VocabTranslationType type,
+        CancellationToken cancellationToken = default);
 }
 
 public record TranslationResult(

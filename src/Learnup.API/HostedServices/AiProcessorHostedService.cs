@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using Learnup.Application.AiPipelines;
 
 namespace Learnup.API.HostedServices;
@@ -13,6 +14,8 @@ public class AiProcessorHostedService(
 
         while (stoppingToken.IsCancellationRequested == false)
         {
+            var sw = Stopwatch.StartNew();
+            
             foreach (var processor in processors)
             {
                 if (stoppingToken.IsCancellationRequested)
@@ -24,10 +27,6 @@ public class AiProcessorHostedService(
                 {
                     await processor.ProcessAsync(stoppingToken);
                 }
-                catch (OperationCanceledException) when (stoppingToken.IsCancellationRequested)
-                {
-                    throw;
-                }
                 catch (Exception exception)
                 {
                     logger.LogError(
@@ -36,6 +35,12 @@ public class AiProcessorHostedService(
                         processor.GetType().Name);
                 }
             }
+
+            if (sw.ElapsedMilliseconds < 1000)
+            {
+                await Task.Delay(1000 - (int)sw.ElapsedMilliseconds , stoppingToken);
+            }
+            
         }
     }
 }
