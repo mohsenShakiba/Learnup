@@ -26,24 +26,24 @@ public class VocabPipeline(
             {
                 var sw = Stopwatch.StartNew();
 
-                var translation = await vocabTranslationProvider.GetTranslationAsync(vocab.Word, cancellationToken);
+                var result = await vocabTranslationProvider.GetTranslationAsync(vocab.Word, cancellationToken);
 
-                vocab.SetTranslation(translation.Translation, translation.Description, translation.ParentWord);
+                vocab.SetTranslation(result.Translation, result.Description, result.ParentWord);
 
                 logger.LogInformation("Vocab {VocabId} was translated in {MilliSeconds}", vocab.Id, sw.ElapsedMilliseconds);
 
-                var transactions = translation.Transactions
-                    .Select(transaction => ToVocabTransaction(vocab.Id, transaction))
-                    .Where(transaction => transaction is not null)
-                    .Select(transaction => transaction!)
-                    .ToList();
-
-                if (transactions.Count > 0)
+                foreach (var typeValue in result.Types)
                 {
-                    dbContext.VocabTransactions.AddRange(transactions);
+                    if (!Enum.TryParse<VocabTranslationType>(typeValue, true, out var type))
+                    {
+                        logger.LogWarning("Skipping vocab {VocabId} transaction with unsupported type {Type}", vocab.Word, typeValue);
+                        continue;
+                    }
+                    
+                    var translation = new VocabTranslation(vocab.Id, type);
+                    
+                    vocab.AddTranslation(translation);
                 }
-
-                logger.LogInformation("Vocab {VocabId} transactions were generated in {MilliSeconds}", vocab.Id, sw.ElapsedMilliseconds);
             }
             catch
             {
@@ -73,33 +73,4 @@ public class VocabPipeline(
         }
     }
 
-    private VocabTransaction? ToVocabTransaction(int vocabId, VocabTransactionResult result)
-    {
-        if (!Enum.TryParse<VocabTransactionType>(result.Type, true, out var type))
-        {
-            logger.LogWarning(
-                "Skipping vocab {VocabId} transaction with unsupported type {Type}",
-                vocabId,
-                result.Type);
-
-            return null;
-        }
-
-        if (string.IsNullOrWhiteSpace(result.Translation)
-            || string.IsNullOrWhiteSpace(result.Example)
-            || string.IsNullOrWhiteSpace(result.ExampleTranslation))
-        {
-            logger.LogWarning("Skipping vocab {VocabId} transaction with missing required fields", vocabId);
-
-            return null;
-        }
-
-        return new VocabTransaction(
-            vocabId,
-            result.Translation,
-            type,
-            result.Example,
-            result.ExampleTranslation,
-            result.Description);
-    }
 }

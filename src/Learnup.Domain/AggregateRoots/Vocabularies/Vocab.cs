@@ -17,6 +17,9 @@ public class Vocab
     public int LanguageId { get; private set; }
     public Language Language { get; private set; } = null!;
 
+    private readonly List<VocabTranslation> _translations = [];
+    public IReadOnlyList<VocabTranslation> Translations => _translations.AsReadOnly();
+
     public Vocab(int languageId, string word, VocabLevel level, string translation = "")
     {
         Word = word;
@@ -41,5 +44,10 @@ public class Vocab
     public void MarkAsPublished()
     {
         Status = VocabStatus.Published;
+    }
+
+    public void AddTranslation(VocabTranslation translation)
+    {
+        _translations.Add(translation);
     }
 }

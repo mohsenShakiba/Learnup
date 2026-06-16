@@ -18,7 +18,7 @@ public static class VocabMapper
             vocab.LanguageId,
             translations ?? []);
 
-    public static VocabTranslationResponse ToResponse(this VocabTransaction translation) =>
+    public static VocabTranslationResponse ToResponse(this VocabTranslation translation) =>
         new(
             translation.Id,
             translation.Translation,

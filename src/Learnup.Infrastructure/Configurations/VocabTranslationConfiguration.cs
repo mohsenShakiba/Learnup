@@ -4,11 +4,11 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Learnup.Infrastructure.Configurations;
 
-public class VocabTransactionConfiguration : IEntityTypeConfiguration<VocabTransaction>
+public class VocabTranslationConfiguration : IEntityTypeConfiguration<VocabTranslation>
 {
-    public void Configure(EntityTypeBuilder<VocabTransaction> builder)
+    public void Configure(EntityTypeBuilder<VocabTranslation> builder)
     {
-        builder.ToTable("VocabTransaction");
+        builder.ToTable("VocabTranslation");
 
         builder.HasKey(vt => vt.Id);
 
@@ -19,20 +19,8 @@ public class VocabTransactionConfiguration : IEntityTypeConfiguration<VocabTrans
         builder.Property(vt => vt.Description)
             .HasMaxLength(1000);
 
-        builder.Property(vt => vt.Type)
-            .HasConversion<int>()
-            .IsRequired();
-
-        builder.Property(vt => vt.Example)
-            .HasMaxLength(1000)
-            .IsRequired();
-
-        builder.Property(vt => vt.ExampleTranslation)
-            .HasMaxLength(1000)
-            .IsRequired();
-
         builder.HasOne(vt => vt.Vocab)
-            .WithMany()
+            .WithMany(v => v.Translations)
             .HasForeignKey(vt => vt.VocabId)
             .OnDelete(DeleteBehavior.Restrict);
     }

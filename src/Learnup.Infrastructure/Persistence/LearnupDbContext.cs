@@ -20,7 +20,7 @@ public class LearnupDbContext(DbContextOptions<LearnupDbContext> options)
     public DbSet<Lesson> Lessons => Set<Lesson>();
     public DbSet<Story> Stories => Set<Story>();
     public DbSet<Vocab> Vocabs => Set<Vocab>();
-    public DbSet<VocabTransaction> VocabTransactions => Set<VocabTransaction>();
+    public DbSet<VocabTranslation> VocabTransactions => Set<VocabTranslation>();
     public DbSet<UserCourse> UserCourses => Set<UserCourse>();
     public DbSet<UserLesson> UserLessons => Set<UserLesson>();
     public DbSet<UserGrammar> UserGrammars => Set<UserGrammar>();

@@ -16,6 +16,6 @@ public sealed record VocabTranslationResponse(
     int Id,
     string Translation,
     string? Description,
-    VocabTransactionType Type,
+    VocabTranslationType Type,
     string Example,
     string ExampleTranslation);

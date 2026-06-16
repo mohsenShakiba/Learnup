@@ -38,7 +38,8 @@ public class AiVocabTranslationProvider(IConfiguration configuration, ILogger<Ai
                 [
                     ChatMessage.CreateSystemMessage(VocabTranslationPrompt.GetPrompt()),
                     ChatMessage.CreateUserMessage(content)
-                ]
+                ],
+                cancellationToken: cancellationToken
             );
 
             var text = completion.Content[0].Text;
@@ -56,7 +57,7 @@ public class AiVocabTranslationProvider(IConfiguration configuration, ILogger<Ai
                 result.Translation,
                 result.Description,
                 result.ParentWord,
-                result.Transactions ?? []);
+                result.Types);
         }
         catch (Exception e)
         {
@@ -67,7 +68,7 @@ public class AiVocabTranslationProvider(IConfiguration configuration, ILogger<Ai
 
     private record Response(
         string Translation,
+        string[] Types,
         string? Description,
-        string? ParentWord,
-        List<VocabTransactionResult>? Transactions);
+        string? ParentWord);
 }

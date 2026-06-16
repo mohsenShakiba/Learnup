@@ -8,8 +8,9 @@ public interface IVocabTranslationProvider
 public record TranslationResult(
     string Translation,
     string? Description,
-    string? ParentWord,
-    IReadOnlyList<VocabTransactionResult> Transactions);
+    string? ParentWord, 
+    string[] Types);
+
 
 public record VocabTransactionResult(
     string Translation,
