@@ -5,6 +5,7 @@ using Learnup.Application.Features.Admin.Grammars;
 using Learnup.Application.ExternalServices;
 using Learnup.Application.Features.Admin;
 using Learnup.Application.Mediation;
+using Learnup.Domain.AggregateRoots.Vocabularies;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Learnup.API.Areas.Admin.Controllers;
@@ -32,20 +33,29 @@ public class ImportController(
 
         await using var stream = request.File.OpenReadStream();
         using var reader = new StreamReader(stream, Encoding.UTF8, detectEncodingFromByteOrderMarks: true);
-        var words = await ReadWordsAsync(reader, cancellationToken);
+        List<VocabImportItem> vocabs;
 
-        if (words.Count == 0)
+        try
+        {
+            vocabs = await ReadVocabsAsync(reader, cancellationToken);
+        }
+        catch (FormatException exception)
+        {
+            return BadRequest(exception.Message);
+        }
+
+        if (vocabs.Count == 0)
         {
             return BadRequest("CSV file does not contain any vocab words.");
         }
 
         var importedCount = await vocabLoader.LoadAsync(
-            words.ToArray(),
+            vocabs,
             request.LevelId,
             request.LanguageId,
             cancellationToken);
 
-        return Ok(new ImportVocabsResponse(words.Count, importedCount));
+        return Ok(new ImportVocabsResponse(vocabs.Count, importedCount));
     }
 
     [HttpPost("stories", Name = "ImportStory")]
@@ -76,38 +86,58 @@ public class ImportController(
         return Ok(grammarId);
     }
 
-    private static async Task<List<string>> ReadWordsAsync(
+    private static async Task<List<VocabImportItem>> ReadVocabsAsync(
         TextReader reader,
         CancellationToken cancellationToken)
     {
-        var words = new List<string>();
+        var vocabs = new List<VocabImportItem>();
+        Dictionary<string, int>? headerIndexes = null;
         var isFirstRow = true;
+        var rowNumber = 0;
 
         while (await reader.ReadLineAsync(cancellationToken) is { } line)
         {
+            rowNumber++;
             var columns = ParseCsvLine(line);
-            if (columns.Count == 0)
+            if (columns.Count == 0 || columns.All(string.IsNullOrWhiteSpace))
             {
                 continue;
             }
 
-            var word = columns[0].Trim();
-            if (string.IsNullOrWhiteSpace(word))
+            if (isFirstRow && IsHeaderRow(columns))
             {
-                continue;
-            }
-
-            if (isFirstRow && word.Equals("word", StringComparison.OrdinalIgnoreCase))
-            {
+                headerIndexes = BuildHeaderIndexes(columns);
                 isFirstRow = false;
                 continue;
             }
 
             isFirstRow = false;
-            words.Add(word);
+
+            var word = GetColumn(columns, headerIndexes, "word", 0);
+            if (string.IsNullOrWhiteSpace(word))
+            {
+                continue;
+            }
+
+            var translation = RequireColumn(columns, headerIndexes, "translation", 1, rowNumber);
+            var type = ParseEnum<VocabType>(
+                RequireColumn(columns, headerIndexes, "type", 2, rowNumber),
+                "type",
+                rowNumber);
+            var level = ParseOptionalEnum<VocabLevel>(GetColumn(columns, headerIndexes, "level", 6), "level", rowNumber);
+
+            vocabs.Add(new VocabImportItem(
+                word,
+                translation,
+                type,
+                level,
+                GetColumn(columns, headerIndexes, "description", 3),
+                GetColumn(columns, headerIndexes, "example", 4),
+                GetColumn(columns, headerIndexes, "exampleTranslation", 5),
+                GetColumn(columns, headerIndexes, "voiceId", 7)));
         }
 
-        return words;
+        return vocabs;
     }
 
     private static List<string> ParseCsvLine(string line)
@@ -145,5 +175,108 @@ public class ImportController(
 
         columns.Add(value.ToString());
         return columns;
+    }
+
+    private static bool IsHeaderRow(IReadOnlyList<string> columns)
+    {
+        var headers = columns
+            .Select(NormalizeHeader)
+            .ToList();
+
+        return headers.FirstOrDefault() == "word" ||
+               headers.Count(header => header is "translation" or "type" or "typeid" or "vocabtype") >= 2;
+    }
+
+    private static Dictionary<string, int> BuildHeaderIndexes(IReadOnlyList<string> columns)
+    {
+        var indexes = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+
+        for (var index = 0; index < columns.Count; index++)
+        {
+            indexes[NormalizeHeader(columns[index])] = index;
+        }
+
+        AddAlias(indexes, "typeid", "type");
+        AddAlias(indexes, "vocabtype", "type");
+        AddAlias(indexes, "levelid", "level");
+        AddAlias(indexes, "vocablevel", "level");
+        AddAlias(indexes, "exampletranslation", "exampleTranslation");
+        AddAlias(indexes, "voiceref", "voiceId");
+
+        return indexes;
+    }
+
+    private static void AddAlias(Dictionary<string, int> indexes, string alias, string target)
+    {
+        if (indexes.TryGetValue(alias, out var index) && !indexes.ContainsKey(target))
+        {
+            indexes[target] = index;
+        }
+    }
+
+    private static string? GetColumn(
+        IReadOnlyList<string> columns,
+        IReadOnlyDictionary<string, int>? headerIndexes,
+        string name,
+        int fallbackIndex)
+    {
+        var index = headerIndexes is not null && headerIndexes.TryGetValue(name, out var headerIndex)
+            ? headerIndex
+            : fallbackIndex;
+
+        return index < columns.Count
+            ? columns[index].Trim()
+            : null;
+    }
+
+    private static string RequireColumn(
+        IReadOnlyList<string> columns,
+        IReadOnlyDictionary<string, int>? headerIndexes,
+        string name,
+        int fallbackIndex,
+        int rowNumber)
+    {
+        var value = GetColumn(columns, headerIndexes, name, fallbackIndex);
+
+        if (string.IsNullOrWhiteSpace(value))
+        {
+            throw new FormatException($"CSV row {rowNumber} is missing required '{name}' value.");
+        }
+
+        return value;
+    }
+
+    private static TEnum ParseEnum<TEnum>(string value, string columnName, int rowNumber)
+        where TEnum : struct, Enum
+    {
+        if (int.TryParse(value, out var enumValue) && Enum.IsDefined(typeof(TEnum), enumValue))
+        {
+            return (TEnum)Enum.ToObject(typeof(TEnum), enumValue);
+        }
+
+        if (Enum.TryParse<TEnum>(value, ignoreCase: true, out var parsed) && Enum.IsDefined(parsed))
+        {
+            return parsed;
+        }
+
+        throw new FormatException($"CSV row {rowNumber} has invalid '{columnName}' value '{value}'.");
+    }
+
+    private static TEnum? ParseOptionalEnum<TEnum>(string? value, string columnName, int rowNumber)
+        where TEnum : struct, Enum
+    {
+        return string.IsNullOrWhiteSpace(value)
+            ? null
+            : ParseEnum<TEnum>(value, columnName, rowNumber);
+    }
+
+    private static string NormalizeHeader(string value)
+    {
+        return value
+            .Trim()
+            .Replace("_", string.Empty)
+            .Replace("-", string.Empty)
+            .Replace(" ", string.Empty)
+            .ToLowerInvariant();
     }
 }

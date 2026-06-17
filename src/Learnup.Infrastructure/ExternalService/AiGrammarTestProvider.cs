@@ -1,6 +1,7 @@
 using System.ClientModel;
 using System.Text.Json;
 using Learnup.Application.ExternalServices;
+using Learnup.Domain.AggregateRoots.Tests;
 using Learnup.Infrastructure.Prompts;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
@@ -45,6 +46,7 @@ public class AiGrammarTestProvider(IConfiguration configuration, ILogger<AiGramm
                 throw new InvalidOperationException("Invalid response from LmStudio");
 
             return new TestGenerationResult(
+                VocabTestType.FillInTheBlanks,
                 result.Question,
                 result.Options.Select(o => new TestOptionResult(o.Text, o.IsCorrect)).ToArray());
         }

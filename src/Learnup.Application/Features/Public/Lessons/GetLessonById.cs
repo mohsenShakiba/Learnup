@@ -45,20 +45,6 @@ internal sealed class GetLessonByIdHandler(ILearnupDbContext dbContext, IIdentit
             await dbContext.SaveChangesAsync(cancellationToken);
         }
 
-        var vocabIds = lesson.Vocabs.Select(lv => lv.VocabId).ToHashSet();
-        var translations = await dbContext.VocabTransactions
-            .AsNoTracking()
-            .Where(translation => vocabIds.Contains(translation.VocabId))
-            .ToListAsync(cancellationToken);
-
-        var translationsByVocabId = translations
-            .GroupBy(translation => translation.VocabId)
-            .ToDictionary(
-                group => group.Key,
-                group => (IReadOnlyList<VocabTranslationResponse>)group
-                    .Select(translation => translation.ToResponse())
-                    .ToList());
-
-        return lesson.ToDetailResponse(translationsByVocabId);
+        return lesson.ToDetailResponse();
     }
 }

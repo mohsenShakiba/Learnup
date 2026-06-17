@@ -6,12 +6,12 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Learnup.Application.Features.Public.Vocabs;
 
-public sealed record GetVocabByWord(string Word) : IRequest<VocabResponse?>;
+public sealed record GetVocabByWord(string Word) : IRequest<List<VocabResponse>>;
 
 internal sealed class GetVocabByWordHandler(ILearnupDbContext dbContext)
-    : IRequestHandler<GetVocabByWord, VocabResponse?>
+    : IRequestHandler<GetVocabByWord, List<VocabResponse>>
 {
-    public async Task<VocabResponse?> Handle(
+    public async Task<List<VocabResponse>> Handle(
         GetVocabByWord request,
         CancellationToken cancellationToken)
     {
@@ -19,24 +19,14 @@ internal sealed class GetVocabByWordHandler(ILearnupDbContext dbContext)
 
         if (string.IsNullOrWhiteSpace(word))
         {
-            return null;
+            return [];
         }
 
-        var vocab = await dbContext.Vocabs
+        var vocabs = await dbContext.Vocabs
             .AsNoTracking()
             .Where(vocab => vocab.Word.ToLower() == word)
-            .FirstOrDefaultAsync(cancellationToken);
-
-        if (vocab is null)
-        {
-            return null;
-        }
-
-        var translations = await dbContext.VocabTransactions
-            .AsNoTracking()
-            .Where(translation => translation.VocabId == vocab.Id)
             .ToListAsync(cancellationToken);
 
-        return vocab.ToResponse(translations.Select(translation => translation.ToResponse()).ToList());
+        return vocabs.Select(v => v.ToResponse()).ToList();
     }
 }

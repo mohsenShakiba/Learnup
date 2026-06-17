@@ -19,7 +19,6 @@ public interface ILearnupDbContext
     DbSet<LessonGrammar> LessonGrammars { get; }
     DbSet<Story> Stories { get; }
     DbSet<Vocab> Vocabs { get; }
-    DbSet<VocabTranslation> VocabTransactions { get; }
     DbSet<VocabTest> VocabTests { get; }
     DbSet<VocabTestOption> VocabTestOptions { get; }
     DbSet<GrammarTest> GrammarTests { get; }

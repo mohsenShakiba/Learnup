@@ -8,6 +8,7 @@ public class VocabTest
 
     public int Id { get; private set; }
     public TestStatus Status { get; private set; }
+    public VocabTestType Type { get; private set; }
     
     public int VocabId { get; private set; }
     public Vocab Vocab { get; private set; } = null!;
@@ -22,8 +23,9 @@ public class VocabTest
         Status = TestStatus.Pending;
     }
 
-    public void Publish(string question, IEnumerable<VocabTestOption> options)
+    public void Publish(VocabTestType type, string question, IEnumerable<VocabTestOption> options)
     {
+        Type = type;
         Question = question;
         _options.Clear();
         _options.AddRange(options);

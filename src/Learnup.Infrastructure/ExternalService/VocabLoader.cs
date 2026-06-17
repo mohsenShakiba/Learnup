@@ -8,19 +8,19 @@ namespace Learnup.Infrastructure.ExternalService;
 public class VocabLoader(LearnupDbContext dbContext) : IVocabLoader
 {
     public async Task<int> LoadAsync(
-        string[] words,
-        int levelId,
+        IReadOnlyCollection<VocabImportItem> vocabs,
+        int defaultLevelId,
         int languageId,
         CancellationToken cancellationToken = default)
     {
-        if (words.Length == 0)
+        if (vocabs.Count == 0)
         {
             return 0;
         }
 
-        if (!Enum.IsDefined(typeof(VocabLevel), levelId))
+        if (!Enum.IsDefined(typeof(VocabLevel), defaultLevelId))
         {
-            throw new ArgumentOutOfRangeException(nameof(levelId), levelId, "Unknown vocab level id.");
+            throw new ArgumentOutOfRangeException(nameof(defaultLevelId), defaultLevelId, "Unknown vocab level id.");
         }
 
         var languageExists = await dbContext.Languages
@@ -31,30 +31,89 @@ public class VocabLoader(LearnupDbContext dbContext) : IVocabLoader
             throw new InvalidOperationException($"Language with id '{languageId}' was not found.");
         }
 
-        var level = (VocabLevel)levelId;
-        var normalizedWords = words
-            .Select(word => word.Trim())
-            .Where(word => !string.IsNullOrWhiteSpace(word))
-            .Distinct(StringComparer.OrdinalIgnoreCase)
+        var defaultLevel = (VocabLevel)defaultLevelId;
+        var normalizedVocabs = vocabs
+            .Select(vocab => vocab with
+            {
+                Word = vocab.Word.Trim(),
+                Translation = NormalizeOptional(vocab.Translation),
+                Description = NormalizeOptional(vocab.Description),
+                Example = NormalizeOptional(vocab.Example),
+                ExampleTranslation = NormalizeOptional(vocab.ExampleTranslation),
+                VoiceId = NormalizeOptional(vocab.VoiceId),
+                Level = vocab.Level ?? defaultLevel
+            })
+            .Where(vocab => !string.IsNullOrWhiteSpace(vocab.Word))
+            .GroupBy(vocab => new
+            {
+                Word = vocab.Word.ToLower(),
+                Level = vocab.Level!.Value
+            })
+            .Select(group => group.First())
             .ToList();
 
-        if (normalizedWords.Count == 0)
+        if (normalizedVocabs.Count == 0)
         {
             return 0;
         }
 
-        var existingWords = await dbContext.Vocabs
-            .Where(vocab => vocab.LanguageId == languageId && vocab.Level == level)
-            .Select(vocab => vocab.Word)
-            .ToListAsync(cancellationToken);
-
-        var existingWordSet = existingWords.ToHashSet(StringComparer.OrdinalIgnoreCase);
-        var newVocabs = normalizedWords
-            .Where(word => !existingWordSet.Contains(word))
-            .Select(word => new Vocab(languageId, word, level))
+        var levels = normalizedVocabs
+            .Select(vocab => vocab.Level!.Value)
+            .Distinct()
             .ToList();
 
-        if (newVocabs.Count == 0)
+        var lowerWords = normalizedVocabs
+            .Select(vocab => vocab.Word.ToLower())
+            .Distinct()
+            .ToList();
+
+        var existingVocabs = await dbContext.Vocabs
+            .Where(vocab =>
+                vocab.LanguageId == languageId &&
+                levels.Contains(vocab.Level) &&
+                lowerWords.Contains(vocab.Word.ToLower()))
+            .ToListAsync(cancellationToken);
+
+        var existingVocabMap = existingVocabs
+            .ToDictionary(
+                vocab => (Word: vocab.Word.ToLower(), vocab.Level),
+                vocab => vocab);
+
+        var updatedCount = 0;
+
+        foreach (var vocab in normalizedVocabs)
+        {
+            if (!existingVocabMap.TryGetValue((vocab.Word.ToLower(), vocab.Level!.Value), out var existingVocab))
+            {
+                continue;
+            }
+
+            existingVocab.UpdateImportDetails(
+                vocab.Translation,
+                vocab.Type,
+                vocab.Description,
+                vocab.Example,
+                vocab.ExampleTranslation,
+                vocab.VoiceId);
+
+            updatedCount++;
+        }
+
+        var newVocabs = normalizedVocabs
+            .Where(vocab => !existingVocabMap.ContainsKey((vocab.Word.ToLower(), vocab.Level!.Value)))
+            .Select(vocab => new Vocab(
+                languageId,
+                vocab.Word,
+                vocab.Translation,
+                vocab.Type,
+                vocab.Level!.Value,
+                vocab.Description,
+                vocab.Example,
+                vocab.ExampleTranslation,
+                vocab.VoiceId))
+            .ToList();
+
+        if (newVocabs.Count == 0 && updatedCount == 0)
         {
             return 0;
         }
@@ -62,6 +121,13 @@ public class VocabLoader(LearnupDbContext dbContext) : IVocabLoader
         dbContext.Vocabs.AddRange(newVocabs);
         await dbContext.SaveChangesAsync(cancellationToken);
 
-        return newVocabs.Count;
+        return newVocabs.Count + updatedCount;
+    }
+
+    private static string? NormalizeOptional(string? value)
+    {
+        return string.IsNullOrWhiteSpace(value)
+            ? null
+            : value.Trim();
     }
 }

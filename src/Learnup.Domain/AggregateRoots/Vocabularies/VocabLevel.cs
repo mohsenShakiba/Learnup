@@ -2,6 +2,7 @@
 
 public enum VocabLevel
 {
+    Unknown = -1,
     Common = 0,
     A1 = 1,
     A2 = 2,
