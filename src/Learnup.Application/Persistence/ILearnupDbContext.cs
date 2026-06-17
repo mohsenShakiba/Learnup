@@ -2,6 +2,7 @@ using Learnup.Domain.AggregateRoots.Courses;
 using Learnup.Domain.AggregateRoots.Grammars;
 using Learnup.Domain.AggregateRoots.Lessons;
 using Learnup.Domain.AggregateRoots.Stories;
+using Learnup.Domain.AggregateRoots.Tests;
 using Learnup.Domain.AggregateRoots.Users;
 using Learnup.Domain.AggregateRoots.Vocabularies;
 using Microsoft.EntityFrameworkCore;
@@ -14,14 +15,22 @@ public interface ILearnupDbContext
     DbSet<Grammar> Grammars { get; }
     DbSet<GrammarLesson> GrammarLessons { get; }
     DbSet<Lesson> Lessons { get; }
+    DbSet<LessonVocab> LessonVocabs { get; }
+    DbSet<LessonGrammar> LessonGrammars { get; }
     DbSet<Story> Stories { get; }
     DbSet<Vocab> Vocabs { get; }
     DbSet<VocabTranslation> VocabTransactions { get; }
+    DbSet<VocabTest> VocabTests { get; }
+    DbSet<VocabTestOption> VocabTestOptions { get; }
+    DbSet<GrammarTest> GrammarTests { get; }
+    DbSet<GrammarTestOption> GrammarTestOptions { get; }
     DbSet<UserCourse> UserCourses { get; }
     DbSet<UserLesson> UserLessons { get; }
     DbSet<UserGrammar> UserGrammars { get; }
     DbSet<UserStory> UserStories { get; }
     DbSet<UserVocab> UserVocabs { get; }
+    DbSet<UserVocabTestResult> UserVocabTestResults { get; }
+    DbSet<UserGrammarTestResult> UserGrammarTestResults { get; }
 
     Task<int> SaveChangesAsync(CancellationToken cancellationToken = new CancellationToken());
 }
