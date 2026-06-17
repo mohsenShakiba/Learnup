@@ -1,3 +1,5 @@
+using Learnup.Domain.AggregateRoots.Users;
+
 namespace Learnup.Application.Responses.Public.LeitnerBox;
 
 public sealed record LeitnerBoxResponse(
@@ -9,5 +11,5 @@ public sealed record LeitnerBoxItemResponse(
     int VocabId,
     string Word,
     string? Translation,
-    int BoxLevel,
+    Level BoxLevel,
     DateTime AddedAt);

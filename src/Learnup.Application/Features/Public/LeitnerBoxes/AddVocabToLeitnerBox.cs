@@ -4,7 +4,7 @@ using Learnup.Application.Persistence;
 using Learnup.Domain.AggregateRoots.Users;
 using Microsoft.EntityFrameworkCore;
 
-namespace Learnup.Application.Features.Public.LeitnerBox;
+namespace Learnup.Application.Features.Public.LeitnerBoxes;
 
 public sealed record AddVocabToLeitnerBox(int VocabId) : IRequest;
 
@@ -19,7 +19,8 @@ internal sealed class AddVocabToLeitnerBoxHandler(ILearnupDbContext dbContext, I
 
         if (box is null)
         {
-            box = new Domain.AggregateRoots.Users.LeitnerBox(identityProvider.UserId);
+            
+            box = LeitnerBox.CreateWithLevels(identityProvider.UserId);
             dbContext.LeitnerBoxes.Add(box);
         }
 
