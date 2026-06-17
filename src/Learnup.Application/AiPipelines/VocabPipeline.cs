@@ -15,6 +15,7 @@ public class VocabPipeline(
 {
     public async Task ProcessAsync(CancellationToken cancellationToken = default)
     {
+        return;
         var vocabCandidates = await dbContext.Vocabs
             .Where(v => v.Status == VocabStatus.Pending)
             .Take(1)

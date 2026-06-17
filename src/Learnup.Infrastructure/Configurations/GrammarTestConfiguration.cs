@@ -22,5 +22,9 @@ public class GrammarTestConfiguration : IEntityTypeConfiguration<GrammarTest>
             .WithOne()
             .HasForeignKey(o => o.GrammarTestId)
             .OnDelete(DeleteBehavior.Cascade);
+        
+        builder.HasOne(t => t.Grammar)
+            .WithMany(v => v.Tests)
+            .OnDelete(DeleteBehavior.Cascade);
     }
 }

@@ -1,3 +1,5 @@
+using Learnup.Domain.AggregateRoots.Vocabularies;
+
 namespace Learnup.Domain.AggregateRoots.Tests;
 
 public class VocabTest
@@ -5,9 +7,12 @@ public class VocabTest
     private readonly List<VocabTestOption> _options = new();
 
     public int Id { get; private set; }
-    public int VocabId { get; private set; }
-    public string Question { get; private set; } = null!;
     public TestStatus Status { get; private set; }
+    
+    public int VocabId { get; private set; }
+    public Vocab Vocab { get; private set; } = null!;
+    
+    public string Question { get; private set; } = null!;
 
     public IReadOnlyList<VocabTestOption> Options => _options.AsReadOnly();
 

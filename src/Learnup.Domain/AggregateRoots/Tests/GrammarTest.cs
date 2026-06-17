@@ -1,3 +1,5 @@
+using Learnup.Domain.AggregateRoots.Grammars;
+
 namespace Learnup.Domain.AggregateRoots.Tests;
 
 public class GrammarTest
@@ -5,9 +7,11 @@ public class GrammarTest
     private readonly List<GrammarTestOption> _options = new();
 
     public int Id { get; private set; }
-    public int GrammarId { get; private set; }
     public string Question { get; private set; } = null!;
     public TestStatus Status { get; private set; }
+    
+    public int GrammarId { get; private set; }
+    public Grammar Grammar { get; private set; } = null!;
 
     public IReadOnlyList<GrammarTestOption> Options => _options.AsReadOnly();
 

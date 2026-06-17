@@ -15,14 +15,10 @@ public class VocabTestPipeline(
 {
     public async Task ProcessAsync(CancellationToken cancellationToken = default)
     {
-        var existingVocabTestIds = await dbContext.VocabTests
-            .Select(t => t.VocabId)
-            .ToListAsync(cancellationToken);
 
         var candidates = await dbContext.Vocabs
-            .Where(v => v.Status == VocabStatus.Published
-                && v.Translation != null
-                && !existingVocabTestIds.Contains(v.Id))
+            .Where(v => v.Status == VocabStatus.Published)
+            .Where(v => !v.Tests.Any())
             .Take(5)
             .ToListAsync(cancellationToken);
 

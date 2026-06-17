@@ -1,0 +1,23 @@
+using Learnup.Application.Features.Public.LeitnerBox;
+using Learnup.Application.Mediation;
+using Learnup.Application.Responses.Public.LeitnerBox;
+using Microsoft.AspNetCore.Mvc;
+
+namespace Learnup.API.Areas.Public.Controllers;
+
+public class LeitnerBoxController(IMediator mediator) : BasePublicController
+{
+    [HttpGet(Name = "GetLeitnerBox")]
+    public async Task<ActionResult<LeitnerBoxResponse>> Get(CancellationToken cancellationToken)
+    {
+        var box = await mediator.Send(new GetLeitnerBox(), cancellationToken);
+        return box is null ? NotFound() : Ok(box);
+    }
+
+    [HttpPost("vocab/{vocabId}", Name = "AddVocabToLeitnerBox")]
+    public async Task<IActionResult> AddVocab(int vocabId, CancellationToken cancellationToken)
+    {
+        await mediator.Send(new AddVocabToLeitnerBox(vocabId), cancellationToken);
+        return NoContent();
+    }
+}

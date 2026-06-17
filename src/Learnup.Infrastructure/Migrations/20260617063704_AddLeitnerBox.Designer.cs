@@ -3,6 +3,7 @@ using System;
 using Learnup.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Learnup.Infrastructure.Migrations
 {
     [DbContext(typeof(LearnupDbContext))]
-    partial class LearnupDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260617063704_AddLeitnerBox")]
+    partial class AddLeitnerBox
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -347,8 +350,6 @@ namespace Learnup.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("GrammarId");
-
                     b.ToTable("GrammarTest", (string)null);
                 });
 
@@ -398,8 +399,6 @@ namespace Learnup.Infrastructure.Migrations
                         .HasColumnType("integer");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("VocabId");
 
                     b.ToTable("VocabTest", (string)null);
                 });
@@ -889,17 +888,6 @@ namespace Learnup.Infrastructure.Migrations
                     b.Navigation("StoryItem");
                 });
 
-            modelBuilder.Entity("Learnup.Domain.AggregateRoots.Tests.GrammarTest", b =>
-                {
-                    b.HasOne("Learnup.Domain.AggregateRoots.Grammars.Grammar", "Grammar")
-                        .WithMany("Tests")
-                        .HasForeignKey("GrammarId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Grammar");
-                });
-
             modelBuilder.Entity("Learnup.Domain.AggregateRoots.Tests.GrammarTestOption", b =>
                 {
                     b.HasOne("Learnup.Domain.AggregateRoots.Tests.GrammarTest", null)
@@ -907,17 +895,6 @@ namespace Learnup.Infrastructure.Migrations
                         .HasForeignKey("GrammarTestId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-                });
-
-            modelBuilder.Entity("Learnup.Domain.AggregateRoots.Tests.VocabTest", b =>
-                {
-                    b.HasOne("Learnup.Domain.AggregateRoots.Vocabularies.Vocab", "Vocab")
-                        .WithMany("Tests")
-                        .HasForeignKey("VocabId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Vocab");
                 });
 
             modelBuilder.Entity("Learnup.Domain.AggregateRoots.Tests.VocabTestOption", b =>
@@ -1142,8 +1119,6 @@ namespace Learnup.Infrastructure.Migrations
                     b.Navigation("Lessons");
 
                     b.Navigation("PrerequisiteGrammars");
-
-                    b.Navigation("Tests");
                 });
 
             modelBuilder.Entity("Learnup.Domain.AggregateRoots.Lessons.Lesson", b =>
@@ -1195,8 +1170,6 @@ namespace Learnup.Infrastructure.Migrations
 
             modelBuilder.Entity("Learnup.Domain.AggregateRoots.Vocabularies.Vocab", b =>
                 {
-                    b.Navigation("Tests");
-
                     b.Navigation("Translations");
                 });
 #pragma warning restore 612, 618

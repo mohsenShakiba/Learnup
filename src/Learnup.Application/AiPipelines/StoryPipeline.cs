@@ -10,6 +10,7 @@ public class StoryPipeline(ILearnupDbContext dbContext, IVoiceProvider voiceProv
 {
     public async Task ProcessAsync(CancellationToken cancellationToken = default)
     {
+        return;
         var stories = await dbContext.Stories
             .Include(s => s.Items)
             .Where(s => s.Status == StoryStatus.Pending)

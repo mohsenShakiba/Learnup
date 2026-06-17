@@ -22,5 +22,9 @@ public class VocabTestConfiguration : IEntityTypeConfiguration<VocabTest>
             .WithOne()
             .HasForeignKey(o => o.VocabTestId)
             .OnDelete(DeleteBehavior.Cascade);
+        
+        builder.HasOne(t => t.Vocab)
+            .WithMany(v => v.Tests)
+            .OnDelete(DeleteBehavior.Cascade);
     }
 }

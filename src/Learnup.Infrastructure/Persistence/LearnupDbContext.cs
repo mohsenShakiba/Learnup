@@ -35,6 +35,7 @@ public class LearnupDbContext(DbContextOptions<LearnupDbContext> options)
     public DbSet<UserVocab> UserVocabs => Set<UserVocab>();
     public DbSet<UserVocabTestResult> UserVocabTestResults => Set<UserVocabTestResult>();
     public DbSet<UserGrammarTestResult> UserGrammarTestResults => Set<UserGrammarTestResult>();
+    public DbSet<LeitnerBox> LeitnerBoxes => Set<LeitnerBox>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

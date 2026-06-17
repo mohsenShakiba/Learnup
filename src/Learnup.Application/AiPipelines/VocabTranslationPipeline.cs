@@ -14,6 +14,7 @@ public class VocabTranslationPipeline(
 {
     public async Task ProcessAsync(CancellationToken cancellationToken = default)
     {
+        return;
         var translations = await dbContext.VocabTransactions
             .Include(translation => translation.Vocab)
             .Where(translation => translation.Status == VocabStatus.Pending)

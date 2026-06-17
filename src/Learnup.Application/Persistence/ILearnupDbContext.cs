@@ -31,6 +31,7 @@ public interface ILearnupDbContext
     DbSet<UserVocab> UserVocabs { get; }
     DbSet<UserVocabTestResult> UserVocabTestResults { get; }
     DbSet<UserGrammarTestResult> UserGrammarTestResults { get; }
+    DbSet<LeitnerBox> LeitnerBoxes { get; }
 
     Task<int> SaveChangesAsync(CancellationToken cancellationToken = new CancellationToken());
 }

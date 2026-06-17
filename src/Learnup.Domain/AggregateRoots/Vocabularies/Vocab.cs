@@ -1,4 +1,5 @@
 ﻿using Learnup.Domain.AggregateRoots.Languages;
+using Learnup.Domain.AggregateRoots.Tests;
 
 namespace Learnup.Domain.AggregateRoots.Vocabularies;
 
@@ -19,6 +20,9 @@ public class Vocab
 
     private readonly List<VocabTranslation> _translations = [];
     public IReadOnlyList<VocabTranslation> Translations => _translations.AsReadOnly();
+    
+    private readonly List<VocabTest> _tests = [];
+    public IReadOnlyList<VocabTest> Tests => _tests.AsReadOnly();
 
     public Vocab(int languageId, string word, VocabLevel level, string translation = "")
     {

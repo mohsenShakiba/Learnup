@@ -14,12 +14,10 @@ public class GrammarTestPipeline(
 {
     public async Task ProcessAsync(CancellationToken cancellationToken = default)
     {
-        var existingGrammarTestIds = await dbContext.GrammarTests
-            .Select(t => t.GrammarId)
-            .ToListAsync(cancellationToken);
-
+  
         var candidates = await dbContext.Grammars
-            .Where(g => !existingGrammarTestIds.Contains(g.Id))
+            .Where(g => g.Id == 1)
+            .Where(g => !g.Tests.Any())
             .Take(5)
             .ToListAsync(cancellationToken);
 
