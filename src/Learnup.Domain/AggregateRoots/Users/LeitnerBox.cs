@@ -2,17 +2,16 @@ namespace Learnup.Domain.AggregateRoots.Users;
 
 public class LeitnerBox
 {
-    private readonly List<LeitnerBoxItem> _items = new();
-
     public int Id { get; private set; }
     public int UserId { get; private set; }
     public User User { get; private set; } = null!;
     public DateTime CreatedAt { get; private set; }
 
-    public IReadOnlyList<LeitnerBoxItem> Items => _items.AsReadOnly();
-
     public IReadOnlyList<BoxLevel> BoxLevels => _boxLevels.AsReadOnly();
-    private List<BoxLevel> _boxLevels = new();
+    private readonly List<BoxLevel> _boxLevels = new();
+
+    public IReadOnlyList<LeitnerBoxItem> Items => _items.AsReadOnly();
+    private readonly List<LeitnerBoxItem> _items = new();
 
     private LeitnerBox()
     {
@@ -24,24 +23,13 @@ public class LeitnerBox
         CreatedAt = DateTime.UtcNow;
     }
 
-    public void AddItem(int vocabId)
-    {
-        if (_items.Any(i => i.VocabId == vocabId))
-            return;
-        
-        var firstBoxLevel = _boxLevels
-            .FirstOrDefault(b => b.Level == Level.Level_1);
-
-        if (firstBoxLevel is null)
-        {
-            throw new InvalidOperationException("No box level found.");
-        }
-
-        _items.Add(new LeitnerBoxItem(vocabId, firstBoxLevel.Id));
-    }
-
     public void AddLevels()
     {
+        if (_boxLevels.Count > 0)
+        {
+            return;
+        }
+
         _boxLevels.Add(new BoxLevel(TimeSpan.FromDays(1), Level.Level_1));
         _boxLevels.Add(new BoxLevel(TimeSpan.FromDays(2), Level.Level_2));
         _boxLevels.Add(new BoxLevel(TimeSpan.FromDays(4), Level.Level_3));
@@ -58,7 +46,18 @@ public class LeitnerBox
         _boxLevels.Add(new BoxLevel(TimeSpan.FromDays(240), Level.Level_14));
         _boxLevels.Add(new BoxLevel(TimeSpan.FromDays(365), Level.Level_15));
     }
-    
+
+    public void AddItem(int vocabId)
+    {
+        var firstLevel = _boxLevels.FirstOrDefault(level => level.Level == Level.Level_1)
+            ?? throw new InvalidOperationException("Leitner box does not contain level 1.");
+
+        var item = new LeitnerBoxItem(vocabId, firstLevel);
+        item.AssignToBox(this);
+        _items.Add(item);
+        firstLevel.AddItem(item);
+    }
+
     public static LeitnerBox CreateWithLevels(int userId)
     {
         var box = new LeitnerBox(userId);

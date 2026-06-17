@@ -11,9 +11,15 @@ public class LeitnerBoxConfiguration : IEntityTypeConfiguration<LeitnerBox>
         builder.ToTable("LeitnerBox");
         builder.HasKey(b => b.Id);
 
+        builder.Property(b => b.CreatedAt).IsRequired();
+
         builder.HasOne(b => b.User)
             .WithMany()
             .HasForeignKey(b => b.UserId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        builder.HasMany(b => b.BoxLevels)
+            .WithOne(l => l.LeitnerBox)
             .OnDelete(DeleteBehavior.Cascade);
 
         builder.HasMany(b => b.Items)

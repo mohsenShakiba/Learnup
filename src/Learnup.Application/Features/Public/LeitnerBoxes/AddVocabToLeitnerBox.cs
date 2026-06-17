@@ -15,6 +15,7 @@ internal sealed class AddVocabToLeitnerBoxHandler(ILearnupDbContext dbContext, I
     {
         var box = await dbContext.LeitnerBoxes
             .Include(b => b.Items)
+            .Include(b => b.BoxLevels)
             .FirstOrDefaultAsync(b => b.UserId == identityProvider.UserId, cancellationToken);
 
         if (box is null)

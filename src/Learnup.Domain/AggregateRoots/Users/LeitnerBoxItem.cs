@@ -1,4 +1,3 @@
-using System.Runtime.InteropServices.JavaScript;
 using Learnup.Domain.AggregateRoots.Vocabularies;
 
 namespace Learnup.Domain.AggregateRoots.Users;
@@ -11,24 +10,41 @@ public class LeitnerBoxItem
     public int VocabId { get; private set; }
     public Vocab Vocab { get; private set; } = null!;
     public int BoxLevelId { get; private set; }
-    public BoxLevel BoxLevel { get; private set; }
+    public BoxLevel BoxLevel { get; private set; } = null!;
     public DateTime AddedAt { get; private set; }
     public DateTime? NextReviewAt { get; private set; }
     public DateTime? ReviewedAt { get; private set; }
-    
+
     private LeitnerBoxItem() { }
 
-    public LeitnerBoxItem(int vocabId, int boxLevelId)
+    public LeitnerBoxItem(int vocabId, BoxLevel boxLevel)
     {
         VocabId = vocabId;
         AddedAt = DateTime.UtcNow;
-        BoxLevelId = boxLevelId;
+        BoxLevel = boxLevel;
+        BoxLevelId = boxLevel.Id;
+        NextReviewAt = AddedAt + boxLevel.WillReviewedIn;
+    }
+
+    internal void AssignToBox(LeitnerBox leitnerBox)
+    {
+        LeitnerBox = leitnerBox;
+        LeitnerBoxId = leitnerBox.Id;
     }
 
     public void ChangeBoxLevel(BoxLevel boxLevel)
     {
-        BoxLevelId = boxLevel.Id;
-        NextReviewAt = DateTime.UtcNow + boxLevel.WillReviewedIn;
-        ReviewedAt = DateTime.UtcNow;
+        if (BoxLevel.Id != boxLevel.Id)
+        {
+            BoxLevel.RemoveItem(this);
+            boxLevel.AddItem(this);
+
+            BoxLevel = boxLevel;
+            BoxLevelId = boxLevel.Id;
+        }
+
+        var reviewedAt = DateTime.UtcNow;
+        ReviewedAt = reviewedAt;
+        NextReviewAt = reviewedAt + boxLevel.WillReviewedIn;
     }
 }

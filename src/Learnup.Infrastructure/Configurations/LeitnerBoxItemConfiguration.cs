@@ -11,8 +11,20 @@ public class LeitnerBoxItemConfiguration : IEntityTypeConfiguration<LeitnerBoxIt
         builder.ToTable("LeitnerBoxItem");
         builder.HasKey(i => i.Id);
 
-        builder.Property(i => i.BoxLevel).IsRequired();
+        builder.Property(i => i.LeitnerBoxId).IsRequired();
+        builder.Property(i => i.BoxLevelId).IsRequired();
+        builder.Property(i => i.VocabId).IsRequired();
         builder.Property(i => i.AddedAt).IsRequired();
+        builder.Property(i => i.NextReviewAt).IsRequired(false);
+        builder.Property(i => i.ReviewedAt).IsRequired(false);
+
+        builder.HasOne(i => i.LeitnerBox)
+            .WithMany(b => b.Items)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        builder.HasOne(i => i.BoxLevel)
+            .WithMany(l => l.Items)
+            .OnDelete(DeleteBehavior.Restrict);
 
         builder.HasOne(i => i.Vocab)
             .WithMany()
