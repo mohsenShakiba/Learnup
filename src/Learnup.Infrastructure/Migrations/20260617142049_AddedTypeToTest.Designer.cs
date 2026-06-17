@@ -3,6 +3,7 @@ using System;
 using Learnup.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Learnup.Infrastructure.Migrations
 {
     [DbContext(typeof(LearnupDbContext))]
-    partial class LearnupDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260617142049_AddedTypeToTest")]
+    partial class AddedTypeToTest
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -695,13 +698,8 @@ namespace Learnup.Infrastructure.Migrations
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Description")
-                        .HasColumnType("text");
-
-                    b.Property<string>("Example")
-                        .HasColumnType("text");
-
-                    b.Property<string>("ExampleTranslation")
-                        .HasColumnType("text");
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)");
 
                     b.Property<int>("LanguageId")
                         .HasColumnType("integer");
@@ -709,14 +707,16 @@ namespace Learnup.Infrastructure.Migrations
                     b.Property<int>("Level")
                         .HasColumnType("integer");
 
+                    b.Property<string>("ParentVocab")
+                        .HasColumnType("text");
+
                     b.Property<int>("Status")
                         .HasColumnType("integer");
 
                     b.Property<string>("Translation")
-                        .HasColumnType("text");
-
-                    b.Property<int>("Type")
-                        .HasColumnType("integer");
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
 
                     b.Property<string>("VoiceId")
                         .HasMaxLength(255)
@@ -732,6 +732,45 @@ namespace Learnup.Infrastructure.Migrations
                     b.HasIndex("LanguageId");
 
                     b.ToTable("Vocab", (string)null);
+                });
+
+            modelBuilder.Entity("Learnup.Domain.AggregateRoots.Vocabularies.VocabTranslation", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)");
+
+                    b.Property<string>("Example")
+                        .HasColumnType("text");
+
+                    b.Property<string>("ExampleTranslation")
+                        .HasColumnType("text");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Translation")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<int>("Type")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("VocabId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("VocabId");
+
+                    b.ToTable("VocabTranslation", (string)null);
                 });
 
             modelBuilder.Entity("Learnup.Domain.AggregateRoots.Courses.Course", b =>
@@ -1086,6 +1125,17 @@ namespace Learnup.Infrastructure.Migrations
                     b.Navigation("Language");
                 });
 
+            modelBuilder.Entity("Learnup.Domain.AggregateRoots.Vocabularies.VocabTranslation", b =>
+                {
+                    b.HasOne("Learnup.Domain.AggregateRoots.Vocabularies.Vocab", "Vocab")
+                        .WithMany("Translations")
+                        .HasForeignKey("VocabId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Vocab");
+                });
+
             modelBuilder.Entity("Learnup.Domain.AggregateRoots.Courses.Course", b =>
                 {
                     b.Navigation("Lessons");
@@ -1152,6 +1202,8 @@ namespace Learnup.Infrastructure.Migrations
             modelBuilder.Entity("Learnup.Domain.AggregateRoots.Vocabularies.Vocab", b =>
                 {
                     b.Navigation("Tests");
+
+                    b.Navigation("Translations");
                 });
 #pragma warning restore 612, 618
         }

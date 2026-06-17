@@ -15,7 +15,6 @@ public class VocabTestPipeline(
 {
     public async Task ProcessAsync(CancellationToken cancellationToken = default)
     {
-
         var candidates = await dbContext.Vocabs
             .Where(v => v.Status == VocabStatus.Published)
             .Where(v => !v.Tests.Any())
@@ -28,11 +27,11 @@ public class VocabTestPipeline(
             {
                 var sw = Stopwatch.StartNew();
 
-                var result = await vocabTestProvider.GetVocabTestAsync(vocab.Word, vocab.Translation!, cancellationToken);
+                var result = await vocabTestProvider.GetVocabTestAsync(vocab,  cancellationToken);
 
                 var test = new VocabTest(vocab.Id);
                 var options = result.Options.Select(o => new VocabTestOption(o.Text, o.IsCorrect)).ToList();
-                test.Publish(result.Question, options);
+                test.Publish(result.Type, result.Question, options);
 
                 dbContext.VocabTests.Add(test);
                 await dbContext.SaveChangesAsync(cancellationToken);

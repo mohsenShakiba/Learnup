@@ -9,13 +9,12 @@ public sealed record VocabResponse(
     string? VoiceId,
     string? Description,
     VocabLevel Level,
-    int LanguageId,
-    IReadOnlyList<VocabTranslationResponse> Translations);
+    int LanguageId);
 
 public sealed record VocabTranslationResponse(
     int Id,
     string Translation,
     string? Description,
-    VocabTranslationType Type,
+    VocabType Type,
     string Example,
     string ExampleTranslation);

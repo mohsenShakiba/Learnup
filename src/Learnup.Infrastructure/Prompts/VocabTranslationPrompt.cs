@@ -17,12 +17,12 @@ public static class VocabTranslationPrompt
                
                Return JSON only. No markdown, explanations, or additional text.
                Schema:
-               [{
+               {
                  "Translation": "string",
                  "Description": "string | null",
                  "ParentWord": "string | null",
                  "Types": ["Noun" | "Verb" | "Adjective" | "Adverb"] 
-               }]
+               }
                """;
     }
 }

@@ -6,8 +6,7 @@ namespace Learnup.Application.Mappers;
 public static class VocabMapper
 {
     public static VocabResponse ToResponse(
-        this Vocab vocab,
-        IReadOnlyList<VocabTranslationResponse>? translations = null) =>
+        this Vocab vocab) =>
         new(
             vocab.Id,
             vocab.Word,
@@ -15,15 +14,5 @@ public static class VocabMapper
             vocab.VoiceId,
             vocab.Description,
             vocab.Level,
-            vocab.LanguageId,
-            translations ?? []);
-
-    public static VocabTranslationResponse ToResponse(this VocabTranslation translation) =>
-        new(
-            translation.Id,
-            translation.Translation,
-            translation.Description,
-            translation.Type,
-            translation.Example ?? string.Empty,
-            translation.ExampleTranslation ?? string.Empty);
+            vocab.LanguageId);
 }

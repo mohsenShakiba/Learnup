@@ -23,7 +23,6 @@ public class LearnupDbContext(DbContextOptions<LearnupDbContext> options)
     public DbSet<LessonGrammar> LessonGrammars => Set<LessonGrammar>();
     public DbSet<Story> Stories => Set<Story>();
     public DbSet<Vocab> Vocabs => Set<Vocab>();
-    public DbSet<VocabTranslation> VocabTransactions => Set<VocabTranslation>();
     public DbSet<VocabTest> VocabTests => Set<VocabTest>();
     public DbSet<VocabTestOption> VocabTestOptions => Set<VocabTestOption>();
     public DbSet<GrammarTest> GrammarTests => Set<GrammarTest>();
