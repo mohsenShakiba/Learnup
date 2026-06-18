@@ -26,4 +26,11 @@ public class VocabTestsController(IMediator mediator) : BasePublicController
         var result = await mediator.Send(new AnswerVocabTest(id, request.SelectedOptionId), cancellationToken);
         return Ok(result);
     }
+
+    [HttpPost("{lessonId}/reset", Name = "ResetVocabTestResult")]
+    public async Task<IActionResult> Reset(int lessonId, CancellationToken cancellationToken)
+    {
+        await mediator.Send(new ResetVocabTestResult(lessonId), cancellationToken);
+        return NoContent();
+    }
 }

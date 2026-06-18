@@ -8,7 +8,11 @@ public sealed record VocabResponse(
     string? Translation,
     string? VoiceId,
     string? Description,
+    string? Example,
+    string? ExampleTranslation,
     VocabLevel Level,
+    VocabStatus Status,
+    VocabType Type,
     int LanguageId);
 
 public sealed record VocabTranslationResponse(

@@ -1,5 +1,6 @@
 using Learnup.Application.Responses.Public.Grammars;
 using Learnup.Application.Responses.Public.Stories;
+using Learnup.Application.Responses.Public.Tests;
 using Learnup.Application.Responses.Public.Vocabs;
 
 namespace Learnup.Application.Responses.Public.Lessons;
@@ -26,4 +27,5 @@ public sealed record LessonDetailResponse(
     int CourseId,
     IReadOnlyList<StoryResponse> Stories,
     IReadOnlyList<GrammarResponse> Grammars,
-    IReadOnlyList<VocabResponse> Vocabs);
+    IReadOnlyList<VocabResponse> Vocabs,
+    LessonVocabTestResponse? VocabTest);

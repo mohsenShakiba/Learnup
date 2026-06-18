@@ -26,4 +26,13 @@ public class GrammarTestsController(IMediator mediator) : BasePublicController
         var result = await mediator.Send(new AnswerGrammarTest(id, request.SelectedOptionId), cancellationToken);
         return Ok(result);
     }
+
+    [HttpPost("{id}/reset", Name = "ResetGrammarTestResult")]
+    public async Task<IActionResult> Reset(
+        int id,
+        CancellationToken cancellationToken)
+    {
+        await mediator.Send(new ResetGrammarTestResult(id), cancellationToken);
+        return NoContent();
+    }
 }

@@ -13,6 +13,10 @@ public static class VocabMapper
             vocab.Translation,
             vocab.VoiceId,
             vocab.Description,
+            vocab.Example,
+            vocab.ExampleTranslation,
             vocab.Level,
+            vocab.Status,
+            vocab.Type,
             vocab.LanguageId);
 }

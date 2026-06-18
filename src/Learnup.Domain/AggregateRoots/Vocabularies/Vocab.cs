@@ -1,4 +1,5 @@
 ﻿using Learnup.Domain.AggregateRoots.Languages;
+using Learnup.Domain.AggregateRoots.Lessons;
 using Learnup.Domain.AggregateRoots.Tests;
 
 namespace Learnup.Domain.AggregateRoots.Vocabularies;

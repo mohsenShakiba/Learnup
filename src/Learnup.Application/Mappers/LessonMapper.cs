@@ -27,15 +27,19 @@ public static class LessonMapper
             lesson.Vocabs.Count(lv => completedVocabIds.Contains(lv.VocabId)));
 
     public static LessonDetailResponse ToDetailResponse(
-        this Lesson lesson) =>
-        new(
+        this Lesson lesson,
+        LessonVocabTestResponse vocabTest)
+    {
+        return new(
             lesson.Id,
             lesson.Title,
             lesson.Order,
             lesson.CourseId,
             lesson.Stories.Select(ls => ls.Story.ToResponse()).ToList(),
             lesson.Grammars.Select(lg => lg.Grammar.ToResponse()).ToList(),
-            lesson.Vocabs.Select(v => v.Vocab.ToResponse()).ToList());
+            lesson.Vocabs.Select(v => v.Vocab.ToResponse()).ToList(),
+            vocabTest);
+    }
 
     private static StoryItemResponse ToResponse(this Domain.AggregateRoots.Stories.StoryItem item) =>
         new(
@@ -45,5 +49,4 @@ public static class LessonMapper
             item.Order,
             item.VoiceId,
             item.Timestamps.Select(t => new StoryItemTimestampResponse(t.Id, t.Word, t.Start, t.End)).ToList());
-
 }

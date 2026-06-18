@@ -39,6 +39,7 @@ internal sealed class GetVocabTestsHandler(ILearnupDbContext dbContext, IIdentit
                 t.Id,
                 t.VocabId,
                 t.Question,
+                t.Type,
                 t.Options.Select(o => new TestOptionResponse(o.Id, o.Text)).ToList(),
                 result?.SelectedOptionId,
                 result?.IsCorrect);
