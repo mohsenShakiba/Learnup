@@ -1,6 +1,8 @@
 using System.ClientModel;
 using System.Text.Json;
 using Learnup.Application.ExternalServices;
+using Learnup.Domain.AggregateRoots.Grammars;
+using Learnup.Domain.AggregateRoots.Stories;
 using Learnup.Domain.AggregateRoots.Tests;
 using Learnup.Infrastructure.Prompts;
 using Microsoft.Extensions.Configuration;
@@ -12,7 +14,8 @@ namespace Learnup.Infrastructure.ExternalService;
 
 public class AiGrammarTestProvider(IConfiguration configuration, ILogger<AiGrammarTestProvider> logger) : IGrammarTestProvider
 {
-    public async Task<TestGenerationResult> GetGrammarTestAsync(string grammarName, string description, CancellationToken cancellationToken = default)
+    public async Task<List<TestGenerationResult>> GetGrammarTestAsync(Grammar grammar, Story story,
+        CancellationToken cancellationToken = default)
     {
         try
         {
@@ -25,45 +28,44 @@ public class AiGrammarTestProvider(IConfiguration configuration, ILogger<AiGramm
 
             var client = new OpenAIClient(
                 credential: new ApiKeyCredential(credential),
-                options: new OpenAIClientOptions { Endpoint = new Uri(baseUrl) });
+                options: new OpenAIClientOptions
+                {
+                    Endpoint = new Uri(baseUrl),
+                    NetworkTimeout = TimeSpan.FromHours(1)
+                });
 
             var chatClient = client.GetChatClient(modelName);
-            var userMessage = "Grammar: " + grammarName + ", Description: " + description;
+            var userMessage = "Grammar: " + grammar.Name + ", Description: " + grammar.Description;
+            var systemMessage = "Story: " + string.Join('\n', story.Items.Select(i => i.Content));
 
             ChatCompletion completion = await chatClient.CompleteChatAsync(
                 [
                     ChatMessage.CreateSystemMessage(GrammarTestPrompt.GetPrompt()),
+                    ChatMessage.CreateSystemMessage(systemMessage),
                     ChatMessage.CreateUserMessage(userMessage)
                 ],
                 cancellationToken: cancellationToken);
 
             var text = completion.Content[0].Text;
-            var cleanedText = ExtractJson(text);
 
-            var result = JsonSerializer.Deserialize<TestResponse>(cleanedText, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+            var result = JsonSerializer.Deserialize<List<TestResponse>>(text, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
 
-            if (result is null)
-                throw new InvalidOperationException("Invalid response from LmStudio");
-
-            return new TestGenerationResult(
-                VocabTestType.FillInTheBlanks,
-                result.Question,
-                result.Options.Select(o => new TestOptionResult(o.Text, o.IsCorrect)).ToArray());
+            return result?.Select(r =>
+            {
+                return new TestGenerationResult(
+                    VocabTestType.FillInTheBlanks,
+                    r.Question,
+                    r.Options.Select(o => new TestOptionResult(o.Text, o.IsCorrect)).ToArray());
+            }).ToList() ?? [];
         }
         catch (Exception e)
         {
-            logger.LogError(e, "Error generating grammar test for {GrammarName}", grammarName);
+            logger.LogError(e, "Error generating grammar test for {GrammarName}", grammar.Name);
             throw;
         }
     }
 
-    private static string ExtractJson(string text)
-    {
-        var start = text.IndexOf("{");
-        var end = text.LastIndexOf("}");
-        return start >= 0 && end > start ? text[start..(end + 1)] : text.Trim();
-    }
-
     private record TestResponse(string Question, OptionResponse[] Options);
+
     private record OptionResponse(string Text, bool IsCorrect);
 }
