@@ -20,4 +20,13 @@ public class LeitnerBoxController(IMediator mediator) : BasePublicController
         await mediator.Send(new AddVocabToLeitnerBox(vocabId), cancellationToken);
         return NoContent();
     }
+
+    [HttpPost("box-level", Name = "GetBoxLevelsInfo")]
+    public async Task<BoxLevelResponse> GetBoxLevelsInfo(CancellationToken cancellationToken)
+    {
+        var query = new GetBoxLevelsInfo();
+        var response = await mediator.Send(query, cancellationToken);
+        return response;
+    }
+    
 }

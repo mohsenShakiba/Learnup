@@ -2,6 +2,7 @@ using Learnup.Application.Authentication;
 using Learnup.Application.Mediation;
 using Learnup.Application.Persistence;
 using Learnup.Application.Responses.Public.LeitnerBox;
+using Learnup.Domain.AggregateRoots.Users;
 using Microsoft.EntityFrameworkCore;
 
 namespace Learnup.Application.Features.Public.LeitnerBoxes;
@@ -22,7 +23,11 @@ internal sealed class GetLeitnerBoxHandler(ILearnupDbContext dbContext, IIdentit
             .FirstOrDefaultAsync(b => b.UserId == identityProvider.UserId, cancellationToken);
 
         if (box is null)
-            return null;
+        {
+            
+            box = LeitnerBox.CreateWithLevels(identityProvider.UserId);
+            dbContext.LeitnerBoxes.Add(box);
+        }
 
         return new LeitnerBoxResponse(
             box.Id,
