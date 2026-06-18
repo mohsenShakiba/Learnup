@@ -4,7 +4,7 @@ using Learnup.Application.Persistence;
 using Learnup.Application.Responses.Public.LeitnerBox;
 using Microsoft.EntityFrameworkCore;
 
-namespace Learnup.Application.Features.Public.LeitnerBox;
+namespace Learnup.Application.Features.Public.LeitnerBoxes;
 
 public sealed record GetLeitnerBox : IRequest<LeitnerBoxResponse?>;
 
@@ -17,6 +17,8 @@ internal sealed class GetLeitnerBoxHandler(ILearnupDbContext dbContext, IIdentit
             .AsNoTracking()
             .Include(b => b.Items)
             .ThenInclude(i => i.Vocab)
+            .Include(b => b.Items)
+            .ThenInclude(i => i.BoxLevel)
             .FirstOrDefaultAsync(b => b.UserId == identityProvider.UserId, cancellationToken);
 
         if (box is null)
@@ -29,7 +31,7 @@ internal sealed class GetLeitnerBoxHandler(ILearnupDbContext dbContext, IIdentit
                 i.VocabId,
                 i.Vocab.Word,
                 i.Vocab.Translation,
-                i.BoxLevel,
+                i.BoxLevel.Level,
                 i.AddedAt)).ToList());
     }
 }

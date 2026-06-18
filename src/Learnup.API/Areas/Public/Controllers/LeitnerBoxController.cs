@@ -1,4 +1,4 @@
-using Learnup.Application.Features.Public.LeitnerBox;
+using Learnup.Application.Features.Public.LeitnerBoxes;
 using Learnup.Application.Mediation;
 using Learnup.Application.Responses.Public.LeitnerBox;
 using Microsoft.AspNetCore.Mvc;
