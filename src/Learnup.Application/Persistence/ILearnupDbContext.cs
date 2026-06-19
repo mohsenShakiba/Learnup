@@ -2,6 +2,7 @@ using Learnup.Domain.AggregateRoots.Courses;
 using Learnup.Domain.AggregateRoots.Grammars;
 using Learnup.Domain.AggregateRoots.Lessons;
 using Learnup.Domain.AggregateRoots.Stories;
+using Learnup.Domain.AggregateRoots.Subscriptions;
 using Learnup.Domain.AggregateRoots.Tests;
 using Learnup.Domain.AggregateRoots.Users;
 using Learnup.Domain.AggregateRoots.Vocabularies;
@@ -31,6 +32,9 @@ public interface ILearnupDbContext
     DbSet<UserVocabTestResult> UserVocabTestResults { get; }
     DbSet<UserGrammarTestResult> UserGrammarTestResults { get; }
     DbSet<LeitnerBox> LeitnerBoxes { get; }
+    DbSet<Subscription> Subscriptions { get; }
+    DbSet<SubscriptionFeature> SubscriptionFeatures { get; }
+    DbSet<UserSubscription> UserSubscriptions { get; }
 
     Task<int> SaveChangesAsync(CancellationToken cancellationToken = new CancellationToken());
 }

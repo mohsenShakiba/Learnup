@@ -8,7 +8,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddApplication();
 builder.Services.AddApplicationSwagger();
 builder.Services.AddInfrastructure(builder.Configuration);
-builder.Services.AddHostedService<AiProcessorHostedService>();
+// builder.Services.AddHostedService<AiProcessorHostedService>();
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();

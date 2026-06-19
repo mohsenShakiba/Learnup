@@ -4,6 +4,7 @@ using Learnup.Domain.AggregateRoots.Grammars;
 using Learnup.Domain.AggregateRoots.Languages;
 using Learnup.Domain.AggregateRoots.Lessons;
 using Learnup.Domain.AggregateRoots.Stories;
+using Learnup.Domain.AggregateRoots.Subscriptions;
 using Learnup.Domain.AggregateRoots.Tests;
 using Learnup.Domain.AggregateRoots.Users;
 using Learnup.Domain.AggregateRoots.Vocabularies;
@@ -35,6 +36,9 @@ public class LearnupDbContext(DbContextOptions<LearnupDbContext> options)
     public DbSet<UserVocabTestResult> UserVocabTestResults => Set<UserVocabTestResult>();
     public DbSet<UserGrammarTestResult> UserGrammarTestResults => Set<UserGrammarTestResult>();
     public DbSet<LeitnerBox> LeitnerBoxes => Set<LeitnerBox>();
+    public DbSet<Subscription> Subscriptions => Set<Subscription>();
+    public DbSet<SubscriptionFeature> SubscriptionFeatures => Set<SubscriptionFeature>();
+    public DbSet<UserSubscription> UserSubscriptions => Set<UserSubscription>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
