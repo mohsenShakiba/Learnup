@@ -1,3 +1,5 @@
+using Learnup.Domain.AggregateRoots.Lessons;
+
 namespace Learnup.Domain.AggregateRoots.Stories;
 
 public class Story
@@ -9,6 +11,7 @@ public class Story
     public int? Duration { get; private set; }
 
     public List<StoryItem> Items { get; private set; }
+    public List<LessonStory> Lessons { get; private set; }
 
     private Story()
     {

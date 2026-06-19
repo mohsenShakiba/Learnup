@@ -15,6 +15,7 @@ public class GrammarTestPipeline(
     public async Task ProcessAsync(CancellationToken cancellationToken = default)
     {
         var candidates = await dbContext.Grammars
+            .Include(g => g.Lessons)
             .Where(g => g.Id == 10)
             .Where(g => !g.Tests.Any())
             .Take(5)
@@ -25,14 +26,32 @@ public class GrammarTestPipeline(
             try
             {
                 var sw = Stopwatch.StartNew();
+                
+                var lessonGrammar = await dbContext.LessonGrammars
+                    .Include(g => g.Lesson)
+                    .ThenInclude(l => l.Stories)
+                    .ThenInclude(s => s.Story)
+                    .ThenInclude(s => s.Items)
+                    .Where(g => g.GrammarId == grammar.Id)
+                    .FirstOrDefaultAsync(cancellationToken);
+                
+                var story = lessonGrammar?.Lesson.Stories.Select(s => s.Story).FirstOrDefault();
 
-                var result = await grammarTestProvider.GetGrammarTestAsync(grammar.Name, grammar.Description, cancellationToken);
+                if (story is null)
+                {
+                    continue;
+                }
+                
+                var results = await grammarTestProvider.GetGrammarTestAsync(grammar, story, cancellationToken);
 
-                var test = new GrammarTest(grammar.Id);
-                var options = result.Options.Select(o => new GrammarTestOption(o.Text, o.IsCorrect)).ToList();
-                test.Publish(result.Question, options);
+                foreach (var result in results)
+                {
+                    var test = new GrammarTest(grammar.Id);
+                    var options = result.Options.Select(o => new GrammarTestOption(o.Text, o.IsCorrect)).ToList();
+                    test.Publish(result.Question, options);
+                    dbContext.GrammarTests.Add(test);
+                }
 
-                dbContext.GrammarTests.Add(test);
                 await dbContext.SaveChangesAsync(cancellationToken);
 
                 logger.LogInformation(

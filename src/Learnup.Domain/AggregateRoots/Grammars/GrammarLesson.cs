@@ -15,7 +15,7 @@ public class GrammarLesson
     
     public int GrammarId { get; private set; }
     public Grammar Grammar { get; private set; }
-
+    
     public int? VoiceId { get; private set; }
 
     public GrammarLesson(string title, HTMLTag htmlTag, string content, int order, string language, int? voiceId, int grammarId)

@@ -8,7 +8,7 @@ using Learnup.Domain.AggregateRoots.Users;
 using Microsoft.EntityFrameworkCore;
 
 namespace Learnup.Application.Features.Public.Lessons;
-
+    
 public sealed record GetLessonById(int Id) : IRequest<LessonDetailResponse?>;
 
 internal sealed class GetLessonByIdHandler(ILearnupDbContext dbContext, IIdentityProvider identityProvider)

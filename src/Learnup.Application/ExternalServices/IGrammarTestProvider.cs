@@ -1,6 +1,9 @@
+using Learnup.Domain.AggregateRoots.Grammars;
+using Learnup.Domain.AggregateRoots.Stories;
+
 namespace Learnup.Application.ExternalServices;
 
 public interface IGrammarTestProvider
 {
-    Task<TestGenerationResult> GetGrammarTestAsync(string grammarName, string description, CancellationToken cancellationToken = default);
+    Task<List<TestGenerationResult>> GetGrammarTestAsync(Grammar grammar, Story story, CancellationToken cancellationToken = default);
 }

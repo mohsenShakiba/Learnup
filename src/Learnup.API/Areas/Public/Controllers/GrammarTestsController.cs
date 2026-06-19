@@ -27,12 +27,10 @@ public class GrammarTestsController(IMediator mediator) : BasePublicController
         return Ok(result);
     }
 
-    [HttpPost("{id}/reset", Name = "ResetGrammarTestResult")]
-    public async Task<IActionResult> Reset(
-        int id,
-        CancellationToken cancellationToken)
+    [HttpPost("{lessonId}/reset", Name = "ResetGrammarTestResult")]
+    public async Task<IActionResult> Reset(int lessonId, CancellationToken cancellationToken)
     {
-        await mediator.Send(new ResetGrammarTestResult(id), cancellationToken);
+        await mediator.Send(new ResetGrammarTestResult(lessonId), cancellationToken);
         return NoContent();
     }
 }

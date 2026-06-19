@@ -5,24 +5,23 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Learnup.Application.Features.Public.Tests;
 
-public sealed record ResetGrammarTestResult(int GrammarTestId) : IRequest;
+public sealed record ResetGrammarTestResult(int LessonId) : IRequest;
 
 internal sealed class ResetGrammarTestResultHandler(ILearnupDbContext dbContext, IIdentityProvider identityProvider)
     : IRequestHandler<ResetGrammarTestResult>
 {
     public async Task<Unit> Handle(ResetGrammarTestResult request, CancellationToken cancellationToken)
     {
-        var result = await dbContext.UserGrammarTestResults
-            .FirstOrDefaultAsync(
-                r => r.UserId == identityProvider.UserId && r.GrammarTestId == request.GrammarTestId,
-                cancellationToken);
+        var lessonGrammarIds = await dbContext.LessonGrammars
+            .Where(l => l.LessonId == request.LessonId)
+            .Select(l => l.GrammarId)
+            .ToListAsync(cancellationToken);
 
-        if (result is null)
-        {
-            return Unit.Value;
-        }
+        var userTests = await dbContext.UserGrammarTestResults
+            .Where(t => t.UserId == identityProvider.UserId && lessonGrammarIds.Contains(t.GrammarTest.GrammarId))
+            .ToListAsync(cancellationToken);
 
-        dbContext.UserGrammarTestResults.Remove(result);
+        dbContext.UserGrammarTestResults.RemoveRange(userTests);
         await dbContext.SaveChangesAsync(cancellationToken);
         return Unit.Value;
     }

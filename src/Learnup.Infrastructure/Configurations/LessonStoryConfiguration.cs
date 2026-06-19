@@ -18,7 +18,7 @@ public class LessonStoryConfiguration : IEntityTypeConfiguration<LessonStory>
             .OnDelete(DeleteBehavior.Cascade);
 
         builder.HasOne(ls => ls.Story)
-            .WithMany()
+            .WithMany(s => s.Lessons)
             .HasForeignKey(ls => ls.StoryId)
             .OnDelete(DeleteBehavior.Restrict);
     }
