@@ -13,3 +13,10 @@ public sealed record LeitnerBoxItemResponse(
     string? Translation,
     Level BoxLevel,
     DateTime AddedAt);
+
+public sealed record DueLeitnerBoxItemResponse(
+    int Id,
+    int VocabId,
+    string Word,
+    string? Translation,
+    DateTime? NextReviewAt);

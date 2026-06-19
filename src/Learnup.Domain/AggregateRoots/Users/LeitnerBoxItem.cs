@@ -47,4 +47,15 @@ public class LeitnerBoxItem
         ReviewedAt = reviewedAt;
         NextReviewAt = reviewedAt + boxLevel.WillReviewedIn;
     }
+
+    public void UpdateNextReviewAt(TimeSpan reviewInterval)
+    {
+        if (reviewInterval < TimeSpan.Zero)
+        {
+            throw new InvalidOperationException("Review interval cannot be negative.");
+        }
+
+        var nextReviewBase = ReviewedAt ?? DateTime.UtcNow;
+        NextReviewAt = nextReviewBase + reviewInterval;
+    }
 }

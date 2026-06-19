@@ -7,6 +7,7 @@ public class BoxLevel
 
     public int LeitnerBoxId { get; private set; }
     public LeitnerBox LeitnerBox { get; private set; } = null!;
+    public TimeSpan WillReviewedIn { get; private set; }
 
     public IReadOnlyList<LeitnerBoxItem> Items => _items.AsReadOnly();
     private readonly List<LeitnerBoxItem> _items = new();
@@ -30,11 +31,19 @@ public class BoxLevel
         _items.Remove(item);
     }
 
-    public TimeSpan WillReviewedIn { get; private set; }
-
     public BoxLevel(TimeSpan willReviewedIn, Level level)
     {
         WillReviewedIn = willReviewedIn;
         Level = level;
+    }
+
+    public void UpdateWillReviewedIn(TimeSpan willReviewedIn)
+    {
+        if (willReviewedIn < TimeSpan.Zero)
+        {
+            throw new InvalidOperationException("Review interval cannot be negative.");
+        }
+
+        WillReviewedIn = willReviewedIn;
     }
 }
