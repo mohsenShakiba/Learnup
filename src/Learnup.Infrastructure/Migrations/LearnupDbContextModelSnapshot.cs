@@ -653,6 +653,31 @@ namespace Learnup.Infrastructure.Migrations
                     b.ToTable("User", (string)null);
                 });
 
+            modelBuilder.Entity("Learnup.Domain.AggregateRoots.Users.UserStreak", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<DateOnly>("StreakDate")
+                        .HasColumnType("date");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime>("VisitedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId", "StreakDate")
+                        .IsUnique();
+
+                    b.ToTable("UserStreak", (string)null);
+                });
+
             modelBuilder.Entity("Learnup.Domain.AggregateRoots.Users.UserCourse", b =>
                 {
                     b.Property<int>("UserId")
@@ -766,6 +791,17 @@ namespace Learnup.Infrastructure.Migrations
                     b.HasIndex("StoryId");
 
                     b.ToTable("UserStory", (string)null);
+                });
+
+            modelBuilder.Entity("Learnup.Domain.AggregateRoots.Users.UserStreak", b =>
+                {
+                    b.HasOne("Learnup.Domain.AggregateRoots.Users.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("Learnup.Domain.AggregateRoots.Users.UserVocab", b =>
