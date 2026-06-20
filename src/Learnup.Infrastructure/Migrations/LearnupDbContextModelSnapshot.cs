@@ -790,6 +790,15 @@ namespace Learnup.Infrastructure.Migrations
                     b.Property<DateTime?>("CompletedAt")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<int?>("LastReadEntityId")
+                        .HasColumnType("integer");
+
+                    b.Property<int?>("LastReadEntityType")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime>("LastVisitedAt")
+                        .HasColumnType("timestamp with time zone");
+
                     b.Property<DateTime>("StartedAt")
                         .HasColumnType("timestamp with time zone");
 

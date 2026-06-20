@@ -1,6 +1,7 @@
 using Learnup.Application.Features.Public.Lessons;
 using Learnup.Application.Mediation;
 using Learnup.Application.Responses.Public.Lessons;
+using Learnup.Domain.AggregateRoots.Users;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Learnup.API.Areas.Public.Controllers;
@@ -20,9 +21,23 @@ public class LessonsController(IMediator mediator) : BasePublicController
     [HttpGet("{id:int}", Name = "GetLessonById")]
     public async Task<ActionResult<LessonDetailResponse>> GetById(
         int id,
+        [FromQuery] UserLessonEntityType? lastReadEntityType,
+        [FromQuery] int? lastReadEntityId,
         CancellationToken cancellationToken)
     {
-        var lesson = await mediator.Send(new GetLessonById(id), cancellationToken);
+        var lesson = await mediator.Send(
+            new GetLessonById(id, lastReadEntityType, lastReadEntityId),
+            cancellationToken);
+
+        return lesson is null
+            ? NotFound()
+            : Ok(lesson);
+    }
+
+    [HttpPost("next", Name = "GoToNextLesson")]
+    public async Task<ActionResult<LessonDetailResponse>> GoToNext(CancellationToken cancellationToken)
+    {
+        var lesson = await mediator.Send(new GoToNextLesson(), cancellationToken);
 
         return lesson is null
             ? NotFound()

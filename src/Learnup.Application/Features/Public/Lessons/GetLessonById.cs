@@ -9,7 +9,10 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Learnup.Application.Features.Public.Lessons;
     
-public sealed record GetLessonById(int Id) : IRequest<LessonDetailResponse?>;
+public sealed record GetLessonById(
+    int Id,
+    UserLessonEntityType? LastReadEntityType = null,
+    int? LastReadEntityId = null) : IRequest<LessonDetailResponse?>;
 
 internal sealed class GetLessonByIdHandler(ILearnupDbContext dbContext, IIdentityProvider identityProvider)
     : IRequestHandler<GetLessonById, LessonDetailResponse?>
@@ -45,19 +48,28 @@ internal sealed class GetLessonByIdHandler(ILearnupDbContext dbContext, IIdentit
             Score = userVocabTests.Count == 0 ? 0 : userVocabTests.Count / (float)vocabTestsCount * 100
         };
 
-        var userLessonExists = await dbContext.UserLessons
-            .AsNoTracking()
-            .AnyAsync(
+        var userLesson = await dbContext.UserLessons
+            .FirstOrDefaultAsync(
                 userLesson => userLesson.UserId == identityProvider.UserId
                     && userLesson.LessonId == request.Id,
                 cancellationToken);
 
-        if (!userLessonExists)
+        if (userLesson is null)
         {
-            dbContext.UserLessons.Add(new UserLesson(identityProvider.UserId, request.Id));
-
-            await dbContext.SaveChangesAsync(cancellationToken);
+            userLesson = new UserLesson(identityProvider.UserId, request.Id);
+            dbContext.UserLessons.Add(userLesson);
         }
+
+        if (request.LastReadEntityType is not null && request.LastReadEntityId is not null)
+        {
+            userLesson.TrackLastReadEntity(request.LastReadEntityType.Value, request.LastReadEntityId.Value);
+        }
+        else
+        {
+            userLesson.Touch();
+        }
+
+        await dbContext.SaveChangesAsync(cancellationToken);
 
         return lesson.ToDetailResponse(vocabTest);
     }
