@@ -13,8 +13,6 @@ public class UserLesson
     public DateTime StartedAt { get; private set; }
     public DateTime LastVisitedAt { get; private set; }
     public DateTime? CompletedAt { get; private set; }
-    public UserLessonEntityType? LastReadEntityType { get; private set; }
-    public int? LastReadEntityId { get; private set; }
 
     public UserLesson(int userId, int lessonId)
     {
@@ -31,13 +29,6 @@ public class UserLesson
     public void Complete()
     {
         CompletedAt ??= DateTime.UtcNow;
-        Touch();
-    }
-
-    public void TrackLastReadEntity(UserLessonEntityType entityType, int entityId)
-    {
-        LastReadEntityType = entityType;
-        LastReadEntityId = entityId;
         Touch();
     }
 }

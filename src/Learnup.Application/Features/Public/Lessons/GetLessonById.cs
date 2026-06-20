@@ -8,7 +8,7 @@ using Learnup.Domain.AggregateRoots.Users;
 using Microsoft.EntityFrameworkCore;
 
 namespace Learnup.Application.Features.Public.Lessons;
-    
+
 public sealed record GetLessonById(
     int Id,
     UserLessonEntityType? LastReadEntityType = null,
@@ -28,15 +28,15 @@ internal sealed class GetLessonByIdHandler(ILearnupDbContext dbContext, IIdentit
             .Include(l => l.Vocabs).ThenInclude(lv => lv.Vocab).ThenInclude(v => v.Tests)
             .Where(l => l.Id == request.Id)
             .FirstOrDefaultAsync(cancellationToken);
-        
+
         if (lesson is null)
         {
             return null;
         }
-        
+
         var vocabIds = lesson.Vocabs.Select(lv => lv.VocabId).ToList();
         var vocabTestsCount = lesson.Vocabs.SelectMany(lv => lv.Vocab.Tests).Count();
-        
+
         var userVocabTests = await dbContext.UserVocabTestResults
             .Where(t => t.UserId == identityProvider.UserId && vocabIds.Contains(t.VocabTest.Vocab.Id))
             .Select(t => t.IsCorrect)
@@ -62,7 +62,7 @@ internal sealed class GetLessonByIdHandler(ILearnupDbContext dbContext, IIdentit
 
         if (request.LastReadEntityType is not null && request.LastReadEntityId is not null)
         {
-            userLesson.TrackLastReadEntity(request.LastReadEntityType.Value, request.LastReadEntityId.Value);
+            // todo, update user lesson
         }
         else
         {

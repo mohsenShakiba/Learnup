@@ -29,3 +29,13 @@ public sealed record LessonDetailResponse(
     IReadOnlyList<GrammarResponse> Grammars,
     IReadOnlyList<VocabResponse> Vocabs,
     LessonVocabTestResponse? VocabTest);
+
+public sealed record CurrentLessonProgressResponse(
+    int LessonId,
+    string Title,
+    int Order,
+    int CourseId,
+    bool IsStoryCompleted,
+    bool IsGrammarCompleted,
+    bool IsVocabCompleted,
+    int? NextLessonId);

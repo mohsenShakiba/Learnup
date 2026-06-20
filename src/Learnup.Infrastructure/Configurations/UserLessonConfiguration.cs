@@ -20,11 +20,6 @@ public class UserLessonConfiguration : IEntityTypeConfiguration<UserLesson>
 
         builder.Property(ul => ul.CompletedAt);
 
-        builder.Property(ul => ul.LastReadEntityType)
-            .HasConversion<int>();
-
-        builder.Property(ul => ul.LastReadEntityId);
-
         builder.HasOne(ul => ul.User)
             .WithMany(u => u.Lessons)
             .HasForeignKey(ul => ul.UserId)

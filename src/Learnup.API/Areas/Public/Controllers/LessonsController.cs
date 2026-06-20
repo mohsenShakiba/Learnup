@@ -18,6 +18,16 @@ public class LessonsController(IMediator mediator) : BasePublicController
         return Ok(lessons);
     }
 
+    [HttpGet("current", Name = "GetCurrentLessonProgress")]
+    public async Task<ActionResult<CurrentLessonProgressResponse>> GetCurrent(CancellationToken cancellationToken)
+    {
+        var progress = await mediator.Send(new GetCurrentLessonProgress(), cancellationToken);
+
+        return progress is null
+            ? NotFound()
+            : Ok(progress);
+    }
+
     [HttpGet("{id:int}", Name = "GetLessonById")]
     public async Task<ActionResult<LessonDetailResponse>> GetById(
         int id,
