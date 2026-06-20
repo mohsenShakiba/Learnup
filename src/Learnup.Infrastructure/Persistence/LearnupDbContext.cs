@@ -3,6 +3,7 @@ using Learnup.Domain.AggregateRoots.Courses;
 using Learnup.Domain.AggregateRoots.Grammars;
 using Learnup.Domain.AggregateRoots.Languages;
 using Learnup.Domain.AggregateRoots.Lessons;
+using Learnup.Domain.AggregateRoots.MotivationalSentences;
 using Learnup.Domain.AggregateRoots.Stories;
 using Learnup.Domain.AggregateRoots.Subscriptions;
 using Learnup.Domain.AggregateRoots.Tests;
@@ -20,6 +21,7 @@ public class LearnupDbContext(DbContextOptions<LearnupDbContext> options)
     public DbSet<GrammarLesson> GrammarLessons => Set<GrammarLesson>();
     public DbSet<Language> Languages => Set<Language>();
     public DbSet<Lesson> Lessons => Set<Lesson>();
+    public DbSet<MotivationalSentence> MotivationalSentences => Set<MotivationalSentence>();
     public DbSet<LessonVocab> LessonVocabs => Set<LessonVocab>();
     public DbSet<LessonGrammar> LessonGrammars => Set<LessonGrammar>();
     public DbSet<Story> Stories => Set<Story>();

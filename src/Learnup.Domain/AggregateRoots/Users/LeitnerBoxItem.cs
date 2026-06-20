@@ -15,7 +15,9 @@ public class LeitnerBoxItem
     public DateTime? NextReviewAt { get; private set; }
     public DateTime? ReviewedAt { get; private set; }
 
-    private LeitnerBoxItem() { }
+    private LeitnerBoxItem()
+    {
+    }
 
     public LeitnerBoxItem(int vocabId, BoxLevel boxLevel)
     {

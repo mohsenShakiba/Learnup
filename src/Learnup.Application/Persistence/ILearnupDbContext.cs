@@ -1,6 +1,7 @@
 using Learnup.Domain.AggregateRoots.Courses;
 using Learnup.Domain.AggregateRoots.Grammars;
 using Learnup.Domain.AggregateRoots.Lessons;
+using Learnup.Domain.AggregateRoots.MotivationalSentences;
 using Learnup.Domain.AggregateRoots.Stories;
 using Learnup.Domain.AggregateRoots.Subscriptions;
 using Learnup.Domain.AggregateRoots.Tests;
@@ -16,6 +17,7 @@ public interface ILearnupDbContext
     DbSet<Grammar> Grammars { get; }
     DbSet<GrammarLesson> GrammarLessons { get; }
     DbSet<Lesson> Lessons { get; }
+    DbSet<MotivationalSentence> MotivationalSentences { get; }
     DbSet<LessonVocab> LessonVocabs { get; }
     DbSet<LessonGrammar> LessonGrammars { get; }
     DbSet<Story> Stories { get; }
