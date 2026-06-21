@@ -25,6 +25,17 @@ public class LeitnerBoxController(IMediator mediator) : BasePublicController
         return NoContent();
     }
 
+    [HttpPost("item/{id:int}/review", Name = "ReviewLeitnerBoxItem")]
+    public async Task<IActionResult> ReviewItem(
+        int id,
+        [FromBody] ReviewLeitnerBoxItemRequest request,
+        CancellationToken cancellationToken)
+    {
+        var command = new ReviewItem(id, request.AnswerQuality);
+        await mediator.Send(command, cancellationToken);
+        return NoContent();
+    }
+
     [HttpPost("box-level", Name = "GetBoxLevelsInfo")]
     public async Task<BoxLevelResponse> GetBoxLevelsInfo(CancellationToken cancellationToken)
     {
