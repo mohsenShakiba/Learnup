@@ -1,3 +1,5 @@
+using Amazon.Runtime;
+using Amazon.S3;
 using Learnup.Application.AiPipelines;
 using Learnup.Application.ExternalServices;
 using Learnup.Application.Persistence;
@@ -28,6 +30,39 @@ public static class DependencyInjection
             provider.GetRequiredService<LearnupDbContext>());
 
         services.AddHttpClient();
+
+        services.Configure<S3FileStorageOptions>(
+            configuration.GetSection(S3FileStorageOptions.SectionName));
+
+        services.AddSingleton<IAmazonS3>(_ =>
+        {
+            var options = configuration
+                .GetSection(S3FileStorageOptions.SectionName)
+                .Get<S3FileStorageOptions>() ?? new S3FileStorageOptions();
+
+            if (string.IsNullOrWhiteSpace(options.ServiceUrl))
+            {
+                throw new InvalidOperationException("S3 service URL is not configured.");
+            }
+
+            if (string.IsNullOrWhiteSpace(options.AccessKey) ||
+                string.IsNullOrWhiteSpace(options.SecretKey))
+            {
+                throw new InvalidOperationException("S3 credentials are not configured.");
+            }
+
+            var clientConfig = new AmazonS3Config
+            {
+                ServiceURL = options.ServiceUrl,
+                ForcePathStyle = options.ForcePathStyle
+            };
+            
+            var credentials = new BasicAWSCredentials(options.AccessKey, options.SecretKey);
+            
+            return new AmazonS3Client(credentials, clientConfig);
+        });
+
+        services.AddScoped<IFileService, S3FileService>();
         services.AddScoped<IAiTextService, OpenAiTextService>();
         services.AddScoped<IVoiceProvider, KokoroVoiceProvider>();
         services.AddScoped<IVocabTranslationProvider, AiVocabTranslationProvider>();

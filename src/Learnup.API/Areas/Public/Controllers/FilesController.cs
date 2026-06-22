@@ -13,6 +13,6 @@ public class FilesController(IMediator mediator) : BasePublicController
 
         return file is null
             ? NotFound()
-            : PhysicalFile(file.Path, file.ContentType, file.Id);
+            : File(file.Content, file.ContentType, file.Id);
     }
 }

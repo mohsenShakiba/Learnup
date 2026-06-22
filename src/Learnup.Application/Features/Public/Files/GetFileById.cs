@@ -42,7 +42,7 @@ internal sealed class GetFileByIdHandler(IConfiguration configuration)
 
         return Task.FromResult<FileResponse?>(new FileResponse(
             fileId,
-            filePath,
+            File.OpenRead(filePath),
             GetContentType(filePath)));
     }
 

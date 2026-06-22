@@ -2,5 +2,5 @@ namespace Learnup.Application.Responses.Public.Files;
 
 public sealed record FileResponse(
     string Id,
-    string Path,
+    Stream Content,
     string ContentType);

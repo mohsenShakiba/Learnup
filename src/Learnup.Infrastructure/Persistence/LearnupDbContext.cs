@@ -37,6 +37,7 @@ public class LearnupDbContext(DbContextOptions<LearnupDbContext> options)
     public DbSet<UserGrammar> UserGrammars => Set<UserGrammar>();
     public DbSet<UserStory> UserStories => Set<UserStory>();
     public DbSet<UserVocab> UserVocabs => Set<UserVocab>();
+    public DbSet<UserBook> UserBooks => Set<UserBook>();
     public DbSet<UserVocabTestResult> UserVocabTestResults => Set<UserVocabTestResult>();
     public DbSet<UserGrammarTestResult> UserGrammarTestResults => Set<UserGrammarTestResult>();
     public DbSet<LeitnerBox> LeitnerBoxes => Set<LeitnerBox>();

@@ -33,6 +33,7 @@ public interface ILearnupDbContext
     DbSet<UserGrammar> UserGrammars { get; }
     DbSet<UserStory> UserStories { get; }
     DbSet<UserVocab> UserVocabs { get; }
+    DbSet<UserBook> UserBooks { get; }
     DbSet<UserVocabTestResult> UserVocabTestResults { get; }
     DbSet<UserGrammarTestResult> UserGrammarTestResults { get; }
     DbSet<LeitnerBox> LeitnerBoxes { get; }
