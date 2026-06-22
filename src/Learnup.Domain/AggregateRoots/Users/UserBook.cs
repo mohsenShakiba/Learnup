@@ -9,7 +9,7 @@ public class UserBook
 
     public string Title { get; private set; }
     public string FileName { get; private set; }
-    public int CurrentPage { get; private set; }
+    public string? CurrentRef { get; private set; }
     public DateTime UploadedAt { get; private set; }
 
     private UserBook()
@@ -23,7 +23,11 @@ public class UserBook
         UserId = userId;
         Title = title;
         FileName = fileName;
-        CurrentPage = 1;
         UploadedAt = DateTime.UtcNow;
+    }
+
+    public void UpdateCurrentRef(string currentRef)
+    {
+        CurrentRef = currentRef;
     }
 }

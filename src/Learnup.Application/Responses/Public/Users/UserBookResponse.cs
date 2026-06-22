@@ -4,5 +4,5 @@ public sealed record UserBookResponse(
     int Id,
     string Title,
     string FileName,
-    int CurrentPage,
+    string? CurrentRef,
     DateTime UploadedAt);

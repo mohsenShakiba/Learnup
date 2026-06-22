@@ -60,4 +60,17 @@ public class UserBooksController(IMediator mediator) : BasePublicController
             ? NotFound()
             : File(file.Content, file.ContentType, file.Id);
     }
+
+    [HttpPut("book/{id:int}", Name = "UpdateUserBookCurrentPage")]
+    public async Task<IActionResult> UpdateCurrentPage(
+        int id,
+        [FromBody] UpdateUserBookCurrentPageRequest request,
+        CancellationToken cancellationToken)
+    {
+        var command = new UpdateUserBookCurrentPage(id, request.CurrentRef);
+
+        await mediator.Send(command, cancellationToken);
+
+        return NoContent();
+    }
 }

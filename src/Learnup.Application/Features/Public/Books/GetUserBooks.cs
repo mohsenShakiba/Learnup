@@ -25,7 +25,7 @@ internal sealed class GetUserBooksHandler(
                 book.Id,
                 book.Title,
                 book.FileName,
-                book.CurrentPage,
+                book.CurrentRef,
                 book.UploadedAt))
             .ToListAsync(cancellationToken);
         

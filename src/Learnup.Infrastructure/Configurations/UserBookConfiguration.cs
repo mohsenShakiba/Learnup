@@ -20,8 +20,8 @@ public class UserBookConfiguration : IEntityTypeConfiguration<UserBook>
             .HasMaxLength(500)
             .IsRequired();
 
-        builder.Property(ub => ub.CurrentPage)
-            .IsRequired();
+        builder.Property(ub => ub.CurrentRef)
+            .HasMaxLength(500);
 
         builder.Property(ub => ub.UploadedAt)
             .IsRequired();
