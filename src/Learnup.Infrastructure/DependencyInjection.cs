@@ -28,6 +28,7 @@ public static class DependencyInjection
             provider.GetRequiredService<LearnupDbContext>());
 
         services.AddHttpClient();
+        services.AddScoped<IAiTextService, OpenAiTextService>();
         services.AddScoped<IVoiceProvider, KokoroVoiceProvider>();
         services.AddScoped<IVocabTranslationProvider, AiVocabTranslationProvider>();
         services.AddScoped<IVocabTestProvider, AiVocabTestProvider>();
