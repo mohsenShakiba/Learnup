@@ -16,12 +16,20 @@ public class UserBookConfiguration : IEntityTypeConfiguration<UserBook>
             .HasMaxLength(500)
             .IsRequired();
 
+        builder.Property(ub => ub.Author)
+            .HasMaxLength(500);
+
         builder.Property(ub => ub.FileName)
             .HasMaxLength(500)
             .IsRequired();
 
+        builder.Property(ub => ub.CoverId)
+            .HasMaxLength(500);
+
         builder.Property(ub => ub.CurrentRef)
             .HasMaxLength(500);
+
+        builder.Property(ub => ub.Progress);
 
         builder.Property(ub => ub.UploadedAt)
             .IsRequired();

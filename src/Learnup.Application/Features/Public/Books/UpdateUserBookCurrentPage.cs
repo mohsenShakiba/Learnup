@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Learnup.Application.Features.Public.Books;
 
-public sealed record UpdateUserBookCurrentPage(int UserBookId, string CurrentRef) : IRequest;
+public sealed record UpdateUserBookCurrentPage(int UserBookId, string CurrentRef, float? Progress) : IRequest;
 
 internal sealed class UpdateUserBookCurrentPageHandler(
     ILearnupDbContext dbContext,
@@ -26,7 +26,7 @@ internal sealed class UpdateUserBookCurrentPageHandler(
             throw new InvalidOperationException("User book not found.");
         }
 
-        book.UpdateCurrentRef(request.CurrentRef);
+        book.UpdateCurrentRef(request.CurrentRef, request.Progress);
 
         await dbContext.SaveChangesAsync(cancellationToken);
 

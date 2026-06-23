@@ -8,7 +8,11 @@ using Microsoft.Extensions.Logging;
 
 namespace Learnup.Infrastructure.ExternalService;
 
-public class KokoroVoiceProvider(IHttpClientFactory httpClientFactory, IConfiguration configuration, ILogger<KokoroVoiceProvider> logger)
+public class KokoroVoiceProvider(
+    IHttpClientFactory httpClientFactory,
+    IConfiguration configuration,
+    ILogger<KokoroVoiceProvider> logger,
+    IFileService fileService)
     : IVoiceProvider
 {
     public async Task<VoiceResult> GetVoiceAsync(string content, VoiceOptions? options, CancellationToken cancellationToken = default)
@@ -46,24 +50,20 @@ public class KokoroVoiceProvider(IHttpClientFactory httpClientFactory, IConfigur
             }
 
             var audioBytes = Convert.FromBase64String(RemoveDataUriPrefix(response.Audio));
-            var fileName = $"kokoro-{DateTimeOffset.UtcNow:yyyyMMddHHmmss}-{Guid.NewGuid():N}.mp3";
-            var outputDirectory = configuration["VoiceConfiguration:OutputDirectory"];
+            var fileName = $"kokoro-{DateTimeOffset.UtcNow:yyyyMMddHHmmss}-{Guid.NewGuid():N}.wav";
+            await using var audioStream = new MemoryStream(audioBytes);
 
-            if (string.IsNullOrWhiteSpace(outputDirectory))
-            {
-                throw new InvalidOperationException("VoiceOutput is not set");
-            }
-            
-            Directory.CreateDirectory(outputDirectory);
-
-            var filePath = Path.Combine(outputDirectory, fileName);
-            await File.WriteAllBytesAsync(filePath, audioBytes, cancellationToken);
+            var storedFile = await fileService.StoreAsync(new StoreFileRequest(
+                audioStream,
+                fileName,
+                BucketNames.FilesBucket,
+                "audio/wav"), cancellationToken);
 
             var captions = response.Timestamps
                 .Select(timestamp => new VoiceCaption(timestamp.Word, timestamp.StartTime, timestamp.EndTime))
                 .ToList();
 
-            return new VoiceResult(fileName, captions);
+            return new VoiceResult(storedFile.Id, captions);
         }
         catch (Exception e)
         {

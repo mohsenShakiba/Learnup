@@ -8,8 +8,11 @@ public class UserBook
     public User User { get; private set; } = null!;
 
     public string Title { get; private set; }
+    public string? Author { get; private set; }
     public string FileName { get; private set; }
+    public string? CoverId { get; private set; }
     public string? CurrentRef { get; private set; }
+    public float? Progress { get; private set; }
     public DateTime UploadedAt { get; private set; }
 
     private UserBook()
@@ -18,16 +21,18 @@ public class UserBook
         FileName = string.Empty;
     }
 
-    public UserBook(int userId, string title, string fileName)
+    public UserBook(int userId, string title, string fileName, string? coverId = null)
     {
         UserId = userId;
         Title = title;
         FileName = fileName;
+        CoverId = coverId;
         UploadedAt = DateTime.UtcNow;
     }
 
-    public void UpdateCurrentRef(string currentRef)
+    public void UpdateCurrentRef(string currentRef, float? progress)
     {
         CurrentRef = currentRef;
+        Progress = progress;
     }
 }

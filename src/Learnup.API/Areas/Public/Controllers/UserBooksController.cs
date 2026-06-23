@@ -24,15 +24,19 @@ public class UserBooksController(IMediator mediator) : BasePublicController
             return BadRequest("Book file cannot be empty.");
         }
 
-        await using var stream = request.File.OpenReadStream();
-        await using var coverStream = request.CoverImage?.OpenReadStream();
+        await using var bookStream = request.File.OpenReadStream();
+
+        await using var coverStream = request.CoverImage is { Length: > 0 } coverImage
+            ? coverImage.OpenReadStream()
+            : null;
 
         var cmd = new UploadUserBook(
-            stream,
-            request.File.FileName,
+            bookStream,
             request.File.ContentType,
             request.File.Length,
-            request.Title);
+            request.Title,
+            coverStream,
+            request.CoverImage?.ContentType);
 
         await mediator.Send(cmd, cancellationToken);
 
@@ -43,22 +47,10 @@ public class UserBooksController(IMediator mediator) : BasePublicController
     public async Task<ActionResult<IReadOnlyList<UserBookResponse>>> Get(CancellationToken cancellationToken)
     {
         var query = new GetUserBooks();
-        
+
         var books = await mediator.Send(query, cancellationToken);
-        
+
         return Ok(books);
-    }
-
-    [HttpGet("book/{name}", Name = "GetUserBookFile")]
-    public async Task<IActionResult> GetFile(string name, CancellationToken cancellationToken)
-    {
-        var query = new GetUserBookFile(name);
-        
-        var file = await mediator.Send(query, cancellationToken);
-
-        return file is null
-            ? NotFound()
-            : File(file.Content, file.ContentType, file.Id);
     }
 
     [HttpPut("book/{id:int}", Name = "UpdateUserBookCurrentPage")]
@@ -67,7 +59,7 @@ public class UserBooksController(IMediator mediator) : BasePublicController
         [FromBody] UpdateUserBookCurrentPageRequest request,
         CancellationToken cancellationToken)
     {
-        var command = new UpdateUserBookCurrentPage(id, request.CurrentRef);
+        var command = new UpdateUserBookCurrentPage(id, request.CurrentRef, request.Progress);
 
         await mediator.Send(command, cancellationToken);
 

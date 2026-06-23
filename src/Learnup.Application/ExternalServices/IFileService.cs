@@ -19,10 +19,12 @@ public interface IFileService
 {
     Task<StoredFile> StoreAsync(StoreFileRequest request, CancellationToken cancellationToken);
 
-    Task<FileContent?> GetAsync(string bucketName, string id, CancellationToken cancellationToken);
+    Task<FileContent?> GetAsync(string fileId, CancellationToken cancellationToken);
 }
 
 public class BucketNames
 {
+    public const string FilesBucket = "learnup-files";
     public const string BooksBucket = "learnup-books";
+    public const string BooksCoverBucket = "learnup-books-cover";
 }

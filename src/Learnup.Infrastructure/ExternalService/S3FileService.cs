@@ -19,23 +19,29 @@ internal sealed class S3FileService(IAmazonS3 s3Client)
             ContentType = request.ContentType,
         }, cancellationToken);
 
-        return new StoredFile(request.FileName, request.ContentType);
+        return new StoredFile(GetFileId(request.BucketName, request.FileName), request.ContentType);
     }
 
     public async Task<FileContent?> GetAsync(
-        string bucketName, string id,
+        string fileId,
         CancellationToken cancellationToken)
     {
+        var parsedFileId = ParseFileId(fileId);
+        if (parsedFileId is null)
+        {
+            return null;
+        }
+
         try
         {
             var response = await s3Client.GetObjectAsync(new GetObjectRequest
             {
-                BucketName = bucketName,
-                Key = id
+                BucketName = parsedFileId.Value.BucketName,
+                Key = parsedFileId.Value.Key
             }, cancellationToken);
 
             return new FileContent(
-                id,
+                fileId,
                 response.ResponseStream,
                 response.Headers.ContentType);
         }
@@ -44,4 +50,22 @@ internal sealed class S3FileService(IAmazonS3 s3Client)
             return null;
         }
     }
+
+    private static string GetFileId(string bucketName, string key)
+    {
+        return $"{bucketName}/{key}";
+    }
+
+    private static ParsedFileId? ParseFileId(string fileId)
+    {
+        var parts = fileId.Split('/', 2, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+        if (parts.Length != 2 || string.IsNullOrWhiteSpace(parts[0]) || string.IsNullOrWhiteSpace(parts[1]))
+        {
+            return null;
+        }
+
+        return new ParsedFileId(parts[0], parts[1]);
+    }
+
+    private readonly record struct ParsedFileId(string BucketName, string Key);
 }

@@ -24,8 +24,11 @@ internal sealed class GetUserBooksHandler(
             .Select(book => new UserBookResponse(
                 book.Id,
                 book.Title,
+                book.Author,
                 book.FileName,
+                book.CoverId,
                 book.CurrentRef,
+                book.Progress,
                 book.UploadedAt))
             .ToListAsync(cancellationToken);
         

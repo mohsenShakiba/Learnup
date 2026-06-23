@@ -1,13 +1,23 @@
 using System.Net.Http.Json;
+using System.Net.Http.Headers;
 using System.Text.Json;
 using Learnup.Application.ExternalServices;
+using Learnup.Application.Responses.Public.Ai;
 using Microsoft.Extensions.Configuration;
 
 namespace Learnup.Infrastructure.ExternalService;
 
 public class OpenAiTextService(IConfiguration configuration, IHttpClientFactory httpClientFactory) : IAiTextService
 {
-    public async Task<string> SendAsync(string prompt, CancellationToken cancellationToken = default)
+    private static readonly JsonSerializerOptions JsonOptions = new()
+    {
+        PropertyNameCaseInsensitive = true
+    };
+
+    public async Task<SendAiTextResponse> SendAsync(
+        string word,
+        string sentence,
+        CancellationToken cancellationToken = default)
     {
         var apiKey = configuration["OpenAiService:ApiKey"];
         var baseUrl = configuration["OpenAiService:BaseUrl"];
@@ -23,15 +33,19 @@ public class OpenAiTextService(IConfiguration configuration, IHttpClientFactory 
         var client = httpClientFactory.CreateClient();
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"{baseUrl.TrimEnd('/')}/chat/completions");
-        request.Headers.Add("Authorization", $"Bearer {apiKey}");
+        request.Headers.Authorization = CreateAuthorizationHeader(apiKey);
 
         var body = new
         {
             model = modelName,
             messages = new[]
             {
-                new { role = "system", content = "Translate the following sentence to farsi, be concise." },
-                new { role = "user", content = prompt }
+                new
+                {
+                    role = "system",
+                    content = "Translate the provided English word and English sentence to Farsi. Return only valid JSON with this exact shape: { \"wordTranslation\": \"...\", \"sentenceTranslation\": \"...\" }."
+                },
+                new { role = "user", content = $"Word: {word}\nSentence: {sentence}" }
             }
         };
 
@@ -43,10 +57,44 @@ public class OpenAiTextService(IConfiguration configuration, IHttpClientFactory 
         var json = await response.Content.ReadAsStringAsync(cancellationToken);
         using var doc = JsonDocument.Parse(json);
 
-        return doc.RootElement
+        var content = doc.RootElement
             .GetProperty("choices")[0]
             .GetProperty("message")
             .GetProperty("content")
-            .GetString() ?? string.Empty;
+            .GetString();
+
+        if (string.IsNullOrWhiteSpace(content))
+            return new SendAiTextResponse(string.Empty, string.Empty);
+
+        var resultJson = ExtractJsonObject(content);
+
+        return JsonSerializer.Deserialize<SendAiTextResponse>(resultJson, JsonOptions)
+               ?? new SendAiTextResponse(string.Empty, string.Empty);
+    }
+
+    private static AuthenticationHeaderValue CreateAuthorizationHeader(string apiKey)
+    {
+        var trimmed = apiKey.Trim();
+        var separatorIndex = trimmed.IndexOf(' ');
+
+        if (separatorIndex > 0)
+        {
+            return new AuthenticationHeaderValue(
+                trimmed[..separatorIndex],
+                trimmed[(separatorIndex + 1)..]);
+        }
+
+        return new AuthenticationHeaderValue("Bearer", trimmed);
+    }
+
+    private static string ExtractJsonObject(string content)
+    {
+        var trimmed = content.Trim();
+        var start = trimmed.IndexOf('{');
+        var end = trimmed.LastIndexOf('}');
+
+        return start >= 0 && end > start
+            ? trimmed[start..(end + 1)]
+            : trimmed;
     }
 }

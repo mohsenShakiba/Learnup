@@ -6,7 +6,7 @@ namespace Learnup.API.Areas.Public.Controllers;
 
 public class FilesController(IMediator mediator) : BasePublicController
 {
-    [HttpGet("{id}", Name = "GetFileById")]
+    [HttpGet("{*id}", Name = "GetFileById")]
     public async Task<IActionResult> GetById(string id, CancellationToken cancellationToken)
     {
         var file = await mediator.Send(new GetFileById(id), cancellationToken);

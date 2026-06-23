@@ -8,10 +8,11 @@ namespace Learnup.Application.Features.Public.Books;
 
 public sealed record UploadUserBook(
     Stream Content,
-    string FileName,
-    string? ContentType,
+    string ContentType,
     long Length,
-    string Title) : IRequest;
+    string Title,
+    Stream? Cover,
+    string? CoverContentType) : IRequest;
 
 internal sealed class UploadUserBookHandler(
     ILearnupDbContext dbContext,
@@ -31,20 +32,65 @@ internal sealed class UploadUserBookHandler(
             throw new ArgumentException("Book title is required.", nameof(request));
         }
 
-        var storedFile = await fileService.StoreAsync(new StoreFileRequest(
+        var fileName = GetEbookFileName(GetRandomName(), request.ContentType);
+
+        var bookFile = await fileService.StoreAsync(new StoreFileRequest(
             request.Content,
-            request.FileName,
+            fileName,
             BucketNames.BooksBucket,
             request.ContentType), cancellationToken);
+
+        StoredFile? storedCover = null;
+        if (request.Cover is not null && !string.IsNullOrWhiteSpace(request.CoverContentType))
+        {
+            var coverName = GetCoverFileName(GetRandomName(), request.CoverContentType);
+            storedCover = await fileService.StoreAsync(new StoreFileRequest(
+                request.Cover,
+                coverName,
+                BucketNames.BooksCoverBucket,
+                request.CoverContentType), cancellationToken);
+        }
 
         var userBook = new UserBook(
             identityProvider.UserId,
             request.Title.Trim(),
-            storedFile.Id);
+            bookFile.Id,
+            storedCover?.Id);
 
         dbContext.UserBooks.Add(userBook);
         await dbContext.SaveChangesAsync(cancellationToken);
 
         return Unit.Value;
+    }
+
+    private static string GetEbookFileName(string fileName, string contentType)
+    {
+        var fileNameWithoutExtension = Path.GetFileNameWithoutExtension(fileName);
+        var extension = contentType.ToLowerInvariant() switch
+        {
+            "application/epub+zip" => ".epub",
+            _ => throw new ArgumentOutOfRangeException()
+        };
+
+        return $"{fileNameWithoutExtension}{extension}";
+    }
+
+    private static string GetCoverFileName(string fileName, string contentType)
+    {
+        var fileNameWithoutExtension = Path.GetFileNameWithoutExtension(fileName);
+        var extension = contentType.ToLowerInvariant() switch
+        {
+            "image/jpeg" => ".jpg",
+            "image/png" => ".png",
+            "image/webp" => ".webp",
+            _ => throw new ArgumentOutOfRangeException()
+        };
+
+        return $"{fileNameWithoutExtension}{extension}";
+    }
+
+    public static string GetRandomName()
+    {
+        return Guid.NewGuid().ToString("N");
     }
 }
