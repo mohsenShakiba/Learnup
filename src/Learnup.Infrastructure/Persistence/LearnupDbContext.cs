@@ -1,5 +1,6 @@
 using Learnup.Application.Persistence;
 using Learnup.Domain.AggregateRoots.Courses;
+using Learnup.Domain.AggregateRoots.Ebooks;
 using Learnup.Domain.AggregateRoots.Grammars;
 using Learnup.Domain.AggregateRoots.Languages;
 using Learnup.Domain.AggregateRoots.Lessons;
@@ -17,6 +18,7 @@ public class LearnupDbContext(DbContextOptions<LearnupDbContext> options)
     : DbContext(options), ILearnupDbContext
 {
     public DbSet<Course> Courses => Set<Course>();
+    public DbSet<Ebook> Ebooks => Set<Ebook>();
     public DbSet<Grammar> Grammars => Set<Grammar>();
     public DbSet<GrammarLesson> GrammarLessons => Set<GrammarLesson>();
     public DbSet<Language> Languages => Set<Language>();

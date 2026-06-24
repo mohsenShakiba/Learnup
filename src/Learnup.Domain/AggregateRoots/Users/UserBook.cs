@@ -1,3 +1,5 @@
+using Learnup.Domain.AggregateRoots.Ebooks;
+
 namespace Learnup.Domain.AggregateRoots.Users;
 
 public class UserBook
@@ -7,27 +9,29 @@ public class UserBook
     public int UserId { get; private set; }
     public User User { get; private set; } = null!;
 
-    public string Title { get; private set; }
-    public string? Author { get; private set; }
-    public string FileName { get; private set; }
-    public string? CoverId { get; private set; }
+    public int EbookId { get; private set; }
+    public Ebook Ebook { get; private set; } = null!;
+
     public string? CurrentRef { get; private set; }
     public float? Progress { get; private set; }
-    public DateTime UploadedAt { get; private set; }
+    public DateTime CreatedAt { get; private set; }
 
     private UserBook()
     {
-        Title = string.Empty;
-        FileName = string.Empty;
     }
 
-    public UserBook(int userId, string title, string fileName, string? coverId = null)
+    public UserBook(int userId, int ebookId)
     {
         UserId = userId;
-        Title = title;
-        FileName = fileName;
-        CoverId = coverId;
-        UploadedAt = DateTime.UtcNow;
+        EbookId = ebookId;
+        CreatedAt = DateTime.UtcNow;
+    }
+
+    public UserBook(int userId, Ebook ebook)
+    {
+        UserId = userId;
+        Ebook = ebook;
+        CreatedAt = DateTime.UtcNow;
     }
 
     public void UpdateCurrentRef(string currentRef, float? progress)

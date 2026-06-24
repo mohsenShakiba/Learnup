@@ -6,10 +6,6 @@ public sealed record StoreFileRequest(
     string BucketName,
     string ContentType);
 
-public sealed record StoredFile(
-    string Id,
-    string ContentType);
-
 public sealed record FileContent(
     string Id,
     Stream Content,
@@ -17,7 +13,7 @@ public sealed record FileContent(
 
 public interface IFileService
 {
-    Task<StoredFile> StoreAsync(StoreFileRequest request, CancellationToken cancellationToken);
+    Task<string> StoreAsync(StoreFileRequest request, CancellationToken cancellationToken);
 
     Task<FileContent?> GetAsync(string fileId, CancellationToken cancellationToken);
 }

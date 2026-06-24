@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Learnup.API.Areas.Public.Controllers;
 
-public class UserBooksController(IMediator mediator) : BasePublicController
+public class BooksControllers(IMediator mediator) : BasePublicController
 {
     [HttpPost(Name = "UploadUserBook")]
     [Consumes("multipart/form-data")]
@@ -30,7 +30,7 @@ public class UserBooksController(IMediator mediator) : BasePublicController
             ? coverImage.OpenReadStream()
             : null;
 
-        var cmd = new UploadUserBook(
+        var cmd = new UploadBook(
             bookStream,
             request.File.ContentType,
             request.File.Length,
@@ -53,8 +53,20 @@ public class UserBooksController(IMediator mediator) : BasePublicController
         return Ok(books);
     }
 
-    [HttpPut("book/{id:int}", Name = "UpdateUserBookCurrentPage")]
-    public async Task<IActionResult> UpdateCurrentPage(
+    [HttpGet("{id:int}", Name = "GetUserBookById")]
+    public async Task<ActionResult<UserBookResponse>> GetById(
+        int id,
+        CancellationToken cancellationToken)
+    {
+        var book = await mediator.Send(new GetUserBookById(id), cancellationToken);
+
+        return book is null
+            ? NotFound()
+            : Ok(book);
+    }
+
+    [HttpPut("book/{id:int}", Name = "UpdateUserBookProgress")]
+    public async Task<IActionResult> UpdateUserBookProgress(
         int id,
         [FromBody] UpdateUserBookCurrentPageRequest request,
         CancellationToken cancellationToken)

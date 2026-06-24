@@ -6,21 +6,20 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Learnup.Application.Features.Public.Books;
 
-public sealed record GetUserBooks : IRequest<IReadOnlyList<UserBookResponse>>;
+public sealed record GetUserBookById(int Id) : IRequest<UserBookResponse?>;
 
-internal sealed class GetUserBooksHandler(
+internal sealed class GetUserBookByIdHandler(
     ILearnupDbContext dbContext,
     IIdentityProvider identityProvider)
-    : IRequestHandler<GetUserBooks, IReadOnlyList<UserBookResponse>>
+    : IRequestHandler<GetUserBookById, UserBookResponse?>
 {
-    public async Task<IReadOnlyList<UserBookResponse>> Handle(
-        GetUserBooks request,
+    public async Task<UserBookResponse?> Handle(
+        GetUserBookById request,
         CancellationToken cancellationToken)
     {
-        var result =  await dbContext.UserBooks
+        return await dbContext.UserBooks
             .AsNoTracking()
-            .Where(book => book.UserId == identityProvider.UserId)
-            .OrderByDescending(book => book.Ebook.UploadedAt)
+            .Where(book => book.Id == request.Id && book.UserId == identityProvider.UserId)
             .Select(book => new UserBookResponse(
                 book.Id,
                 book.Ebook.Title,
@@ -30,8 +29,6 @@ internal sealed class GetUserBooksHandler(
                 book.CurrentRef,
                 book.Progress,
                 book.Ebook.UploadedAt))
-            .ToListAsync(cancellationToken);
-        
-        return result;
+            .FirstOrDefaultAsync(cancellationToken);
     }
 }

@@ -53,7 +53,7 @@ public class KokoroVoiceProvider(
             var fileName = $"kokoro-{DateTimeOffset.UtcNow:yyyyMMddHHmmss}-{Guid.NewGuid():N}.wav";
             await using var audioStream = new MemoryStream(audioBytes);
 
-            var storedFile = await fileService.StoreAsync(new StoreFileRequest(
+            var fileId = await fileService.StoreAsync(new StoreFileRequest(
                 audioStream,
                 fileName,
                 BucketNames.FilesBucket,
@@ -63,7 +63,7 @@ public class KokoroVoiceProvider(
                 .Select(timestamp => new VoiceCaption(timestamp.Word, timestamp.StartTime, timestamp.EndTime))
                 .ToList();
 
-            return new VoiceResult(storedFile.Id, captions);
+            return new VoiceResult(fileId, captions);
         }
         catch (Exception e)
         {

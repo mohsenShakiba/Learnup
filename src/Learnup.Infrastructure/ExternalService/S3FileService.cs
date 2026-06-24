@@ -1,16 +1,19 @@
 using Amazon.S3;
 using Amazon.S3.Model;
 using Learnup.Application.ExternalServices;
+using System.Net;
 
 namespace Learnup.Infrastructure.ExternalService;
 
 internal sealed class S3FileService(IAmazonS3 s3Client)
     : IFileService
 {
-    public async Task<StoredFile> StoreAsync(
+    public async Task<string> StoreAsync(
         StoreFileRequest request,
         CancellationToken cancellationToken)
     {
+        await EnsureBucketExistsAsync(request.BucketName, cancellationToken);
+
         await s3Client.PutObjectAsync(new PutObjectRequest
         {
             BucketName = request.BucketName,
@@ -19,7 +22,34 @@ internal sealed class S3FileService(IAmazonS3 s3Client)
             ContentType = request.ContentType,
         }, cancellationToken);
 
-        return new StoredFile(GetFileId(request.BucketName, request.FileName), request.ContentType);
+        return $"{request.BucketName}/{request.FileName}";
+    }
+
+    private async Task EnsureBucketExistsAsync(
+        string bucketName,
+        CancellationToken cancellationToken)
+    {
+        try
+        {
+            await s3Client.HeadBucketAsync(new HeadBucketRequest
+            {
+                BucketName = bucketName
+            }, cancellationToken);
+        }
+        catch (AmazonS3Exception ex) when (ex.StatusCode == HttpStatusCode.NotFound)
+        {
+            try
+            {
+                await s3Client.PutBucketAsync(new PutBucketRequest
+                {
+                    BucketName = bucketName
+                }, cancellationToken);
+            }
+            catch (AmazonS3Exception createException) when (
+                createException.ErrorCode == "BucketAlreadyOwnedByYou")
+            {
+            }
+        }
     }
 
     public async Task<FileContent?> GetAsync(

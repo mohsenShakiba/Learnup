@@ -1,4 +1,5 @@
 using Learnup.Domain.AggregateRoots.Courses;
+using Learnup.Domain.AggregateRoots.Ebooks;
 using Learnup.Domain.AggregateRoots.Grammars;
 using Learnup.Domain.AggregateRoots.Lessons;
 using Learnup.Domain.AggregateRoots.MotivationalSentences;
@@ -14,6 +15,7 @@ namespace Learnup.Application.Persistence;
 public interface ILearnupDbContext
 {
     DbSet<Course> Courses { get; }
+    DbSet<Ebook> Ebooks { get; }
     DbSet<Grammar> Grammars { get; }
     DbSet<GrammarLesson> GrammarLessons { get; }
     DbSet<Lesson> Lessons { get; }

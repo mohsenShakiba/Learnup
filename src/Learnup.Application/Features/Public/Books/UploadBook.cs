@@ -2,11 +2,12 @@ using Learnup.Application.Authentication;
 using Learnup.Application.ExternalServices;
 using Learnup.Application.Mediation;
 using Learnup.Application.Persistence;
+using Learnup.Domain.AggregateRoots.Ebooks;
 using Learnup.Domain.AggregateRoots.Users;
 
 namespace Learnup.Application.Features.Public.Books;
 
-public sealed record UploadUserBook(
+public sealed record UploadBook(
     Stream Content,
     string ContentType,
     long Length,
@@ -14,13 +15,13 @@ public sealed record UploadUserBook(
     Stream? Cover,
     string? CoverContentType) : IRequest;
 
-internal sealed class UploadUserBookHandler(
+internal sealed class UploadBookHandler(
     ILearnupDbContext dbContext,
     IIdentityProvider identityProvider,
     IFileService fileService)
-    : IRequestHandler<UploadUserBook>
+    : IRequestHandler<UploadBook>
 {
-    public async Task<Unit> Handle(UploadUserBook request, CancellationToken cancellationToken)
+    public async Task<Unit> Handle(UploadBook request, CancellationToken cancellationToken)
     {
         if (request.Length <= 0)
         {
@@ -34,28 +35,30 @@ internal sealed class UploadUserBookHandler(
 
         var fileName = GetEbookFileName(GetRandomName(), request.ContentType);
 
-        var bookFile = await fileService.StoreAsync(new StoreFileRequest(
+        var bookFileId = await fileService.StoreAsync(new StoreFileRequest(
             request.Content,
             fileName,
             BucketNames.BooksBucket,
             request.ContentType), cancellationToken);
+        
+        string? coverFileId = null;
 
-        StoredFile? storedCover = null;
         if (request.Cover is not null && !string.IsNullOrWhiteSpace(request.CoverContentType))
         {
             var coverName = GetCoverFileName(GetRandomName(), request.CoverContentType);
-            storedCover = await fileService.StoreAsync(new StoreFileRequest(
+            coverFileId = await fileService.StoreAsync(new StoreFileRequest(
                 request.Cover,
                 coverName,
                 BucketNames.BooksCoverBucket,
                 request.CoverContentType), cancellationToken);
         }
 
-        var userBook = new UserBook(
-            identityProvider.UserId,
+        var ebook = new Ebook(
             request.Title.Trim(),
-            bookFile.Id,
-            storedCover?.Id);
+            bookFileId,
+            coverFileId);
+
+        var userBook = new UserBook(identityProvider.UserId, ebook);
 
         dbContext.UserBooks.Add(userBook);
         await dbContext.SaveChangesAsync(cancellationToken);
