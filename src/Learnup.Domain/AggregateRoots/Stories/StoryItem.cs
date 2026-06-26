@@ -6,6 +6,7 @@ public class StoryItem
     public string Content { get; private set; }
     public string Translation { get; private set; }
     public int Order { get; private set; }
+    public int Person { get; private set; }
     public string? VoiceId { get; private set; }
     public List<StoryItemTimestamp> Timestamps { get; private set; }
     
@@ -19,11 +20,12 @@ public class StoryItem
         Timestamps = [];
     }
 
-    public StoryItem(string content, string translation, int order)
+    public StoryItem(string content, string translation, int person, int order)
     {
         Content = content;
         Translation = translation;
         Order = order;
+        Person = person;
         Timestamps = [];
     }
 

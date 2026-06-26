@@ -5,6 +5,7 @@ using Learnup.Application.Features.Admin.Grammars;
 using Learnup.Application.ExternalServices;
 using Learnup.Application.Features.Admin;
 using Learnup.Application.Mediation;
+using Learnup.Application.Requests.Admin.Stories;
 using Learnup.Domain.AggregateRoots.Vocabularies;
 using Microsoft.AspNetCore.Mvc;
 
@@ -58,17 +59,13 @@ public class ImportController(
         return Ok(new ImportVocabsResponse(vocabs.Count, importedCount));
     }
 
-    [HttpPost("stories", Name = "ImportStory")]
-    public async Task<ActionResult<int>> ImportStory(
-        [FromBody] ImportStoryRequest request,
+    [HttpPost("stories/{lessonId:int}", Name = "ImportStory")]
+    public async Task<ActionResult<int>> ImportStory(int lessonId,
+        [FromBody] StoryRequest  request,
         CancellationToken cancellationToken)
     {
         var storyId = await mediator.Send(
-            new ImportStory(
-                request.Story,
-                request.CourseId,
-                request.LessonId,
-                request.GrammarIds),
+            new ImportStory(request, lessonId),
             cancellationToken);
 
         return Ok(storyId);

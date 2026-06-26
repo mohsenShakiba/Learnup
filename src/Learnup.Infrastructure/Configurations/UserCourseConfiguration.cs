@@ -23,6 +23,6 @@ public class UserCourseConfiguration : IEntityTypeConfiguration<UserCourse>
         builder.HasOne(uc => uc.Course)
             .WithMany(c => c.Users)
             .HasForeignKey(uc => uc.CourseId)
-            .OnDelete(DeleteBehavior.Restrict);
+            .OnDelete(DeleteBehavior.Cascade);
     }
 }

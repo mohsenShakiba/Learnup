@@ -16,6 +16,13 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
             .HasMaxLength(100)
             .IsRequired();
 
+        builder.Property(u => u.MobileNumber)
+            .HasMaxLength(20)
+            .IsRequired();
+
+        builder.HasIndex(u => u.MobileNumber)
+            .IsUnique();
+
         builder.Property(u => u.AvatarUrl)
             .HasMaxLength(500);
 

@@ -6,8 +6,6 @@ public interface IStoryLoader
 {
     Task<int> LoadAsync(
         StoryRequest storyRequest,
-        int courseId,
         int lessonId,
-        List<int> grammarIds,
         CancellationToken cancellationToken = default);
 }

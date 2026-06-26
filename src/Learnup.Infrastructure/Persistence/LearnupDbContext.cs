@@ -33,6 +33,7 @@ public class LearnupDbContext(DbContextOptions<LearnupDbContext> options)
     public DbSet<GrammarTest> GrammarTests => Set<GrammarTest>();
     public DbSet<GrammarTestOption> GrammarTestOptions => Set<GrammarTestOption>();
     public DbSet<User> Users => Set<User>();
+    public DbSet<UserOtp> UserOtps => Set<UserOtp>();
     public DbSet<UserStreak> UserStreaks => Set<UserStreak>();
     public DbSet<UserCourse> UserCourses => Set<UserCourse>();
     public DbSet<UserLesson> UserLessons => Set<UserLesson>();

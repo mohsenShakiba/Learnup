@@ -12,9 +12,7 @@ public class StoryLoader(LearnupDbContext dbContext) : IStoryLoader
 {
     public async Task<int> LoadAsync(
         StoryRequest storyRequest,
-        int courseId,
         int lessonId,
-        List<int> grammarIds,
         CancellationToken cancellationToken = default)
     {
         var lesson = await dbContext.Lessons
@@ -27,17 +25,10 @@ public class StoryLoader(LearnupDbContext dbContext) : IStoryLoader
             throw new InvalidOperationException($"Lesson with id '{lessonId}' was not found.");
         }
 
-        if (lesson.CourseId != courseId)
-        {
-            throw new InvalidOperationException($"Lesson '{lessonId}' does not belong to course '{courseId}'.");
-        }
-
         ValidateStory(storyRequest);
 
         var words = storyRequest.Words;
         var sentences = storyRequest.Sentences;
-
-        await ValidateGrammarsAsync(grammarIds, cancellationToken);
 
         var normalizedWords = words
             .Select(word => word.Trim())
@@ -52,7 +43,7 @@ public class StoryLoader(LearnupDbContext dbContext) : IStoryLoader
 
         foreach (var sentence in sentences.OrderBy(sentence => sentence.Order))
         {
-            story.Items.Add(new StoryItem(sentence.Text.Trim(), sentence.Translation.Trim(), sentence.Order));
+            story.Items.Add(new StoryItem(sentence.Text.Trim(), sentence.Translation.Trim(), sentence.Person, sentence.Order));
         }
 
         dbContext.Stories.Add(story);
@@ -61,7 +52,6 @@ public class StoryLoader(LearnupDbContext dbContext) : IStoryLoader
         dbContext.Set<LessonStory>().Add(new LessonStory(lessonId, story.Id));
         
         await AddMissingLessonVocabLinksAsync(lessonId, vocabIds, cancellationToken);
-        await AddMissingLessonGrammarLinksAsync(lessonId, grammarIds, cancellationToken);
 
         await dbContext.SaveChangesAsync(cancellationToken);
         
@@ -131,53 +121,6 @@ public class StoryLoader(LearnupDbContext dbContext) : IStoryLoader
             .Select(vocabId => new LessonVocab(lessonId, vocabId));
 
         dbContext.Set<LessonVocab>().AddRange(newLessonVocabs);
-    }
-
-    private async Task AddMissingLessonGrammarLinksAsync(
-        int lessonId,
-        List<int> grammarIds,
-        CancellationToken cancellationToken)
-    {
-        if (grammarIds.Count == 0)
-        {
-            return;
-        }
-
-        var existingGrammarIds = await dbContext.Set<LessonGrammar>()
-            .Where(lessonGrammar => lessonGrammar.LessonId == lessonId && grammarIds.Contains(lessonGrammar.GrammarId))
-            .Select(lessonGrammar => lessonGrammar.GrammarId)
-            .ToListAsync(cancellationToken);
-
-        var existingGrammarIdSet = existingGrammarIds.ToHashSet();
-        var newLessonGrammars = grammarIds
-            .Where(grammarId => !existingGrammarIdSet.Contains(grammarId))
-            .Select(grammarId => new LessonGrammar(lessonId, grammarId));
-
-        dbContext.Set<LessonGrammar>().AddRange(newLessonGrammars);
-    }
-
-    private async Task ValidateGrammarsAsync(
-        List<int> grammarIds,
-        CancellationToken cancellationToken)
-    {
-        if (grammarIds.Count == 0)
-        {
-            return;
-        }
-
-        var existingGrammarIds = await dbContext.Grammars
-            .Where(grammar => grammarIds.Contains(grammar.Id))
-            .Select(grammar => grammar.Id)
-            .ToListAsync(cancellationToken);
-
-        var missingGrammarIds = grammarIds
-            .Except(existingGrammarIds)
-            .ToList();
-
-        if (missingGrammarIds.Count > 0)
-        {
-            throw new InvalidOperationException($"Grammar ids were not found: {string.Join(", ", missingGrammarIds)}.");
-        }
     }
 
     private static void ValidateStory(StoryRequest story)

@@ -25,6 +25,6 @@ public class UserStoryConfiguration : IEntityTypeConfiguration<UserStory>
         builder.HasOne(us => us.Story)
             .WithMany()
             .HasForeignKey(us => us.StoryId)
-            .OnDelete(DeleteBehavior.Restrict);
+            .OnDelete(DeleteBehavior.Cascade);
     }
 }

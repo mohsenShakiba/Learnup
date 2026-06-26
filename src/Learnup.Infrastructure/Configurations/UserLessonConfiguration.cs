@@ -28,6 +28,6 @@ public class UserLessonConfiguration : IEntityTypeConfiguration<UserLesson>
         builder.HasOne(ul => ul.Lesson)
             .WithMany(l => l.Users)
             .HasForeignKey(ul => ul.LessonId)
-            .OnDelete(DeleteBehavior.Restrict);
+            .OnDelete(DeleteBehavior.Cascade);
     }
 }

@@ -22,7 +22,7 @@ public class VocabConfiguration : IEntityTypeConfiguration<Vocab>
         builder.HasOne(v => v.Language)
             .WithMany()
             .HasForeignKey(v => v.LanguageId)
-            .OnDelete(DeleteBehavior.Restrict);
+            .OnDelete(DeleteBehavior.Cascade);
 
   
     }

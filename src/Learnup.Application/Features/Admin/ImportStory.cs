@@ -6,9 +6,7 @@ namespace Learnup.Application.Features.Admin;
 
 public sealed record ImportStory(
     StoryRequest Story,
-    int CourseId,
-    int LessonId,
-    List<int> GrammarIds) : IRequest<int>;
+    int LessonId) : IRequest<int>;
 
 internal sealed class ImportStoryHandler(IStoryLoader storyLoader) : IRequestHandler<ImportStory, int>
 {
@@ -16,9 +14,7 @@ internal sealed class ImportStoryHandler(IStoryLoader storyLoader) : IRequestHan
     {
         return storyLoader.LoadAsync(
             request.Story,
-            request.CourseId,
             request.LessonId,
-            request.GrammarIds,
             cancellationToken);
     }
 }

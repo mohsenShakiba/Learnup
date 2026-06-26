@@ -4,10 +4,30 @@ public class User
 {
     public int Id { get; private set; }
     public string DisplayName { get; private set; }
+    public string MobileNumber { get; private set; }
     public string? AvatarUrl { get; private set; }
     public DateTime CreatedAt { get; private set; }
     public DateTime? LastLogin { get; private set; }
     public UserStatus Status { get; private set; }
+
+    private User()
+    {
+        DisplayName = null!;
+        MobileNumber = null!;
+    }
+
+    public User(string mobileNumber, DateTime createdAt)
+    {
+        MobileNumber = mobileNumber;
+        DisplayName = mobileNumber;
+        CreatedAt = createdAt;
+        Status = UserStatus.Active;
+    }
+
+    public void RecordLogin(DateTime loggedInAt)
+    {
+        LastLogin = loggedInAt;
+    }
 
     public ICollection<UserLesson> Lessons { get; private set; } = new List<UserLesson>();
     public ICollection<UserGrammar> Grammars { get; private set; } = new List<UserGrammar>();

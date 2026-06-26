@@ -25,6 +25,6 @@ public class UserVocabConfiguration : IEntityTypeConfiguration<UserVocab>
         builder.HasOne(uv => uv.Vocab)
             .WithMany()
             .HasForeignKey(uv => uv.VocabId)
-            .OnDelete(DeleteBehavior.Restrict);
+            .OnDelete(DeleteBehavior.Cascade);
     }
 }

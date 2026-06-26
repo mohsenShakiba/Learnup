@@ -8,12 +8,13 @@ namespace Learnup.API.Areas.Public.Controllers;
 
 public class AiController(IMediator mediator) : BasePublicController
 {
-    [HttpPost("send")]
+    [HttpPost("Process")]
     public async Task<ActionResult<SendAiTextResponse>> Send(
         [FromBody] SendAiTextRequest request,
         CancellationToken cancellationToken)
     {
-        var result = await mediator.Send(new SendAiText(request.Word, request.Sentence), cancellationToken);
+        var query = new SendAiText(request.Word, request.Sentence);
+        var result = await mediator.Send(query, cancellationToken);
         return Ok(result);
     }
 }

@@ -25,6 +25,6 @@ public class UserGrammarConfiguration : IEntityTypeConfiguration<UserGrammar>
         builder.HasOne(ug => ug.Grammar)
             .WithMany()
             .HasForeignKey(ug => ug.GrammarId)
-            .OnDelete(DeleteBehavior.Restrict);
+            .OnDelete(DeleteBehavior.Cascade);
     }
 }

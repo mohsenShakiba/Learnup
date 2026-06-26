@@ -1,8 +1,10 @@
 using Amazon.Runtime;
 using Amazon.S3;
 using Learnup.Application.AiPipelines;
+using Learnup.Application.Authentication;
 using Learnup.Application.ExternalServices;
 using Learnup.Application.Persistence;
+using Learnup.Infrastructure.Authentication;
 using Learnup.Infrastructure.ExternalService;
 using Learnup.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
@@ -33,6 +35,8 @@ public static class DependencyInjection
 
         services.Configure<S3FileStorageOptions>(
             configuration.GetSection(S3FileStorageOptions.SectionName));
+        services.Configure<JwtOptions>(
+            configuration.GetSection(JwtOptions.SectionName));
 
         services.AddSingleton<IAmazonS3>(_ =>
         {
@@ -63,6 +67,8 @@ public static class DependencyInjection
         });
 
         services.AddScoped<IFileService, S3FileService>();
+        services.AddScoped<IJwtTokenService, JwtTokenService>();
+        services.AddScoped<IOtpSender, ConsoleOtpSender>();
         services.AddScoped<IAiTextService, OpenAiTextService>();
         services.AddScoped<IVoiceProvider, KokoroVoiceProvider>();
         services.AddScoped<IVocabTranslationProvider, AiVocabTranslationProvider>();

@@ -12,8 +12,6 @@ public static class DependencyInjection
     {
         services.AddMemoryCache();
         services.AddScoped<IMediator, Mediator>();
-        services.AddScoped<IIdentityProvider, TestIdentityProvider>();
-
         services.AddAiProcessors(typeof(DependencyInjection).Assembly);
         
         services.AddMediatorHandlers(typeof(DependencyInjection).Assembly);

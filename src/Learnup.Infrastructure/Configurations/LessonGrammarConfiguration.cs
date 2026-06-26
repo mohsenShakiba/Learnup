@@ -20,6 +20,6 @@ public class LessonGrammarConfiguration : IEntityTypeConfiguration<LessonGrammar
         builder.HasOne(lg => lg.Grammar)
             .WithMany()
             .HasForeignKey(lg => lg.GrammarId)
-            .OnDelete(DeleteBehavior.Restrict);
+            .OnDelete(DeleteBehavior.Cascade);
     }
 }

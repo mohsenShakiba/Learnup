@@ -3,6 +3,7 @@ using System;
 using Learnup.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Learnup.Infrastructure.Migrations
 {
     [DbContext(typeof(LearnupDbContext))]
-    partial class LearnupDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260626075950_AddMobileOtpAuthentication")]
+    partial class AddMobileOtpAuthentication
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -363,9 +366,6 @@ namespace Learnup.Infrastructure.Migrations
                         .HasColumnType("character varying(2000)");
 
                     b.Property<int>("Order")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("Person")
                         .HasColumnType("integer");
 
                     b.Property<int>("StoryId")
@@ -1113,7 +1113,7 @@ namespace Learnup.Infrastructure.Migrations
                     b.HasOne("Learnup.Domain.AggregateRoots.Grammars.Grammar", "Grammar")
                         .WithMany()
                         .HasForeignKey("GrammarId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("Learnup.Domain.AggregateRoots.Lessons.Lesson", "Lesson")
@@ -1138,7 +1138,7 @@ namespace Learnup.Infrastructure.Migrations
                     b.HasOne("Learnup.Domain.AggregateRoots.Stories.Story", "Story")
                         .WithMany("Lessons")
                         .HasForeignKey("StoryId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Lesson");
@@ -1157,7 +1157,7 @@ namespace Learnup.Infrastructure.Migrations
                     b.HasOne("Learnup.Domain.AggregateRoots.Vocabularies.Vocab", "Vocab")
                         .WithMany()
                         .HasForeignKey("VocabId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Lesson");
@@ -1330,7 +1330,7 @@ namespace Learnup.Infrastructure.Migrations
                     b.HasOne("Learnup.Domain.AggregateRoots.Courses.Course", "Course")
                         .WithMany("Users")
                         .HasForeignKey("CourseId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("Learnup.Domain.AggregateRoots.Users.User", "User")
@@ -1349,7 +1349,7 @@ namespace Learnup.Infrastructure.Migrations
                     b.HasOne("Learnup.Domain.AggregateRoots.Grammars.Grammar", "Grammar")
                         .WithMany()
                         .HasForeignKey("GrammarId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("Learnup.Domain.AggregateRoots.Users.User", "User")
@@ -1395,7 +1395,7 @@ namespace Learnup.Infrastructure.Migrations
                     b.HasOne("Learnup.Domain.AggregateRoots.Lessons.Lesson", "Lesson")
                         .WithMany("Users")
                         .HasForeignKey("LessonId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("Learnup.Domain.AggregateRoots.Users.User", "User")
@@ -1414,7 +1414,7 @@ namespace Learnup.Infrastructure.Migrations
                     b.HasOne("Learnup.Domain.AggregateRoots.Stories.Story", "Story")
                         .WithMany()
                         .HasForeignKey("StoryId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("Learnup.Domain.AggregateRoots.Users.User", "User")
@@ -1450,7 +1450,7 @@ namespace Learnup.Infrastructure.Migrations
                     b.HasOne("Learnup.Domain.AggregateRoots.Vocabularies.Vocab", "Vocab")
                         .WithMany()
                         .HasForeignKey("VocabId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("User");
@@ -1490,7 +1490,7 @@ namespace Learnup.Infrastructure.Migrations
                     b.HasOne("Learnup.Domain.AggregateRoots.Languages.Language", "Language")
                         .WithMany()
                         .HasForeignKey("LanguageId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Language");

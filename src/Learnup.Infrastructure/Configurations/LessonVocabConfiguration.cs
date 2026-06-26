@@ -20,6 +20,6 @@ public class LessonVocabConfiguration : IEntityTypeConfiguration<LessonVocab>
         builder.HasOne(lv => lv.Vocab)
             .WithMany()
             .HasForeignKey(lv => lv.VocabId)
-            .OnDelete(DeleteBehavior.Restrict);
+            .OnDelete(DeleteBehavior.Cascade);
     }
 }
