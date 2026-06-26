@@ -20,7 +20,8 @@ public interface IFileService
 
 public class BucketNames
 {
-    public const string FilesBucket = "learnup-files";
+    public const string StoryVoices = "learnup-story-voices";
     public const string BooksBucket = "learnup-books";
     public const string BooksCoverBucket = "learnup-books-cover";
+    public const string UserAvatarsBucket = "learnup-user-avatars";
 }

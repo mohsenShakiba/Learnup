@@ -47,6 +47,7 @@ public static class LessonMapper
             item.Content,
             item.Translation,
             item.Order,
+            item.Person,
             item.VoiceId,
             item.Timestamps.Select(t => new StoryItemTimestampResponse(t.Id, t.Word, t.Start, t.End)).ToList());
 }

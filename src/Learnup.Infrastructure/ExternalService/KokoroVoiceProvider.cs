@@ -56,7 +56,7 @@ public class KokoroVoiceProvider(
             var fileId = await fileService.StoreAsync(new StoreFileRequest(
                 audioStream,
                 fileName,
-                BucketNames.FilesBucket,
+                BucketNames.StoryVoices,
                 "audio/wav"), cancellationToken);
 
             var captions = response.Timestamps

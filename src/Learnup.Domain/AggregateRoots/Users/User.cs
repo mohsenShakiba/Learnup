@@ -29,6 +29,27 @@ public class User
         LastLogin = loggedInAt;
     }
 
+    public void UpdateProfile(string displayName, string? avatarUrl)
+    {
+        if (string.IsNullOrWhiteSpace(displayName))
+        {
+            throw new ArgumentException("Display name is required.", nameof(displayName));
+        }
+
+        DisplayName = displayName.Trim();
+        AvatarUrl = string.IsNullOrWhiteSpace(avatarUrl) ? null : avatarUrl.Trim();
+    }
+
+    public void UpdateAvatar(string avatarUrl)
+    {
+        if (string.IsNullOrWhiteSpace(avatarUrl))
+        {
+            throw new ArgumentException("Avatar URL is required.", nameof(avatarUrl));
+        }
+
+        AvatarUrl = avatarUrl.Trim();
+    }
+
     public ICollection<UserLesson> Lessons { get; private set; } = new List<UserLesson>();
     public ICollection<UserGrammar> Grammars { get; private set; } = new List<UserGrammar>();
     public ICollection<UserStory> Stories { get; private set; } = new List<UserStory>();

@@ -23,6 +23,11 @@ public class AiProcessorHostedService(
                     break;
                 }
 
+                if (!processor.Enabled)
+                {
+                    continue;
+                }
+
                 try
                 {
                     await processor.ProcessAsync(stoppingToken);

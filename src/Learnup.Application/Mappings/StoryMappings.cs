@@ -25,6 +25,7 @@ public static class StoryMappings
             storyItem.Content,
             storyItem.Translation,
             storyItem.Order,
+            storyItem.Person,
             storyItem.VoiceId,
             storyItem.Timestamps
                 .OrderBy(timestamp => timestamp.Start)

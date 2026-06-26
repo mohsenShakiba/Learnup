@@ -8,9 +8,10 @@ namespace Learnup.Application.AiPipelines;
 
 public class StoryPipeline(ILearnupDbContext dbContext, IVoiceProvider voiceProvider, ILogger<StoryPipeline> logger): IPipeline
 {
+    public bool Enabled => true;
+    
     public async Task ProcessAsync(CancellationToken cancellationToken = default)
     {
-        return;
         var stories = await dbContext.Stories
             .Include(s => s.Items)
             .Where(s => s.Status == StoryStatus.Pending)
@@ -23,7 +24,8 @@ public class StoryPipeline(ILearnupDbContext dbContext, IVoiceProvider voiceProv
             {
                 try
                 {
-                    var result = await voiceProvider.GetVoiceAsync(item.Content, new VoiceOptions(VoiceIds.Heart, 0.8), cancellationToken: cancellationToken);
+                    var option = item.Person == 1 ? new VoiceOptions(VoiceIds.Heart, 0.8) : new VoiceOptions(VoiceIds.Bella, 0.8);
+                    var result = await voiceProvider.GetVoiceAsync(item.Content, option, cancellationToken: cancellationToken);
 
                     item.SetVoice(
                         result.VoiceId,

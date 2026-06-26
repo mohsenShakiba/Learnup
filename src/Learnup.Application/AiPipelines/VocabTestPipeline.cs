@@ -13,6 +13,8 @@ public class VocabTestPipeline(
     IVocabTestProvider vocabTestProvider,
     ILogger<VocabTestPipeline> logger) : IPipeline
 {
+    public bool Enabled => false;
+    
     public async Task ProcessAsync(CancellationToken cancellationToken = default)
     {
         var candidates = await dbContext.Vocabs

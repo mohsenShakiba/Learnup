@@ -12,6 +12,7 @@ public sealed record StoryItemResponse(
     string Content,
     string Translation,
     int Order,
+    int Person,
     string? VoiceId,
     IReadOnlyList<StoryItemTimestampResponse> Timestamps);
 

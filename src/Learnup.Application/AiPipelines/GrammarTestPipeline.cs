@@ -12,6 +12,8 @@ public class GrammarTestPipeline(
     IGrammarTestProvider grammarTestProvider,
     ILogger<GrammarTestPipeline> logger) : IPipeline
 {
+    public bool Enabled => false;
+
     public async Task ProcessAsync(CancellationToken cancellationToken = default)
     {
         var candidates = await dbContext.Grammars
