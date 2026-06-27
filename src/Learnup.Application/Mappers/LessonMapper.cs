@@ -10,21 +10,19 @@ namespace Learnup.Application.Mappers;
 public static class LessonMapper
 {
     public static LessonResponse ToResponse(
-        this Lesson lesson,
-        HashSet<int> completedStoryIds,
-        HashSet<int> completedGrammarIds,
-        HashSet<int> completedVocabIds) =>
-        new(
+        this Lesson lesson)
+    {
+        var userLesson = lesson.Users.FirstOrDefault();
+
+        return new(
             lesson.Id,
             lesson.Title,
             lesson.Order,
             lesson.CourseId,
-            lesson.Stories.Count,
-            lesson.Grammars.Count,
-            lesson.Vocabs.Count,
-            lesson.Stories.Count(ls => completedStoryIds.Contains(ls.StoryId)),
-            lesson.Grammars.Count(lg => completedGrammarIds.Contains(lg.GrammarId)),
-            lesson.Vocabs.Count(lv => completedVocabIds.Contains(lv.VocabId)));
+            userLesson?.IsStoryCompleted ?? false,
+            userLesson?.IsGrammarCompleted ?? false,
+            userLesson?.IsVocabCompleted ?? false);
+    }
 
     public static LessonDetailResponse ToDetailResponse(
         this Lesson lesson,

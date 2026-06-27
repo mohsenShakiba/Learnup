@@ -13,7 +13,11 @@ public class UserLesson
     public DateTime StartedAt { get; private set; }
     public DateTime LastVisitedAt { get; private set; }
     public DateTime? CompletedAt { get; private set; }
-
+    
+    public bool IsStoryCompleted { get; private set; }
+    public bool IsGrammarCompleted { get; private set; }
+    public bool IsVocabCompleted { get; private set; }
+    
     public UserLesson(int userId, int lessonId)
     {
         UserId = userId;
@@ -21,14 +25,4 @@ public class UserLesson
         StartedAt = LastVisitedAt = DateTime.UtcNow;
     }
 
-    public void Touch()
-    {
-        LastVisitedAt = DateTime.UtcNow;
-    }
-
-    public void Complete()
-    {
-        CompletedAt ??= DateTime.UtcNow;
-        Touch();
-    }
 }

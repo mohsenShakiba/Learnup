@@ -33,4 +33,11 @@ public class GrammarTestsController(IMediator mediator) : BasePublicController
         await mediator.Send(new ResetGrammarTestResult(lessonId), cancellationToken);
         return NoContent();
     }
+
+    [HttpPost("{lessonId}/check", Name = "CheckGrammarTest")]
+    public async Task<IActionResult> Check(int lessonId, CancellationToken cancellationToken)
+    {
+        await mediator.Send(new CheckGrammarTest(lessonId), cancellationToken);
+        return NoContent();
+    }
 }

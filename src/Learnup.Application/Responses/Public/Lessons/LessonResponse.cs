@@ -10,14 +10,11 @@ public sealed record LessonResponse(
     string Title,
     int Order,
     int CourseId,
-    int StoriesCount,
-    int GrammarsCount,
-    int VocabsCount,
-    int CompletedStoriesCount,
-    int CompletedGrammarsCount,
-    int CompletedVocabsCount)
+    bool IsStoryCompleted,
+    bool IsGrammarCompleted,
+    bool IsVocabCompleted)
 {
-    public bool IsCompleted => CompletedStoriesCount == StoriesCount && CompletedGrammarsCount == GrammarsCount && CompletedVocabsCount == VocabsCount;
+    public bool IsCompleted => IsStoryCompleted && IsGrammarCompleted && IsVocabCompleted;
 }
 
 public sealed record LessonDetailResponse(

@@ -12,4 +12,20 @@ public class UserVocab
 
     public DateTime StartedAt { get; private set; }
     public DateTime? CompletedAt { get; private set; }
+
+    private UserVocab()
+    {
+    }
+
+    public UserVocab(int userId, int vocabId)
+    {
+        UserId = userId;
+        VocabId = vocabId;
+        StartedAt = DateTime.UtcNow;
+    }
+
+    public void Complete()
+    {
+        CompletedAt ??= DateTime.UtcNow;
+    }
 }

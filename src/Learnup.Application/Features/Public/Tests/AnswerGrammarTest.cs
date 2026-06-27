@@ -32,8 +32,7 @@ internal sealed class AnswerGrammarTestHandler(ILearnupDbContext dbContext, IIde
 
         if (existing is null)
         {
-            dbContext.UserGrammarTestResults.Add(
-                new UserGrammarTestResult(identityProvider.UserId, request.GrammarTestId, request.SelectedOptionId, isCorrect));
+            dbContext.UserGrammarTestResults.Add(new UserGrammarTestResult(identityProvider.UserId, request.GrammarTestId, request.SelectedOptionId, isCorrect));
             await dbContext.SaveChangesAsync(cancellationToken);
         }
 

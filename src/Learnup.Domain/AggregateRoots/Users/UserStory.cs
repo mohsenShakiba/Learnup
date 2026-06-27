@@ -12,4 +12,16 @@ public class UserStory
 
     public DateTime StartedAt { get; private set; }
     public DateTime? CompletedAt { get; private set; }
+    
+    public bool IsStoryCompleted { get; private set; }
+    public bool IsGrammarCompleted { get; private set; }
+    public bool IsVocabCompleted { get; private set; }
+
+    public void CheckIfCompleted()
+    {
+        if (IsStoryCompleted && IsGrammarCompleted && IsVocabCompleted)
+        {
+            CompletedAt = DateTime.UtcNow;
+        }
+    }
 }

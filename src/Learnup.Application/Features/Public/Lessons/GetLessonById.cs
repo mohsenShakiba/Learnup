@@ -60,15 +60,6 @@ internal sealed class GetLessonByIdHandler(ILearnupDbContext dbContext, IIdentit
             dbContext.UserLessons.Add(userLesson);
         }
 
-        if (request.LastReadEntityType is not null && request.LastReadEntityId is not null)
-        {
-            // todo, update user lesson
-        }
-        else
-        {
-            userLesson.Touch();
-        }
-
         await dbContext.SaveChangesAsync(cancellationToken);
 
         return lesson.ToDetailResponse(vocabTest);

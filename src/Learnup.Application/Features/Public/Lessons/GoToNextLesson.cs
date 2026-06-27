@@ -40,8 +40,6 @@ internal sealed class GoToNextLessonHandler(ILearnupDbContext dbContext, IIdenti
             .ThenBy(l => l.Id)
             .FirstOrDefaultAsync(cancellationToken);
 
-        currentUserLesson.Complete();
-
         if (nextLesson is null)
         {
             await dbContext.SaveChangesAsync(cancellationToken);
@@ -57,10 +55,6 @@ internal sealed class GoToNextLessonHandler(ILearnupDbContext dbContext, IIdenti
         {
             nextUserLesson = new UserLesson(identityProvider.UserId, nextLesson.Id);
             dbContext.UserLessons.Add(nextUserLesson);
-        }
-        else
-        {
-            nextUserLesson.Touch();
         }
 
         await dbContext.SaveChangesAsync(cancellationToken);

@@ -12,4 +12,20 @@ public class UserGrammar
     
     public DateTime StartedAt { get; private set; }
     public DateTime? CompletedAt { get; private set; }
+
+    private UserGrammar()
+    {
+    }
+
+    public UserGrammar(int userId, int grammarId)
+    {
+        UserId = userId;
+        GrammarId = grammarId;
+        StartedAt = DateTime.UtcNow;
+    }
+
+    public void Complete()
+    {
+        CompletedAt ??= DateTime.UtcNow;
+    }
 }
