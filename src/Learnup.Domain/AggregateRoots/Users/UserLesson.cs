@@ -1,4 +1,5 @@
 using Learnup.Domain.AggregateRoots.Lessons;
+using Learnup.Domain.AggregateRoots.Tests;
 
 namespace Learnup.Domain.AggregateRoots.Users;
 
@@ -25,4 +26,31 @@ public class UserLesson
         StartedAt = LastVisitedAt = DateTime.UtcNow;
     }
 
+    public void Touch()
+    {
+        LastVisitedAt = DateTime.UtcNow;
+    }
+
+    public void CompleteTest(TestType type)
+    {
+        if (type == TestType.Vocab)
+        {
+            IsVocabCompleted = true;
+        }
+        else if (type == TestType.Grammar)
+        {
+            IsGrammarCompleted = true;
+        }
+
+        Touch();
+        CompleteIfReady();
+    }
+
+    private void CompleteIfReady()
+    {
+        if (IsStoryCompleted && IsGrammarCompleted && IsVocabCompleted)
+        {
+            CompletedAt ??= DateTime.UtcNow;
+        }
+    }
 }

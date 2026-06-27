@@ -4,11 +4,11 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Learnup.Infrastructure.Configurations;
 
-public class UserVocabTestResultConfiguration : IEntityTypeConfiguration<UserVocabTestResult>
+public class UserTestResultConfiguration : IEntityTypeConfiguration<UserTestResult>
 {
-    public void Configure(EntityTypeBuilder<UserVocabTestResult> builder)
+    public void Configure(EntityTypeBuilder<UserTestResult> builder)
     {
-        builder.ToTable("UserVocabTestResult");
+        builder.ToTable("UserTestResult");
         builder.HasKey(r => r.Id);
 
         builder.HasOne(r => r.User)
@@ -16,9 +16,9 @@ public class UserVocabTestResultConfiguration : IEntityTypeConfiguration<UserVoc
             .HasForeignKey(r => r.UserId)
             .OnDelete(DeleteBehavior.Cascade);
 
-        builder.HasOne(r => r.VocabTest)
+        builder.HasOne(r => r.Test)
             .WithMany()
-            .HasForeignKey(r => r.VocabTestId)
+            .HasForeignKey(r => r.TestId)
             .OnDelete(DeleteBehavior.Cascade);
 
         builder.HasOne(r => r.SelectedOption)

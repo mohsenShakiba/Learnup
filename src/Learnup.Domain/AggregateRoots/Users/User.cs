@@ -9,6 +9,9 @@ public class User
     public DateTime CreatedAt { get; private set; }
     public DateTime? LastLogin { get; private set; }
     public UserStatus Status { get; private set; }
+    
+    public ICollection<UserLesson> Lessons { get; private set; } = new List<UserLesson>();
+    public ICollection<UserBook> Books { get; private set; } = new List<UserBook>();
 
     private User()
     {
@@ -50,9 +53,5 @@ public class User
         AvatarUrl = avatarUrl.Trim();
     }
 
-    public ICollection<UserLesson> Lessons { get; private set; } = new List<UserLesson>();
-    public ICollection<UserGrammar> Grammars { get; private set; } = new List<UserGrammar>();
-    public ICollection<UserStory> Stories { get; private set; } = new List<UserStory>();
-    public ICollection<UserVocab> Vocabs { get; private set; } = new List<UserVocab>();
-    public ICollection<UserBook> Books { get; private set; } = new List<UserBook>();
+
 }

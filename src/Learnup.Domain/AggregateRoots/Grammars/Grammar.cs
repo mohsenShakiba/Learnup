@@ -1,5 +1,4 @@
 using Learnup.Domain.AggregateRoots.Lessons;
-using Learnup.Domain.AggregateRoots.Tests;
 using Learnup.Domain.AggregateRoots.Vocabularies;
 
 namespace Learnup.Domain.AggregateRoots.Grammars;
@@ -22,9 +21,6 @@ public class Grammar
     private readonly List<GrammarLesson> _lessons = [];
     public IReadOnlyList<GrammarLesson> Lessons => _lessons.AsReadOnly();
     
-    private readonly List<GrammarTest> _tests = [];
-    public IReadOnlyList<GrammarTest> Tests => _tests.AsReadOnly();
-
     public Grammar(string name, VocabLevel level, int order, TimeSpan estimatedTime, string description, int? parentGrammarId)
     {
         Name = name;

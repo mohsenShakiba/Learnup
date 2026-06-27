@@ -25,7 +25,7 @@ public sealed record LessonDetailResponse(
     IReadOnlyList<StoryResponse> Stories,
     IReadOnlyList<GrammarResponse> Grammars,
     IReadOnlyList<VocabResponse> Vocabs,
-    LessonVocabTestResponse? VocabTest);
+    LessonTestResponse? Test);
 
 public sealed record CurrentLessonProgressResponse(
     int LessonId,

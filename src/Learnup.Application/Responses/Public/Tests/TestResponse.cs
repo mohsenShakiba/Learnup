@@ -2,13 +2,12 @@ using Learnup.Domain.AggregateRoots.Tests;
 
 namespace Learnup.Application.Responses.Public.Tests;
 
-
-
-public sealed record VocabTestResponse(
+public sealed record TestResponse(
     int Id,
-    int VocabId,
+    int LessonId,
+    TestType Type,
+    TestQuestionType QuestionType,
     string Question,
-    VocabTestType Type,
     IReadOnlyList<TestOptionResponse> Options,
     int? UserSelectedOptionId,
     bool? IsCorrect);

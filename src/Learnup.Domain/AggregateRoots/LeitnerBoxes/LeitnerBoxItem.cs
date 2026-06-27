@@ -1,12 +1,12 @@
+using Learnup.Domain.AggregateRoots.Users;
 using Learnup.Domain.AggregateRoots.Vocabularies;
 
-namespace Learnup.Domain.AggregateRoots.Users;
+namespace Learnup.Domain.AggregateRoots.LeitnerBoxes;
 
 public class LeitnerBoxItem
 {
     public int Id { get; private set; }
-    public int LeitnerBoxId { get; private set; }
-    public LeitnerBox LeitnerBox { get; private set; } = null!;
+
     public int VocabId { get; private set; }
     public Vocab Vocab { get; private set; } = null!;
     public int BoxLevelId { get; private set; }
@@ -14,6 +14,9 @@ public class LeitnerBoxItem
     public DateTime AddedAt { get; private set; }
     public DateTime? NextReviewAt { get; private set; }
     public DateTime? ReviewedAt { get; private set; }
+    
+    public int LeitnerBoxId { get; private set; }
+    public LeitnerBox LeitnerBox { get; private set; } = null!;
 
     private LeitnerBoxItem()
     {

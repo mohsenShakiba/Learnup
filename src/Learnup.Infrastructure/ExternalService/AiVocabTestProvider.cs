@@ -58,6 +58,6 @@ public class AiVocabTestProvider(IConfiguration configuration, ILogger<AiVocabTe
     }
     
 
-    private record TestResponse(VocabTestType Type, string Question, OptionResponse[] Options);
+    private record TestResponse(TestQuestionType Type, string Question, OptionResponse[] Options);
     private record OptionResponse(string Text, bool IsCorrect);
 }

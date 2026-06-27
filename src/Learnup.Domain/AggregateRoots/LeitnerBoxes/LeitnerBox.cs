@@ -1,4 +1,6 @@
-namespace Learnup.Domain.AggregateRoots.Users;
+using Learnup.Domain.AggregateRoots.Users;
+
+namespace Learnup.Domain.AggregateRoots.LeitnerBoxes;
 
 public class LeitnerBox
 {

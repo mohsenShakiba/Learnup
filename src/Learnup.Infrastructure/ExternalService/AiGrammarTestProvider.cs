@@ -53,7 +53,7 @@ public class AiGrammarTestProvider(IConfiguration configuration, ILogger<AiGramm
             return result?.Select(r =>
             {
                 return new TestGenerationResult(
-                    VocabTestType.FillInTheBlanks,
+                    TestQuestionType.FillInTheBlanks,
                     r.Question,
                     r.Options.Select(o => new TestOptionResult(o.Text, o.IsCorrect)).ToArray());
             }).ToList() ?? [];

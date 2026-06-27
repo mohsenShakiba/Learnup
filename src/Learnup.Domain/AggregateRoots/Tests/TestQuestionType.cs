@@ -1,6 +1,6 @@
-﻿namespace Learnup.Domain.AggregateRoots.Tests;
+namespace Learnup.Domain.AggregateRoots.Tests;
 
-public enum VocabTestType
+public enum TestQuestionType
 {
     FindTheRightWord = 1,
     FindTheRightTranslation = 2,

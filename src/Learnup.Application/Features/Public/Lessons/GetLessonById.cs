@@ -4,6 +4,7 @@ using Learnup.Application.Mediation;
 using Learnup.Application.Persistence;
 using Learnup.Application.Responses.Public.Lessons;
 using Learnup.Application.Responses.Public.Vocabs;
+using Learnup.Domain.AggregateRoots.Tests;
 using Learnup.Domain.AggregateRoots.Users;
 using Microsoft.EntityFrameworkCore;
 
@@ -25,7 +26,7 @@ internal sealed class GetLessonByIdHandler(ILearnupDbContext dbContext, IIdentit
             .AsNoTracking()
             .Include(l => l.Stories).ThenInclude(ls => ls.Story).ThenInclude(s => s.Items)
             .Include(l => l.Grammars).ThenInclude(lg => lg.Grammar)
-            .Include(l => l.Vocabs).ThenInclude(lv => lv.Vocab).ThenInclude(v => v.Tests)
+            .Include(l => l.Vocabs).ThenInclude(lv => lv.Vocab)
             .Where(l => l.Id == request.Id)
             .FirstOrDefaultAsync(cancellationToken);
 
@@ -34,18 +35,20 @@ internal sealed class GetLessonByIdHandler(ILearnupDbContext dbContext, IIdentit
             return null;
         }
 
-        var vocabIds = lesson.Vocabs.Select(lv => lv.VocabId).ToList();
-        var vocabTestsCount = lesson.Vocabs.SelectMany(lv => lv.Vocab.Tests).Count();
+        var testsCount = await dbContext.Tests
+            .CountAsync(t => t.LessonId == lesson.Id && t.Type == TestType.Vocab, cancellationToken);
 
-        var userVocabTests = await dbContext.UserVocabTestResults
-            .Where(t => t.UserId == identityProvider.UserId && vocabIds.Contains(t.VocabTest.Vocab.Id))
+        var userTests = await dbContext.UserTestResults
+            .Where(t => t.UserId == identityProvider.UserId
+                && t.Test.LessonId == lesson.Id
+                && t.Test.Type == TestType.Vocab)
             .Select(t => t.IsCorrect)
             .ToListAsync(cancellationToken);
 
-        var vocabTest = new LessonVocabTestResponse
+        var test = new LessonTestResponse
         {
-            IsPassed = vocabTestsCount == userVocabTests.Count,
-            Score = userVocabTests.Count == 0 ? 0 : userVocabTests.Count / (float)vocabTestsCount * 100
+            IsPassed = testsCount == userTests.Count,
+            Score = userTests.Count == 0 || testsCount == 0 ? 0 : userTests.Count / (float)testsCount * 100
         };
 
         var userLesson = await dbContext.UserLessons
@@ -62,6 +65,6 @@ internal sealed class GetLessonByIdHandler(ILearnupDbContext dbContext, IIdentit
 
         await dbContext.SaveChangesAsync(cancellationToken);
 
-        return lesson.ToDetailResponse(vocabTest);
+        return lesson.ToDetailResponse(test);
     }
 }

@@ -1,3 +1,4 @@
+using Learnup.Domain.AggregateRoots.LeitnerBoxes;
 using Learnup.Domain.AggregateRoots.Users;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;

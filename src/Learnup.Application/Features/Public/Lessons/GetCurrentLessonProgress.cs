@@ -30,34 +30,9 @@ internal sealed class GetCurrentLessonProgressHandler(ILearnupDbContext dbContex
 
         var lesson = currentUserLesson.Lesson;
 
-        var storyIds = lesson.Stories.Select(ls => ls.StoryId).ToHashSet();
-        var grammarIds = lesson.Grammars.Select(lg => lg.GrammarId).ToHashSet();
-        var vocabIds = lesson.Vocabs.Select(lv => lv.VocabId).ToHashSet();
-
-        var completedStoryIds = storyIds.Count == 0
-            ? []
-            : await dbContext.UserStories
-                .Where(us => us.UserId == identityProvider.UserId && us.CompletedAt != null && storyIds.Contains(us.StoryId))
-                .Select(us => us.StoryId)
-                .ToHashSetAsync(cancellationToken);
-
-        var completedGrammarIds = grammarIds.Count == 0
-            ? []
-            : await dbContext.UserGrammars
-                .Where(ug => ug.UserId == identityProvider.UserId && ug.CompletedAt != null && grammarIds.Contains(ug.GrammarId))
-                .Select(ug => ug.GrammarId)
-                .ToHashSetAsync(cancellationToken);
-
-        var completedVocabIds = vocabIds.Count == 0
-            ? []
-            : await dbContext.UserVocabs
-                .Where(uv => uv.UserId == identityProvider.UserId && uv.CompletedAt != null && vocabIds.Contains(uv.VocabId))
-                .Select(uv => uv.VocabId)
-                .ToHashSetAsync(cancellationToken);
-
-        var isStoryCompleted = storyIds.Count == 0 || storyIds.All(completedStoryIds.Contains);
-        var isGrammarCompleted = grammarIds.Count == 0 || grammarIds.All(completedGrammarIds.Contains);
-        var isVocabCompleted = vocabIds.Count == 0 || vocabIds.All(completedVocabIds.Contains);
+        var isStoryCompleted = lesson.Stories.Count == 0 || currentUserLesson.IsStoryCompleted;
+        var isGrammarCompleted = lesson.Grammars.Count == 0 || currentUserLesson.IsGrammarCompleted;
+        var isVocabCompleted = lesson.Vocabs.Count == 0 || currentUserLesson.IsVocabCompleted;
 
         int? nextLessonId = null;
         if (isStoryCompleted && isGrammarCompleted && isVocabCompleted)

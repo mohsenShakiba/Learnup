@@ -1,15 +1,17 @@
 namespace Learnup.Domain.AggregateRoots.Tests;
 
-public class GrammarTestOption
+public class TestOption
 {
     public int Id { get; private set; }
-    public int GrammarTestId { get; private set; }
+    public int TestId { get; private set; }
     public string Text { get; private set; } = null!;
     public bool IsCorrect { get; private set; }
 
-    private GrammarTestOption() { }
+    private TestOption()
+    {
+    }
 
-    public GrammarTestOption(string text, bool isCorrect)
+    public TestOption(string text, bool isCorrect)
     {
         Text = text;
         IsCorrect = isCorrect;

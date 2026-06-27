@@ -4,11 +4,11 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Learnup.Infrastructure.Configurations;
 
-public class VocabTestOptionConfiguration : IEntityTypeConfiguration<VocabTestOption>
+public class TestOptionConfiguration : IEntityTypeConfiguration<TestOption>
 {
-    public void Configure(EntityTypeBuilder<VocabTestOption> builder)
+    public void Configure(EntityTypeBuilder<TestOption> builder)
     {
-        builder.ToTable("VocabTestOption");
+        builder.ToTable("TestOption");
         builder.HasKey(o => o.Id);
 
         builder.Property(o => o.Text)

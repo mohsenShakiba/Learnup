@@ -26,7 +26,7 @@ public static class LessonMapper
 
     public static LessonDetailResponse ToDetailResponse(
         this Lesson lesson,
-        LessonVocabTestResponse vocabTest)
+        LessonTestResponse test)
     {
         return new(
             lesson.Id,
@@ -36,7 +36,7 @@ public static class LessonMapper
             lesson.Stories.Select(ls => ls.Story.ToResponse()).ToList(),
             lesson.Grammars.Select(lg => lg.Grammar.ToResponse()).ToList(),
             lesson.Vocabs.Select(v => v.Vocab.ToResponse()).ToList(),
-            vocabTest);
+            test);
     }
 
     private static StoryItemResponse ToResponse(this Domain.AggregateRoots.Stories.StoryItem item) =>

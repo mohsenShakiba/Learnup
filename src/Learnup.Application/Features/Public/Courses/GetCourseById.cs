@@ -2,7 +2,6 @@ using Learnup.Application.Authentication;
 using Learnup.Application.Mediation;
 using Learnup.Application.Persistence;
 using Learnup.Application.Responses.Public.Courses;
-using Learnup.Domain.AggregateRoots.Users;
 using Microsoft.EntityFrameworkCore;
 
 namespace Learnup.Application.Features.Public.Courses;
@@ -14,19 +13,6 @@ internal sealed class GetCourseByIdHandler(ILearnupDbContext dbContext, IIdentit
 {
     public async Task<CourseResponse?> Handle(GetCourseById request, CancellationToken cancellationToken)
     {
-        
-        var existingUserCourse = dbContext.UserCourses
-            .FirstOrDefault(uc => uc.UserId == identityProvider.UserId && uc.CourseId == request.Id);
-
-        if (existingUserCourse is null)
-        {
-            existingUserCourse = new UserCourse(identityProvider.UserId, request.Id);
-            
-            dbContext.UserCourses.Add(existingUserCourse);
-
-            await dbContext.SaveChangesAsync(cancellationToken);
-        }
-        
         return await dbContext.Courses
             .AsNoTracking()
             .Where(course => course.Id == request.Id)
@@ -38,10 +24,15 @@ internal sealed class GetCourseByIdHandler(ILearnupDbContext dbContext, IIdentit
                     course.Description,
                     course.Order,
                     course.Lessons.Count,
-                    course.Lessons.SelectMany(l => l.Users.Where(u => u.UserId == identityProvider.UserId)).Count(),
+                    course.Lessons.SelectMany(l => l.Users)
+                        .Count(u => u.UserId == identityProvider.UserId && u.CompletedAt != null),
                     course.LanguageId,
                     course.CoverId,
-                    course.Users.FirstOrDefault(u => u.UserId == identityProvider.UserId).FirstVisitedAt
+                    course.Lessons.SelectMany(l => l.Users)
+                        .Where(u => u.UserId == identityProvider.UserId)
+                        .OrderByDescending(u => u.LastVisitedAt)
+                        .Select(u => (DateTime?)u.LastVisitedAt)
+                        .FirstOrDefault()
                 )
             )
             .FirstOrDefaultAsync(cancellationToken);

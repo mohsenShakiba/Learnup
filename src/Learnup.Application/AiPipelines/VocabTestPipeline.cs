@@ -17,30 +17,32 @@ public class VocabTestPipeline(
     
     public async Task ProcessAsync(CancellationToken cancellationToken = default)
     {
-        var candidates = await dbContext.Vocabs
-            .Where(v => v.Status == VocabStatus.Published)
-            .Where(v => !v.Tests.Any())
+        var candidates = await dbContext.LessonVocabs
+            .Include(lv => lv.Vocab)
+            .Where(lv => lv.Vocab.Status == VocabStatus.Published)
+            .Where(lv => !dbContext.Tests.Any(t => t.LessonId == lv.LessonId && t.Type == TestType.Vocab))
             .Take(5)
             .ToListAsync(cancellationToken);
 
-        foreach (var vocab in candidates)
+        foreach (var lessonVocab in candidates)
         {
             try
             {
                 var sw = Stopwatch.StartNew();
+                var vocab = lessonVocab.Vocab;
 
                 var result = await vocabTestProvider.GetVocabTestAsync(vocab,  cancellationToken);
 
-                var test = new VocabTest(vocab.Id);
-                var options = result.Options.Select(o => new VocabTestOption(o.Text, o.IsCorrect)).ToList();
+                var test = new Test(lessonVocab.LessonId, TestType.Vocab);
+                var options = result.Options.Select(o => new TestOption(o.Text, o.IsCorrect)).ToList();
                 test.Publish(result.Type, result.Question, options);
 
-                dbContext.VocabTests.Add(test);
+                dbContext.Tests.Add(test);
                 await dbContext.SaveChangesAsync(cancellationToken);
 
                 logger.LogInformation(
-                    "VocabTest for vocab {VocabId} generated in {MilliSeconds}ms",
-                    vocab.Id,
+                    "Test for lesson {LessonId} generated in {MilliSeconds}ms",
+                    lessonVocab.LessonId,
                     sw.ElapsedMilliseconds);
             }
             catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
@@ -49,7 +51,7 @@ public class VocabTestPipeline(
             }
             catch (Exception exception)
             {
-                logger.LogError(exception, "Error generating test for vocab {VocabId}", vocab.Id);
+                logger.LogError(exception, "Error generating test for lesson {LessonId}", lessonVocab.LessonId);
             }
         }
     }

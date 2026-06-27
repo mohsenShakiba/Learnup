@@ -16,25 +16,26 @@ public class GrammarTestPipeline(
 
     public async Task ProcessAsync(CancellationToken cancellationToken = default)
     {
-        var candidates = await dbContext.Grammars
-            .Include(g => g.Lessons)
-            .Where(g => g.Id == 10)
-            .Where(g => !g.Tests.Any())
+        var candidates = await dbContext.LessonGrammars
+            .Include(lg => lg.Grammar)
+            .Where(lg => lg.GrammarId == 10)
+            .Where(lg => !dbContext.Tests.Any(t => t.LessonId == lg.LessonId && t.Type == TestType.Grammar))
             .Take(5)
             .ToListAsync(cancellationToken);
 
-        foreach (var grammar in candidates)
+        foreach (var lessonGrammarCandidate in candidates)
         {
             try
             {
                 var sw = Stopwatch.StartNew();
+                var grammar = lessonGrammarCandidate.Grammar;
                 
                 var lessonGrammar = await dbContext.LessonGrammars
                     .Include(g => g.Lesson)
                     .ThenInclude(l => l.Stories)
                     .ThenInclude(s => s.Story)
                     .ThenInclude(s => s.Items)
-                    .Where(g => g.GrammarId == grammar.Id)
+                    .Where(g => g.LessonId == lessonGrammarCandidate.LessonId && g.GrammarId == grammar.Id)
                     .FirstOrDefaultAsync(cancellationToken);
                 
                 var story = lessonGrammar?.Lesson.Stories.Select(s => s.Story).FirstOrDefault();
@@ -48,17 +49,17 @@ public class GrammarTestPipeline(
 
                 foreach (var result in results)
                 {
-                    var test = new GrammarTest(grammar.Id);
-                    var options = result.Options.Select(o => new GrammarTestOption(o.Text, o.IsCorrect)).ToList();
-                    test.Publish(result.Question, options);
-                    dbContext.GrammarTests.Add(test);
+                    var test = new Test(lessonGrammarCandidate.LessonId, TestType.Grammar);
+                    var options = result.Options.Select(o => new TestOption(o.Text, o.IsCorrect)).ToList();
+                    test.Publish(result.Type, result.Question, options);
+                    dbContext.Tests.Add(test);
                 }
 
                 await dbContext.SaveChangesAsync(cancellationToken);
 
                 logger.LogInformation(
-                    "GrammarTest for grammar {GrammarId} generated in {MilliSeconds}ms",
-                    grammar.Id,
+                    "Test for lesson {LessonId} generated in {MilliSeconds}ms",
+                    lessonGrammarCandidate.LessonId,
                     sw.ElapsedMilliseconds);
             }
             catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
@@ -67,7 +68,7 @@ public class GrammarTestPipeline(
             }
             catch (Exception exception)
             {
-                logger.LogError(exception, "Error generating test for grammar {GrammarId}", grammar.Id);
+                logger.LogError(exception, "Error generating test for lesson {LessonId}", lessonGrammarCandidate.LessonId);
             }
         }
     }

@@ -3,6 +3,7 @@ using Learnup.Application.Mappers;
 using Learnup.Application.Mediation;
 using Learnup.Application.Persistence;
 using Learnup.Application.Responses.Public.Lessons;
+using Learnup.Domain.AggregateRoots.Tests;
 using Learnup.Domain.AggregateRoots.Users;
 using Microsoft.EntityFrameworkCore;
 
@@ -33,7 +34,7 @@ internal sealed class GoToNextLessonHandler(ILearnupDbContext dbContext, IIdenti
         var nextLesson = await dbContext.Lessons
             .Include(l => l.Stories).ThenInclude(ls => ls.Story).ThenInclude(s => s.Items)
             .Include(l => l.Grammars).ThenInclude(lg => lg.Grammar)
-            .Include(l => l.Vocabs).ThenInclude(lv => lv.Vocab).ThenInclude(v => v.Tests)
+            .Include(l => l.Vocabs).ThenInclude(lv => lv.Vocab)
             .Where(l => l.CourseId == currentLesson.CourseId
                 && (l.Order > currentLesson.Order || (l.Order == currentLesson.Order && l.Id > currentLesson.Id)))
             .OrderBy(l => l.Order)
@@ -59,20 +60,22 @@ internal sealed class GoToNextLessonHandler(ILearnupDbContext dbContext, IIdenti
 
         await dbContext.SaveChangesAsync(cancellationToken);
 
-        var vocabIds = nextLesson.Vocabs.Select(lv => lv.VocabId).ToList();
-        var vocabTestsCount = nextLesson.Vocabs.SelectMany(lv => lv.Vocab.Tests).Count();
+        var testsCount = await dbContext.Tests
+            .CountAsync(t => t.LessonId == nextLesson.Id && t.Type == TestType.Vocab, cancellationToken);
 
-        var userVocabTests = await dbContext.UserVocabTestResults
-            .Where(t => t.UserId == identityProvider.UserId && vocabIds.Contains(t.VocabTest.Vocab.Id))
+        var userTests = await dbContext.UserTestResults
+            .Where(t => t.UserId == identityProvider.UserId
+                && t.Test.LessonId == nextLesson.Id
+                && t.Test.Type == TestType.Vocab)
             .Select(t => t.IsCorrect)
             .ToListAsync(cancellationToken);
 
-        var vocabTest = new LessonVocabTestResponse
+        var test = new LessonTestResponse
         {
-            IsPassed = vocabTestsCount == userVocabTests.Count,
-            Score = userVocabTests.Count == 0 ? 0 : userVocabTests.Count / (float)vocabTestsCount * 100
+            IsPassed = testsCount == userTests.Count,
+            Score = userTests.Count == 0 || testsCount == 0 ? 0 : userTests.Count / (float)testsCount * 100
         };
 
-        return nextLesson.ToDetailResponse(vocabTest);
+        return nextLesson.ToDetailResponse(test);
     }
 }

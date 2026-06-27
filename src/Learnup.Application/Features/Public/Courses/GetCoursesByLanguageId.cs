@@ -31,10 +31,15 @@ internal sealed class GetCoursesByLanguageIdHandler(ILearnupDbContext dbContext,
                     .Where(lesson => lesson.CourseId == course.Id)
                     .SelectMany(lesson => lesson.Stories)
                     .Count(),
-                course.Lessons.SelectMany(l => l.Users.Where(u => u.UserId == identityProvider.UserId)).Count(),
+                course.Lessons.SelectMany(l => l.Users)
+                    .Count(u => u.UserId == identityProvider.UserId && u.CompletedAt != null),
                 course.LanguageId,
                 course.CoverId,
-                course.Users.FirstOrDefault(u => u.UserId == identityProvider.UserId).FirstVisitedAt))
+                course.Lessons.SelectMany(l => l.Users)
+                    .Where(u => u.UserId == identityProvider.UserId)
+                    .OrderByDescending(u => u.LastVisitedAt)
+                    .Select(u => (DateTime?)u.LastVisitedAt)
+                    .FirstOrDefault()))
             .ToListAsync(cancellationToken);
     }
 }
