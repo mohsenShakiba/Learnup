@@ -12,10 +12,11 @@ public class Test
     public TestQuestionType QuestionType { get; private set; }
     public string Question { get; private set; } = null!;
     public TestStatus Status { get; private set; }
+    public string? VoiceId { get; private set; }
 
     private readonly List<TestOption> _options = [];
     public IReadOnlyList<TestOption> Options => _options.AsReadOnly();
-    
+
     private readonly List<UserTestResult> _userTestResults = [];
     public IReadOnlyList<UserTestResult> UserTestResults => _userTestResults.AsReadOnly();
 

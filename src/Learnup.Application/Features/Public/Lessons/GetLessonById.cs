@@ -37,7 +37,7 @@ internal sealed class GetLessonByIdHandler(ILearnupDbContext dbContext, IIdentit
         if (userLesson is null)
         {
             userLesson = new UserLesson(identityProvider.UserId, request.Id);
-            userLesson.SetRequirements(lesson.Stories.Count, lesson.Grammars.Count, lesson.Vocabs.Count);
+            userLesson.SetRequirements(lesson.Stories.Count, lesson.Grammars.Count, lesson.Vocabs.Count, lesson.Tests.Count);
             dbContext.UserLessons.Add(userLesson);
         }
         else

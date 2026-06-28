@@ -35,7 +35,7 @@ public static class LessonMapper
             lesson.Order,
             lesson.CourseId,
             nextLessonId,
-            lesson.Users.FirstOrDefault()?.ToResponse() ?? new UserLessonResponse(false, false, false, false, false),
+            lesson.Users.FirstOrDefault()?.ToResponse() ?? new UserLessonResponse(UserLessonStatus.None, false, false, false, false, false),
             lesson.Stories.Select(s => s.Story.ToResponse()).ToList(),
             lesson.Grammars.Select(g => g.Grammar.ToResponse()).ToList(),
             lesson.Vocabs.Select(v => v.Vocab.ToResponse()).ToList(),
@@ -45,6 +45,7 @@ public static class LessonMapper
     public static UserLessonResponse ToResponse(this UserLesson userLesson)
     {
         return new(
+            userLesson.Status,
             userLesson.IsStoryCompleted,
             userLesson.IsGrammarCompleted,
             userLesson.IsVocabCompleted,
