@@ -21,9 +21,7 @@ public class UsersController(IMediator mediator) : BasePublicController
     }
 
     [HttpPut("profile", Name = "UpdateProfile")]
-    public async Task<ActionResult<UserProfileResponse>> UpdateProfile(
-        [FromBody] UpdateProfileRequest request,
-        CancellationToken cancellationToken)
+    public async Task<ActionResult<UserProfileResponse>> UpdateProfile([FromBody] UpdateProfileRequest request, CancellationToken cancellationToken)
     {
         if (string.IsNullOrWhiteSpace(request.DisplayName))
         {
@@ -50,9 +48,7 @@ public class UsersController(IMediator mediator) : BasePublicController
 
     [HttpPost("profile/avatar", Name = "UploadAvatar")]
     [Consumes("multipart/form-data")]
-    public async Task<ActionResult<UserProfileResponse>> UploadAvatar(
-        [FromForm] UploadAvatarRequest request,
-        CancellationToken cancellationToken)
+    public async Task<ActionResult<UserProfileResponse>> UploadAvatar([FromForm] UploadAvatarRequest request, CancellationToken cancellationToken)
     {
         if (request.File is null || request.File.Length <= 0)
         {
@@ -65,10 +61,8 @@ public class UsersController(IMediator mediator) : BasePublicController
         }
 
         await using var avatarStream = request.File.OpenReadStream();
-        var command = new UploadAvatar(
-            avatarStream,
-            request.File.ContentType,
-            request.File.Length);
+        
+        var command = new UploadAvatar(avatarStream, request.File.ContentType);
 
         var profile = await mediator.Send(command, cancellationToken);
 

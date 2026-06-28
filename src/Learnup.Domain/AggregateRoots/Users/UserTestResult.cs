@@ -26,4 +26,10 @@ public class UserTestResult
         IsCorrect = isCorrect;
         AnsweredAt = DateTime.UtcNow;
     }
+
+    public void UpdateSelectedOption(int selectedOptionId, bool isCorrect)
+    {
+        SelectedOptionId = selectedOptionId;
+        IsCorrect = isCorrect;
+    }
 }

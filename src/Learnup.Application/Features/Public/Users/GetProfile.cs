@@ -8,14 +8,10 @@ namespace Learnup.Application.Features.Public.Users;
 
 public sealed record GetProfile : IRequest<UserProfileResponse?>;
 
-internal sealed class GetProfileHandler(
-    ILearnupDbContext dbContext,
-    IIdentityProvider identityProvider)
+internal sealed class GetProfileHandler(ILearnupDbContext dbContext, IIdentityProvider identityProvider)
     : IRequestHandler<GetProfile, UserProfileResponse?>
 {
-    public async Task<UserProfileResponse?> Handle(
-        GetProfile request,
-        CancellationToken cancellationToken)
+    public async Task<UserProfileResponse?> Handle(GetProfile request, CancellationToken cancellationToken)
     {
         var profile = await dbContext.Users
             .AsNoTracking()

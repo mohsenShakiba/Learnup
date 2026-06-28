@@ -13,11 +13,6 @@ public sealed record StoryItemResponse(
     string Translation,
     int Order,
     int Person,
-    string? VoiceId,
-    IReadOnlyList<StoryItemTimestampResponse> Timestamps);
+    string? VoiceId);
 
-public sealed record StoryItemTimestampResponse(
-    int Id,
-    string Word,
-    float Start,
-    float End);
+

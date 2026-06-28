@@ -26,14 +26,7 @@ public class StoryPipeline(ILearnupDbContext dbContext, IVoiceProvider voiceProv
                 {
                     var option = item.Person == 1 ? new VoiceOptions(VoiceIds.Heart, 0.8) : new VoiceOptions(VoiceIds.Bella, 0.8);
                     var result = await voiceProvider.GetVoiceAsync(item.Content, option, cancellationToken: cancellationToken);
-
-                    item.SetVoice(
-                        result.VoiceId,
-                        result.Captions.Select(caption => new StoryItemTimestamp(
-                            item.Id, 
-                            caption.Word,
-                            caption.Start,
-                            caption.End)));
+                    item.SetVoice(result.VoiceId);
                 }
                 catch
                 {

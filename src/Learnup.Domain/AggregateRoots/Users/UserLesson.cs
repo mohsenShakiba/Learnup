@@ -14,13 +14,13 @@ public class UserLesson
     public DateTime StartedAt { get; private set; }
     public DateTime LastVisitedAt { get; private set; }
     public DateTime? CompletedAt { get; private set; }
-    
+
     public bool IsStoryCompleted { get; private set; }
     public bool IsGrammarCompleted { get; private set; }
     public bool IsVocabCompleted { get; private set; }
     public bool IsGrammarTestCompleted { get; private set; }
     public bool IsVocabTestCompleted { get; private set; }
-    
+
     public UserLesson(int userId, int lessonId)
     {
         UserId = userId;
@@ -31,21 +31,6 @@ public class UserLesson
     public void Touch()
     {
         LastVisitedAt = DateTime.UtcNow;
-    }
-
-    public void CompleteTest(TestType type)
-    {
-        if (type == TestType.Vocab)
-        {
-            IsVocabCompleted = true;
-        }
-        else if (type == TestType.Grammar)
-        {
-            IsGrammarCompleted = true;
-        }
-
-        Touch();
-        CompleteIfReady();
     }
 
     private void CompleteIfReady()
@@ -67,17 +52,54 @@ public class UserLesson
         {
             IsStoryCompleted = true;
         }
-        
+
         if (grammarsCount == 0)
         {
             IsGrammarCompleted = true;
             IsGrammarTestCompleted = true;
         }
-        
+
         if (vocabsCount == 0)
         {
             IsVocabCompleted = true;
             IsVocabTestCompleted = true;
         }
+    }
+
+    public void CompleteStory()
+    {
+        IsStoryCompleted = true;
+        Touch();
+        CompleteIfReady();
+    }
+    
+    public void CompleteGrammar()
+    {
+        IsGrammarCompleted = true;
+        Touch();
+        CompleteIfReady();
+    }
+    
+    public void CompleteGrammarTest()
+    {
+        IsGrammarCompleted = true;
+        IsGrammarTestCompleted = true;
+        Touch();
+        CompleteIfReady();
+    }
+    
+    public void CompleteVocab()
+    {
+        IsVocabCompleted = true;
+        Touch();
+        CompleteIfReady();
+    }
+    
+    public void CompleteVocabTest()
+    {
+        IsVocabCompleted = true;
+        IsVocabTestCompleted = true;
+        Touch();
+        CompleteIfReady();
     }
 }

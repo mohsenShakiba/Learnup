@@ -9,28 +9,22 @@ namespace Learnup.Application.Features.Public.Users;
 
 public sealed record GetUserStreak : IRequest<UserStreakResponse?>;
 
-internal sealed class GetUserStreakHandler(
-    ILearnupDbContext dbContext,
-    IIdentityProvider identityProvider)
+internal sealed class GetUserStreakHandler(ILearnupDbContext dbContext, IIdentityProvider identityProvider)
     : IRequestHandler<GetUserStreak, UserStreakResponse?>
 {
-    public async Task<UserStreakResponse?> Handle(
-        GetUserStreak request,
-        CancellationToken cancellationToken)
+    public async Task<UserStreakResponse?> Handle(GetUserStreak request, CancellationToken cancellationToken)
     {
         var visitedAt = DateTime.UtcNow;
         var streakDate = DateOnly.FromDateTime(visitedAt);
 
         var todayStreak = await dbContext.UserStreaks
             .FirstOrDefaultAsync(
-                streak => streak.UserId == identityProvider.UserId && streak.StreakDate == streakDate,
-                cancellationToken);
+                streak => streak.UserId == identityProvider.UserId && streak.StreakDate == streakDate, cancellationToken);
 
         if (todayStreak is null)
         {
             todayStreak = new UserStreak(identityProvider.UserId, streakDate, visitedAt);
             dbContext.UserStreaks.Add(todayStreak);
-
             await dbContext.SaveChangesAsync(cancellationToken);
         }
 
@@ -39,22 +33,20 @@ internal sealed class GetUserStreakHandler(
             .Where(streak => streak.UserId == identityProvider.UserId)
             .OrderBy(streak => streak.StreakDate)
             .Select(streak => streak.StreakDate)
+            .Take(30)
             .ToListAsync(cancellationToken);
 
-        var (currentStreak, longestStreak) = CalculateStreaks(streakDates, todayStreak.StreakDate);
+        var currentStreak = CalculateCurrentStreak(streakDates, todayStreak.StreakDate);
         var lastSevenDays = GetLastSevenDays(streakDates, todayStreak.StreakDate);
 
         return new UserStreakResponse(
             currentStreak,
-            longestStreak,
             todayStreak.StreakDate,
             todayStreak.VisitedAt,
             lastSevenDays);
     }
 
-    private static IReadOnlyList<UserStreakDayResponse> GetLastSevenDays(
-        IReadOnlyList<DateOnly> streakDates,
-        DateOnly currentDate)
+    private static IReadOnlyList<UserStreakDayResponse> GetLastSevenDays(IReadOnlyList<DateOnly> streakDates, DateOnly currentDate)
     {
         var streakDateSet = streakDates.ToHashSet();
 
@@ -65,35 +57,15 @@ internal sealed class GetUserStreakHandler(
             .ToList();
     }
 
-    private static (int CurrentStreak, int LongestStreak) CalculateStreaks(
-        IReadOnlyList<DateOnly> streakDates,
-        DateOnly currentDate)
+    private static int CalculateCurrentStreak(IReadOnlyList<DateOnly> streakDates, DateOnly currentDate)
     {
         var streakDateSet = streakDates.ToHashSet();
-        var longestStreak = 0;
-        var runningStreak = 0;
-        DateOnly? previousDate = null;
-
-        foreach (var streakDate in streakDates)
-        {
-            runningStreak = previousDate == streakDate.AddDays(-1)
-                ? runningStreak + 1
-                : 1;
-
-            if (runningStreak > longestStreak)
-            {
-                longestStreak = runningStreak;
-            }
-
-            previousDate = streakDate;
-        }
-
         var currentStreak = 0;
         for (var date = currentDate; streakDateSet.Contains(date); date = date.AddDays(-1))
         {
             currentStreak++;
         }
 
-        return (currentStreak, longestStreak);
+        return currentStreak;
     }
 }

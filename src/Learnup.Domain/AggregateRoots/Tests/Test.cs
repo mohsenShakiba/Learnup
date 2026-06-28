@@ -5,7 +5,6 @@ namespace Learnup.Domain.AggregateRoots.Tests;
 
 public class Test
 {
-
     public int Id { get; private set; }
     public int LessonId { get; private set; }
     public Lesson Lesson { get; private set; } = null!;

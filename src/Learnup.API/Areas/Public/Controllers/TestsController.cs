@@ -9,16 +9,6 @@ namespace Learnup.API.Areas.Public.Controllers;
 
 public class TestsController(IMediator mediator) : BasePublicController
 {
-    [HttpGet("lesson/{lessonId}", Name = "GetTests")]
-    public async Task<ActionResult<IReadOnlyList<TestResponse>>> GetByLesson(
-        int lessonId,
-        [FromQuery] TestType type,
-        CancellationToken cancellationToken)
-    {
-        var tests = await mediator.Send(new GetTests(lessonId, type), cancellationToken);
-        return Ok(tests);
-    }
-
     [HttpPost("{id}/answer", Name = "AnswerTest")]
     public async Task<ActionResult<AnswerTestResponse>> Answer(
         int id,
@@ -36,16 +26,6 @@ public class TestsController(IMediator mediator) : BasePublicController
         CancellationToken cancellationToken)
     {
         await mediator.Send(new ResetTestResult(lessonId, type), cancellationToken);
-        return NoContent();
-    }
-
-    [HttpPost("lesson/{lessonId}/check", Name = "CheckTest")]
-    public async Task<IActionResult> Check(
-        int lessonId,
-        [FromQuery] TestType type,
-        CancellationToken cancellationToken)
-    {
-        await mediator.Send(new CheckTest(lessonId, type), cancellationToken);
         return NoContent();
     }
 }

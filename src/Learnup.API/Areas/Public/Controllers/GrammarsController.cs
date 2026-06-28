@@ -35,11 +35,4 @@ public class GrammarsController(IMediator mediator) : BasePublicController
         return Ok();
     }
 
-    [HttpGet("{grammarId:int}/lessons")]
-    public async Task<ActionResult<List<GrammarLessonResponse>>> ListLessons(int grammarId)
-    {
-        var query = new ListGrammarLessons(grammarId);
-        var response = await mediator.Send(query);
-        return Ok(response);
-    }
 }

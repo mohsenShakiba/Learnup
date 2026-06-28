@@ -7,10 +7,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Learnup.Application.Features.Public.Users;
 
-public sealed record UploadAvatar(
-    Stream Content,
-    string ContentType,
-    long Length) : IRequest<UserProfileResponse?>;
+public sealed record UploadAvatar(Stream Content, string ContentType) : IRequest<UserProfileResponse?>;
 
 internal sealed class UploadAvatarHandler(
     ILearnupDbContext dbContext,
@@ -22,11 +19,6 @@ internal sealed class UploadAvatarHandler(
         UploadAvatar request,
         CancellationToken cancellationToken)
     {
-        if (request.Length <= 0)
-        {
-            throw new ArgumentException("Avatar file cannot be empty.", nameof(request));
-        }
-
         var user = await dbContext.Users
             .FirstOrDefaultAsync(user => user.Id == identityProvider.UserId, cancellationToken);
 

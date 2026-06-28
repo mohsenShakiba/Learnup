@@ -1,4 +1,5 @@
 using Learnup.Application.Authentication;
+using Learnup.Application.Mappers;
 using Learnup.Application.Mediation;
 using Learnup.Application.Persistence;
 using Learnup.Application.Responses.Public.Subscriptions;
@@ -22,15 +23,7 @@ internal sealed class GetUserCurrentSubscriptionHandler(
             .AsNoTracking()
             .Where(us => us.UserId == identityProvider.UserId && us.Status == UserSubscriptionStatus.Active)
             .OrderByDescending(us => us.StartedAt)
-            .Select(us => new UserSubscriptionResponse(
-                us.Id,
-                us.SubscriptionId,
-                us.Subscription.Title,
-                us.Subscription.Type,
-                us.Subscription.Duration,
-                us.StartedAt,
-                us.ExpiresAt,
-                us.Status))
+            .Select(SubscriptionMapper.ToUserSubscriptionResponse())
             .FirstOrDefaultAsync(cancellationToken);
     }
 }

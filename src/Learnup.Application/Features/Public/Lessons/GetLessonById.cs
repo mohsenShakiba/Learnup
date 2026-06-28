@@ -3,8 +3,6 @@ using Learnup.Application.Mappers;
 using Learnup.Application.Mediation;
 using Learnup.Application.Persistence;
 using Learnup.Application.Responses.Public.Lessons;
-using Learnup.Application.Responses.Public.Vocabs;
-using Learnup.Domain.AggregateRoots.Tests;
 using Learnup.Domain.AggregateRoots.Users;
 using Microsoft.EntityFrameworkCore;
 
@@ -20,10 +18,10 @@ internal sealed class GetLessonByIdHandler(ILearnupDbContext dbContext, IIdentit
         var lesson = await dbContext.Lessons
             .AsNoTracking()
             .Include(l => l.Stories).ThenInclude(ls => ls.Story).ThenInclude(s => s.Items)
-            .Include(l => l.Grammars).ThenInclude(lg => lg.Grammar)
+            .Include(l => l.Grammars).ThenInclude(lg => lg.Grammar).ThenInclude(g => g.Lessons)
             .Include(l => l.Vocabs).ThenInclude(lv => lv.Vocab)
             .Include(l => l.Tests).ThenInclude(t => t.Options)
-            .Include(l => l.Tests).ThenInclude(t => t.UserTestResults)
+            .Include(l => l.Tests).ThenInclude(t => t.UserTestResults.Where(r => r.UserId == identityProvider.UserId))
             .Where(l => l.Id == request.Id)
             .FirstOrDefaultAsync(cancellationToken);
 
@@ -47,8 +45,14 @@ internal sealed class GetLessonByIdHandler(ILearnupDbContext dbContext, IIdentit
             userLesson.Touch();
         }
         
+        var nextLessonId = await dbContext.Lessons
+            .Where(l => l.CourseId == lesson.CourseId && l.Order > lesson.Order)
+            .OrderBy(l => l.Order)
+            .Select(l => l.Id)
+            .FirstOrDefaultAsync(cancellationToken);
+        
         await dbContext.SaveChangesAsync(cancellationToken);
 
-        return lesson.ToDetailResponse();
+        return lesson.ToDetailResponse(nextLessonId);
     }
 }

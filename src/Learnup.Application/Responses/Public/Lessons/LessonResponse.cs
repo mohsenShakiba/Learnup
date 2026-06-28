@@ -22,6 +22,8 @@ public sealed record LessonDetailResponse(
     string Title,
     int Order,
     int CourseId,
+    int? NextLessonId,
+    UserLessonResponse UserLesson,
     List<StoryResponse> Stories,
     List<GrammarResponse> Grammars,
     List<VocabResponse> Vocabs,

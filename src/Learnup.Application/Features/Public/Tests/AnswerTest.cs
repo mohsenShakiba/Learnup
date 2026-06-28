@@ -15,12 +15,13 @@ internal sealed class AnswerTestHandler(ILearnupDbContext dbContext, IIdentityPr
     public async Task<AnswerTestResponse> Handle(AnswerTest request, CancellationToken cancellationToken)
     {
         var test = await dbContext.Tests
-            .Include(t => t.Options)
-            .FirstOrDefaultAsync(t => t.Id == request.TestId, cancellationToken)
-            ?? throw new InvalidOperationException("Test not found");
+                       .Include(t => t.Options)
+                       .FirstOrDefaultAsync(t => t.Id == request.TestId, cancellationToken)
+                   ?? throw new InvalidOperationException("Test not found");
 
-        var selectedOption = test.Options.FirstOrDefault(o => o.Id == request.SelectedOptionId)
-            ?? throw new InvalidOperationException("Option not found");
+        var selectedOption = test.Options
+                                 .FirstOrDefault(o => o.Id == request.SelectedOptionId)
+                             ?? throw new InvalidOperationException("Option not found");
 
         var correctOption = test.Options.First(o => o.IsCorrect);
         var isCorrect = selectedOption.IsCorrect;
@@ -32,8 +33,13 @@ internal sealed class AnswerTestHandler(ILearnupDbContext dbContext, IIdentityPr
 
         if (existing is null)
         {
-            dbContext.UserTestResults.Add(
-                new UserTestResult(identityProvider.UserId, request.TestId, request.SelectedOptionId, isCorrect));
+            var userTestResult = new UserTestResult(identityProvider.UserId, request.TestId, request.SelectedOptionId, isCorrect);
+            dbContext.UserTestResults.Add(userTestResult);
+            await dbContext.SaveChangesAsync(cancellationToken);
+        }
+        else
+        {
+            existing.UpdateSelectedOption(request.SelectedOptionId, isCorrect);
             await dbContext.SaveChangesAsync(cancellationToken);
         }
 

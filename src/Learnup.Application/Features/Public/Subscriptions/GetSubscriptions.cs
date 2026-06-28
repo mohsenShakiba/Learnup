@@ -1,3 +1,4 @@
+using Learnup.Application.Mappers;
 using Learnup.Application.Mediation;
 using Learnup.Application.Persistence;
 using Learnup.Application.Responses.Public.Subscriptions;
@@ -18,19 +19,7 @@ internal sealed class GetSubscriptionsHandler(ILearnupDbContext dbContext)
             .AsNoTracking()
             .Where(s => s.IsActive)
             .OrderBy(s => s.Id)
-            .Select(s => new SubscriptionResponse(
-                s.Id,
-                s.Title,
-                s.Description,
-                s.Type,
-                s.Duration,
-                s.Price,
-                s.DiscountPercent,
-                s.IsActive,
-                s.Features
-                    .OrderBy(f => f.Order)
-                    .Select(f => new SubscriptionFeatureResponse(f.Id, f.Description, f.IsIncluded, f.Order))
-                    .ToList()))
+            .Select(SubscriptionMapper.ToResponse())
             .ToListAsync(cancellationToken);
     }
 }

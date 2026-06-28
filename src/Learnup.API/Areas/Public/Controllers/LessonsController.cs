@@ -1,7 +1,6 @@
 using Learnup.Application.Features.Public.Lessons;
 using Learnup.Application.Mediation;
 using Learnup.Application.Responses.Public.Lessons;
-using Learnup.Domain.AggregateRoots.Users;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Learnup.API.Areas.Public.Controllers;
@@ -29,28 +28,23 @@ public class LessonsController(IMediator mediator) : BasePublicController
     }
 
     [HttpGet("{id:int}", Name = "GetLessonById")]
-    public async Task<ActionResult<LessonDetailResponse>> GetById(
-        int id,
-        [FromQuery] UserLessonEntityType? lastReadEntityType,
-        [FromQuery] int? lastReadEntityId,
-        CancellationToken cancellationToken)
+    public async Task<ActionResult<LessonDetailResponse>> GetById(int id, CancellationToken cancellationToken)
     {
-        var lesson = await mediator.Send(
-            new GetLessonById(id, lastReadEntityType, lastReadEntityId),
-            cancellationToken);
+        var lesson = await mediator.Send(new GetLessonById(id), cancellationToken);
 
         return lesson is null
             ? NotFound()
             : Ok(lesson);
     }
 
-    [HttpPost("next", Name = "GoToNextLesson")]
-    public async Task<ActionResult<LessonDetailResponse>> GoToNext(CancellationToken cancellationToken)
+    [HttpPost("{id:int}/section-completed", Name = "OnLessonSectionCompleted")]
+    public async Task<IActionResult> CompleteSection(
+        int id,
+        [FromQuery] StorySection section,
+        CancellationToken cancellationToken)
     {
-        var lesson = await mediator.Send(new GoToNextLesson(), cancellationToken);
+        await mediator.Send(new OnLessonSectionCompleted(id, section), cancellationToken);
 
-        return lesson is null
-            ? NotFound()
-            : Ok(lesson);
+        return NoContent();
     }
 }

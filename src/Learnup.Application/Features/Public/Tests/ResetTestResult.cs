@@ -21,6 +21,7 @@ internal sealed class ResetTestResultHandler(ILearnupDbContext dbContext, IIdent
 
         dbContext.UserTestResults.RemoveRange(userTests);
         await dbContext.SaveChangesAsync(cancellationToken);
+        
         return Unit.Value;
     }
 }
