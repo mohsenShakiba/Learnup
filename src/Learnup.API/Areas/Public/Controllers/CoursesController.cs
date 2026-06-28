@@ -12,7 +12,7 @@ public class CoursesController(IMediator mediator) : BasePublicController
         int languageId,
         CancellationToken cancellationToken)
     {
-        var courses = await mediator.Send(new GetCoursesByLanguageId(languageId), cancellationToken);
+        var courses = await mediator.Send(new ListCourses(languageId), cancellationToken);
 
         return Ok(courses);
     }

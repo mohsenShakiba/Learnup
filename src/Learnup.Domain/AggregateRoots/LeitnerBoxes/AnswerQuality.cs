@@ -1,4 +1,4 @@
-﻿namespace Learnup.Application.Features.Public.LeitnerBoxes;
+﻿namespace Learnup.Domain.AggregateRoots.LeitnerBoxes;
 
 public enum AnswerQuality
 {

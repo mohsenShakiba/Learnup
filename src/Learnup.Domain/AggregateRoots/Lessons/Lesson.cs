@@ -1,6 +1,7 @@
 ﻿using Learnup.Domain.AggregateRoots.Courses;
 using Learnup.Domain.AggregateRoots.Grammars;
 using Learnup.Domain.AggregateRoots.Stories;
+using Learnup.Domain.AggregateRoots.Tests;
 using Learnup.Domain.AggregateRoots.Users;
 
 namespace Learnup.Domain.AggregateRoots.Lessons;
@@ -18,6 +19,7 @@ public class Lesson
     public List<LessonGrammar> Grammars { get; private set; }
     public List<LessonVocab> Vocabs { get; private set; }
     public List<UserLesson> Users { get; private set; }
+    public List<Test> Tests { get; private set; }
 
     public int CourseId { get; private set; }
     public Course Course { get; private set; } = null!;

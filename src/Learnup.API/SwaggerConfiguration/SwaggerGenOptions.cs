@@ -3,7 +3,7 @@ using System.Text.RegularExpressions;
 using Microsoft.OpenApi;
 using Swashbuckle.AspNetCore.SwaggerGen;
 
-namespace Atlas.API.SwaggerConfiguration;
+namespace Learnup.API.SwaggerConfiguration;
 
 public static class SwaggerGenOptions
 {

@@ -22,10 +22,10 @@ public sealed record LessonDetailResponse(
     string Title,
     int Order,
     int CourseId,
-    IReadOnlyList<StoryResponse> Stories,
-    IReadOnlyList<GrammarResponse> Grammars,
-    IReadOnlyList<VocabResponse> Vocabs,
-    LessonTestResponse? Test);
+    List<StoryResponse> Stories,
+    List<GrammarResponse> Grammars,
+    List<VocabResponse> Vocabs,
+    List<TestResponse> Tests);
 
 public sealed record CurrentLessonProgressResponse(
     int LessonId,

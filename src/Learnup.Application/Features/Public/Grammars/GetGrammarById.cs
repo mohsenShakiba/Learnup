@@ -11,9 +11,7 @@ public sealed record GetGrammarById(int Id) : IRequest<GrammarResponse?>;
 internal sealed class GetGrammarByIdHandler(ILearnupDbContext dbContext)
     : IRequestHandler<GetGrammarById, GrammarResponse?>
 {
-    public async Task<GrammarResponse?> Handle(
-        GetGrammarById request,
-        CancellationToken cancellationToken)
+    public async Task<GrammarResponse?> Handle(GetGrammarById request, CancellationToken cancellationToken)
     {
         var grammar = await dbContext.Grammars
             .AsNoTracking()

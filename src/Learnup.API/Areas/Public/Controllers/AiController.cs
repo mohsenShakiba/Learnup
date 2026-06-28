@@ -13,7 +13,7 @@ public class AiController(IMediator mediator) : BasePublicController
         [FromBody] SendAiTextRequest request,
         CancellationToken cancellationToken)
     {
-        var query = new SendAiText(request.Word, request.Sentence);
+        var query = new AiTranslate(request.Word, request.Sentence);
         var result = await mediator.Send(query, cancellationToken);
         return Ok(result);
     }

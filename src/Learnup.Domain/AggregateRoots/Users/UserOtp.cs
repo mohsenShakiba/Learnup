@@ -4,7 +4,7 @@ public class UserOtp
 {
     public int Id { get; private set; }
     public string MobileNumber { get; private set; }
-    public string CodeHash { get; private set; }
+    public string Code { get; private set; }
     public DateTime CreatedAt { get; private set; }
     public DateTime ExpiresAt { get; private set; }
     public DateTime? ConsumedAt { get; private set; }
@@ -12,22 +12,22 @@ public class UserOtp
     private UserOtp()
     {
         MobileNumber = null!;
-        CodeHash = null!;
+        Code = null!;
     }
 
-    public UserOtp(string mobileNumber, string codeHash, DateTime createdAt, DateTime expiresAt)
+    public UserOtp(string mobileNumber, string code, DateTime createdAt, DateTime expiresAt)
     {
         MobileNumber = mobileNumber;
-        CodeHash = codeHash;
+        Code = code;
         CreatedAt = createdAt;
         ExpiresAt = expiresAt;
     }
 
-    public bool IsValid(string codeHash, DateTime now)
+    public bool IsValid(string code, DateTime now)
     {
         return ConsumedAt is null &&
                ExpiresAt >= now &&
-               CodeHash == codeHash;
+               Code == code;
     }
 
     public void Consume(DateTime consumedAt)

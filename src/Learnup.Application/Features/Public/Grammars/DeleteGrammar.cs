@@ -21,6 +21,7 @@ public class DeleteGrammarHandler(ILearnupDbContext context) : IRequestHandler<D
         context.Grammars.Remove(grammar);
         
         await context.SaveChangesAsync(cancellationToken);
+        
         return Unit.Value;
     }
 }

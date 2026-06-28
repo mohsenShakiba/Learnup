@@ -7,14 +7,12 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Learnup.Application.Features.Public.Lessons;
 
-public sealed record GetLessonsByCourseId(int CourseId) : IRequest<IReadOnlyList<LessonResponse>>;
+public sealed record ListLessons(int CourseId) : IRequest<IReadOnlyList<LessonResponse>>;
 
-internal sealed class GetLessonsByCourseIdHandler(ILearnupDbContext dbContext, IIdentityProvider identityProvider)
-    : IRequestHandler<GetLessonsByCourseId, IReadOnlyList<LessonResponse>>
+internal sealed class ListLessonsHandler(ILearnupDbContext dbContext, IIdentityProvider identityProvider)
+    : IRequestHandler<ListLessons, IReadOnlyList<LessonResponse>>
 {
-    public async Task<IReadOnlyList<LessonResponse>> Handle(
-        GetLessonsByCourseId request,
-        CancellationToken cancellationToken)
+    public async Task<IReadOnlyList<LessonResponse>> Handle(ListLessons request, CancellationToken cancellationToken)
     {
         var lessons = await dbContext.Lessons
             .AsNoTracking()

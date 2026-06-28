@@ -17,7 +17,7 @@ public class UserTestResultConfiguration : IEntityTypeConfiguration<UserTestResu
             .OnDelete(DeleteBehavior.Cascade);
 
         builder.HasOne(r => r.Test)
-            .WithMany()
+            .WithMany(t => t.UserTestResults)
             .HasForeignKey(r => r.TestId)
             .OnDelete(DeleteBehavior.Cascade);
 

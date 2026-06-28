@@ -6,13 +6,14 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Learnup.Application.Features.Public.Grammars;
 
-public record ListLessons() : IRequest<List<GrammarLessonResponse>>;
+public record ListGrammarLessons(int GrammarId) : IRequest<List<GrammarLessonResponse>>;
 
-public class ListLessonsHandler(ILearnupDbContext context) : IRequestHandler<ListLessons, List<GrammarLessonResponse>>
+public class ListGrammarLessonsHandler(ILearnupDbContext context) : IRequestHandler<ListGrammarLessons, List<GrammarLessonResponse>>
 {
-    public async Task<List<GrammarLessonResponse>> Handle(ListLessons request, CancellationToken cancellationToken)
+    public async Task<List<GrammarLessonResponse>> Handle(ListGrammarLessons request, CancellationToken cancellationToken)
     {
         var lessons = await context.GrammarLessons
+            .Where(l => l.GrammarId == request.GrammarId)
             .Select(l => l.ToResponse())
             .ToListAsync(cancellationToken);
 

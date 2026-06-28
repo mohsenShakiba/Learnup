@@ -15,7 +15,8 @@ public class ListGrammarsHandler(ILearnupDbContext context) : IRequestHandler<Li
     {
         var grammars = await context.Grammars
             .Include(g => g.Lessons)
-            .Select(g => g.ToResponse()).ToListAsync(cancellationToken);
+            .Select(g => g.ToResponse())
+            .ToListAsync(cancellationToken);
         
         return grammars;
     }

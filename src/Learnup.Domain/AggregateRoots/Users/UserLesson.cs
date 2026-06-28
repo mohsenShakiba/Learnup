@@ -18,6 +18,8 @@ public class UserLesson
     public bool IsStoryCompleted { get; private set; }
     public bool IsGrammarCompleted { get; private set; }
     public bool IsVocabCompleted { get; private set; }
+    public bool IsGrammarTestCompleted { get; private set; }
+    public bool IsVocabTestCompleted { get; private set; }
     
     public UserLesson(int userId, int lessonId)
     {
@@ -51,6 +53,31 @@ public class UserLesson
         if (IsStoryCompleted && IsGrammarCompleted && IsVocabCompleted)
         {
             CompletedAt ??= DateTime.UtcNow;
+        }
+    }
+
+    public bool IsCompleted()
+    {
+        return IsStoryCompleted && IsGrammarCompleted && IsVocabCompleted;
+    }
+
+    public void SetRequirements(int storiesCount, int grammarsCount, int vocabsCount)
+    {
+        if (storiesCount == 0)
+        {
+            IsStoryCompleted = true;
+        }
+        
+        if (grammarsCount == 0)
+        {
+            IsGrammarCompleted = true;
+            IsGrammarTestCompleted = true;
+        }
+        
+        if (vocabsCount == 0)
+        {
+            IsVocabCompleted = true;
+            IsVocabTestCompleted = true;
         }
     }
 }

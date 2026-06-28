@@ -46,7 +46,7 @@ public class BooksControllers(IMediator mediator) : BasePublicController
     [HttpGet(Name = "GetUserBooks")]
     public async Task<ActionResult<IReadOnlyList<UserBookResponse>>> Get(CancellationToken cancellationToken)
     {
-        var query = new GetUserBooks();
+        var query = new ListUserBooks();
 
         var books = await mediator.Send(query, cancellationToken);
 

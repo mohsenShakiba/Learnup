@@ -25,7 +25,7 @@ public class TestConfiguration : IEntityTypeConfiguration<Test>
             .IsRequired();
 
         builder.HasOne(t => t.Lesson)
-            .WithMany()
+            .WithMany(l => l.Tests)
             .HasForeignKey(t => t.LessonId)
             .OnDelete(DeleteBehavior.Cascade);
 

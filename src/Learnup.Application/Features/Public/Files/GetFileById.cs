@@ -7,29 +7,25 @@ namespace Learnup.Application.Features.Public.Files;
 
 public sealed record GetFileById(string Id) : IRequest<FileResponse?>;
 
-internal sealed class GetFileByIdHandler(
-    IFileService fileService,
-    IMemoryCache memoryCache)
+internal sealed class GetFileByIdHandler(IFileService fileService, IMemoryCache memoryCache)
     : IRequestHandler<GetFileById, FileResponse?>
 {
     private static readonly TimeSpan CacheDuration = TimeSpan.FromDays(1);
 
-    public async Task<FileResponse?> Handle(
-        GetFileById request,
-        CancellationToken cancellationToken)
+    public async Task<FileResponse?> Handle(GetFileById request, CancellationToken cancellationToken)
     {
         if (string.IsNullOrWhiteSpace(request.Id))
         {
             return null;
         }
 
-        if (memoryCache.TryGetValue<CachedFile>(GetCacheKey(request.Id), out var cachedFile) &&
-            cachedFile is not null)
+        if (memoryCache.TryGetValue<CachedFile>(GetCacheKey(request.Id), out var cachedFile))
         {
-            return cachedFile.ToResponse();
+            return cachedFile?.ToResponse();
         }
 
         var file = await fileService.GetAsync(request.Id, cancellationToken);
+        
         if (file is null)
         {
             return null;
@@ -37,16 +33,11 @@ internal sealed class GetFileByIdHandler(
 
         var memoryStream = new MemoryStream();
         await file.Content.CopyToAsync(memoryStream, cancellationToken);
-        file.Content.Dispose();
+        await file.Content.DisposeAsync();
 
-        var cacheEntry = new CachedFile(
-            file.Id,
-            memoryStream.ToArray(),
-            file.ContentType);
+        var cacheEntry = new CachedFile(file.Id, memoryStream.ToArray(), file.ContentType);
 
-        memoryCache.Set(
-            GetCacheKey(request.Id),
-            cacheEntry,
+        memoryCache.Set(GetCacheKey(request.Id), cacheEntry,
             new MemoryCacheEntryOptions
             {
                 AbsoluteExpirationRelativeToNow = CacheDuration
@@ -60,17 +51,11 @@ internal sealed class GetFileByIdHandler(
         return $"file:{fileId}";
     }
 
-    private sealed record CachedFile(
-        string Id,
-        byte[] Content,
-        string ContentType)
+    private sealed record CachedFile(string Id, byte[] Content, string ContentType)
     {
         public FileResponse ToResponse()
         {
-            return new FileResponse(
-                Id,
-                new MemoryStream(Content, writable: false),
-                ContentType);
+            return new FileResponse(Id, new MemoryStream(Content, writable: false), ContentType);
         }
     }
 }

@@ -61,6 +61,7 @@ internal sealed class UploadBookHandler(
         var userBook = new UserBook(identityProvider.UserId, ebook);
 
         dbContext.UserBooks.Add(userBook);
+        
         await dbContext.SaveChangesAsync(cancellationToken);
 
         return Unit.Value;
@@ -92,7 +93,7 @@ internal sealed class UploadBookHandler(
         return $"{fileNameWithoutExtension}{extension}";
     }
 
-    public static string GetRandomName()
+    private static string GetRandomName()
     {
         return Guid.NewGuid().ToString("N");
     }

@@ -1,9 +1,9 @@
-using Atlas.API.SwaggerConfiguration;
 using System.Text;
 using Learnup.API.Authentication;
 using Learnup.Application;
 using Learnup.Application.Authentication;
 using Learnup.API.HostedServices;
+using Learnup.API.SwaggerConfiguration;
 using Learnup.Infrastructure;
 using Learnup.Infrastructure.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;

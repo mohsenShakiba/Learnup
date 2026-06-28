@@ -16,7 +16,7 @@ public class UserOtpConfiguration : IEntityTypeConfiguration<UserOtp>
             .HasMaxLength(20)
             .IsRequired();
 
-        builder.Property(otp => otp.CodeHash)
+        builder.Property(otp => otp.Code)
             .HasMaxLength(64)
             .IsRequired();
 

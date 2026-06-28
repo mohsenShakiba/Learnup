@@ -1,6 +1,7 @@
 using System.Security.Cryptography;
 using System.Text;
 using Learnup.Application.ExternalServices;
+using Learnup.Application.Helpers;
 using Learnup.Application.Mediation;
 using Learnup.Application.Persistence;
 using Learnup.Application.Responses.Public.Authentication;
@@ -11,50 +12,35 @@ namespace Learnup.Application.Features.Public.Authentication;
 
 public sealed record SendOtp(string MobileNumber) : IRequest<SendOtpResponse>;
 
-internal sealed class SendOtpHandler(
-    ILearnupDbContext dbContext,
-    IOtpSender otpSender)
+internal sealed class SendOtpHandler(ILearnupDbContext dbContext, IOtpSender otpSender)
     : IRequestHandler<SendOtp, SendOtpResponse>
 {
     private static readonly TimeSpan OtpLifetime = TimeSpan.FromMinutes(2);
 
     public async Task<SendOtpResponse> Handle(SendOtp request, CancellationToken cancellationToken)
     {
-        var mobileNumber = NormalizeMobileNumber(request.MobileNumber);
+        var mobileNumber = AuthHelper.NormalizeMobileNumber(request.MobileNumber);
         var now = DateTime.UtcNow;
         var expiresAt = now.Add(OtpLifetime);
         var code = "1234";
 
-        var activeOtps = await dbContext.UserOtps
-            .Where(otp => otp.MobileNumber == mobileNumber && otp.ConsumedAt == null)
-            .ToListAsync(cancellationToken);
+        var activeOtpCode = await dbContext.UserOtps
+            .Where(otp => otp.MobileNumber == mobileNumber)
+            .OrderByDescending(otp => otp.CreatedAt)
+            .FirstOrDefaultAsync(cancellationToken);
 
-        foreach (var otp in activeOtps)
+        if (activeOtpCode is not null && activeOtpCode.ConsumedAt is null)
         {
-            otp.Consume(now);
+            return new SendOtpResponse(activeOtpCode.ExpiresAt);
         }
 
-        dbContext.UserOtps.Add(new UserOtp(mobileNumber, HashOtp(mobileNumber, code), now, expiresAt));
-
+        var newOtpCode = new UserOtp(mobileNumber, code, now, expiresAt);
+        
+        dbContext.UserOtps.Add(newOtpCode);
         await otpSender.SendAsync(mobileNumber, code, cancellationToken);
         await dbContext.SaveChangesAsync(cancellationToken);
 
         return new SendOtpResponse(expiresAt);
     }
-
-    internal static string NormalizeMobileNumber(string mobileNumber)
-    {
-        if (string.IsNullOrWhiteSpace(mobileNumber))
-        {
-            throw new ArgumentException("Mobile number is required.", nameof(mobileNumber));
-        }
-
-        return mobileNumber.Trim();
-    }
-
-    internal static string HashOtp(string mobileNumber, string code)
-    {
-        var bytes = SHA256.HashData(Encoding.UTF8.GetBytes($"{mobileNumber}:{code}"));
-        return Convert.ToHexString(bytes);
-    }
+    
 }

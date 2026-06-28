@@ -11,39 +11,33 @@ public sealed record GetCurrentLessonProgress : IRequest<CurrentLessonProgressRe
 internal sealed class GetCurrentLessonProgressHandler(ILearnupDbContext dbContext, IIdentityProvider identityProvider)
     : IRequestHandler<GetCurrentLessonProgress, CurrentLessonProgressResponse?>
 {
-    public async Task<CurrentLessonProgressResponse?> Handle(
-        GetCurrentLessonProgress request,
-        CancellationToken cancellationToken)
+    public async Task<CurrentLessonProgressResponse?> Handle(GetCurrentLessonProgress request, CancellationToken cancellationToken)
     {
         var currentUserLesson = await dbContext.UserLessons
             .AsNoTracking()
-            .Include(ul => ul.Lesson).ThenInclude(l => l.Stories)
-            .Include(ul => ul.Lesson).ThenInclude(l => l.Grammars)
-            .Include(ul => ul.Lesson).ThenInclude(l => l.Vocabs)
+            .Include(ul => ul.Lesson)
             .Where(ul => ul.UserId == identityProvider.UserId && ul.CompletedAt == null)
             .OrderByDescending(ul => ul.LastVisitedAt)
-            .ThenByDescending(ul => ul.StartedAt)
             .FirstOrDefaultAsync(cancellationToken);
 
         if (currentUserLesson is null)
             return null;
 
         var lesson = currentUserLesson.Lesson;
-
-        var isStoryCompleted = lesson.Stories.Count == 0 || currentUserLesson.IsStoryCompleted;
-        var isGrammarCompleted = lesson.Grammars.Count == 0 || currentUserLesson.IsGrammarCompleted;
-        var isVocabCompleted = lesson.Vocabs.Count == 0 || currentUserLesson.IsVocabCompleted;
-
+        
         int? nextLessonId = null;
-        if (isStoryCompleted && isGrammarCompleted && isVocabCompleted)
+        if (currentUserLesson.IsCompleted())
         {
             nextLessonId = await dbContext.Lessons
-                .Where(l => l.CourseId == lesson.CourseId
-                    && (l.Order > lesson.Order || (l.Order == lesson.Order && l.Id > lesson.Id)))
+                .Where(l => l.CourseId == lesson.CourseId && l.Order > lesson.Order)
                 .OrderBy(l => l.Order)
-                .ThenBy(l => l.Id)
-                .Select(l => (int?)l.Id)
+                .Select(l => l.Id)
                 .FirstOrDefaultAsync(cancellationToken);
+        }
+
+        if (nextLessonId is null)
+        {
+            return null;
         }
 
         return new CurrentLessonProgressResponse(
@@ -51,9 +45,9 @@ internal sealed class GetCurrentLessonProgressHandler(ILearnupDbContext dbContex
             lesson.Title,
             lesson.Order,
             lesson.CourseId,
-            isStoryCompleted,
-            isGrammarCompleted,
-            isVocabCompleted,
+            currentUserLesson.IsStoryCompleted,
+            currentUserLesson.IsGrammarCompleted,
+            currentUserLesson.IsVocabCompleted,
             nextLessonId);
     }
 }

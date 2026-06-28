@@ -1,4 +1,5 @@
 using Learnup.Application.Authentication;
+using Learnup.Application.Mappers;
 using Learnup.Application.Mediation;
 using Learnup.Application.Persistence;
 using Learnup.Application.Responses.Public.Courses;
@@ -13,28 +14,13 @@ internal sealed class GetCourseByIdHandler(ILearnupDbContext dbContext, IIdentit
 {
     public async Task<CourseResponse?> Handle(GetCourseById request, CancellationToken cancellationToken)
     {
-        return await dbContext.Courses
+        var course = await dbContext.Courses
             .AsNoTracking()
+            .Include(course => course.Lessons)
+            .ThenInclude(lesson => lesson.Users.Where(userLesson => userLesson.UserId == identityProvider.UserId))
             .Where(course => course.Id == request.Id)
-            .Select(course => new CourseResponse(
-                    course.Id,
-                    course.Code,
-                    course.Slug,
-                    course.Title,
-                    course.Description,
-                    course.Order,
-                    course.Lessons.Count,
-                    course.Lessons.SelectMany(l => l.Users)
-                        .Count(u => u.UserId == identityProvider.UserId && u.CompletedAt != null),
-                    course.LanguageId,
-                    course.CoverId,
-                    course.Lessons.SelectMany(l => l.Users)
-                        .Where(u => u.UserId == identityProvider.UserId)
-                        .OrderByDescending(u => u.LastVisitedAt)
-                        .Select(u => (DateTime?)u.LastVisitedAt)
-                        .FirstOrDefault()
-                )
-            )
             .FirstOrDefaultAsync(cancellationToken);
+
+        return course?.ToResponse();
     }
 }

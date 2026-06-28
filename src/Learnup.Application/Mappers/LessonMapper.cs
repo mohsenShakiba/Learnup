@@ -20,23 +20,20 @@ public static class LessonMapper
             lesson.Order,
             lesson.CourseId,
             userLesson?.IsStoryCompleted ?? false,
-            userLesson?.IsGrammarCompleted ?? false,
-            userLesson?.IsVocabCompleted ?? false);
+            userLesson?.IsGrammarTestCompleted ?? false,
+            userLesson?.IsVocabTestCompleted ?? false);
     }
 
-    public static LessonDetailResponse ToDetailResponse(
-        this Lesson lesson,
-        LessonTestResponse test)
+    public static LessonDetailResponse ToDetailResponse(this Lesson lesson)
     {
         return new(
             lesson.Id,
             lesson.Title,
             lesson.Order,
             lesson.CourseId,
-            lesson.Stories.Select(ls => ls.Story.ToResponse()).ToList(),
-            lesson.Grammars.Select(lg => lg.Grammar.ToResponse()).ToList(),
-            lesson.Vocabs.Select(v => v.Vocab.ToResponse()).ToList(),
-            test);
+            lesson.Stories.Select(s => s.StoryId),
+            lesson.Grammars.Select(s => s.GrammarId),
+            lesson.Tests.Where(t => t.).Select(t => t.Id));
     }
 
     private static StoryItemResponse ToResponse(this Domain.AggregateRoots.Stories.StoryItem item) =>

@@ -7,19 +7,14 @@ namespace Learnup.Application.Features.Public.Books;
 
 public sealed record UpdateUserBookCurrentPage(int UserBookId, string CurrentRef, float? Progress) : IRequest;
 
-internal sealed class UpdateUserBookCurrentPageHandler(
-    ILearnupDbContext dbContext,
-    IIdentityProvider identityProvider)
+internal sealed class UpdateUserBookCurrentPageHandler(ILearnupDbContext dbContext, IIdentityProvider identityProvider)
     : IRequestHandler<UpdateUserBookCurrentPage>
 {
-    public async Task<Unit> Handle(
-        UpdateUserBookCurrentPage request,
-        CancellationToken cancellationToken)
+    public async Task<Unit> Handle(UpdateUserBookCurrentPage request, CancellationToken cancellationToken)
     {
         var book = await dbContext.UserBooks
-            .FirstOrDefaultAsync(
-                book => book.Id == request.UserBookId && book.UserId == identityProvider.UserId,
-                cancellationToken);
+            .FirstOrDefaultAsync(book => book.Id == request.UserBookId &&
+                                         book.UserId == identityProvider.UserId, cancellationToken);
 
         if (book is null)
         {
