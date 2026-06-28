@@ -20,8 +20,14 @@ internal sealed class GetBoxLevelsInfoHandler(ILearnupDbContext dbContext, IIden
             .Include(b => b.BoxLevels)
             .Include(b => b.Items)
             .ThenInclude(i => i.BoxLevel)
-            .FirstOrDefaultAsync(b => b.UserId == identityProvider.UserId, cancellationToken)
-            ?? LeitnerBox.CreateWithLevels(identityProvider.UserId);
+            .FirstOrDefaultAsync(b => b.UserId == identityProvider.UserId, cancellationToken);
+
+        if (box is null)
+        {
+            box = LeitnerBox.CreateWithLevels(identityProvider.UserId);
+            dbContext.LeitnerBoxes.Add(box);
+            await dbContext.SaveChangesAsync(cancellationToken);
+        }
 
         var now = DateTime.UtcNow;
 
