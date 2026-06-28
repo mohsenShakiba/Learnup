@@ -25,7 +25,7 @@ public class GrammarConfiguration : IEntityTypeConfiguration<Grammar>
         builder.Property(g => g.Order)
             .IsRequired();
 
-        builder.Property(g => g.EstimatedTime)
+        builder.Property(g => g.Duration)
             .IsRequired();
 
         builder.HasMany(g => g.Lessons)

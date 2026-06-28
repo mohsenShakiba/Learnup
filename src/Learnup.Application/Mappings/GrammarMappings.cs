@@ -12,7 +12,7 @@ public static class GrammarMappings
             grammar.Name,
             grammar.Level,
             grammar.Order,
-            grammar.EstimatedTime,
+            grammar.Duration,
             grammar.Description,
             grammar.ParentGrammarId,
             grammar.PrerequisiteGrammars

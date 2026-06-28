@@ -9,7 +9,7 @@ public class Grammar
     public string Name { get; private set; }
     public VocabLevel Level { get; private set; }
     public int Order { get; private set; }
-    public TimeSpan EstimatedTime { get; private set; }
+    public int Duration { get; private set; }
     public string Description { get; private set; }
     
     public int? ParentGrammarId { get; private set; }
@@ -21,12 +21,12 @@ public class Grammar
     private readonly List<GrammarLesson> _lessons = [];
     public IReadOnlyList<GrammarLesson> Lessons => _lessons.AsReadOnly();
     
-    public Grammar(string name, VocabLevel level, int order, TimeSpan estimatedTime, string description, int? parentGrammarId)
+    public Grammar(string name, VocabLevel level, int order, int duration, string description, int? parentGrammarId)
     {
         Name = name;
         Level = level;
         Order = order;
-        EstimatedTime = estimatedTime;
+        Duration = duration;
         Description = description;
     }
 

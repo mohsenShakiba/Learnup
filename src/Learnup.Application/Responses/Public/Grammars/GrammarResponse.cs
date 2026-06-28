@@ -8,7 +8,7 @@ public sealed record GrammarResponse(
     string Name,
     VocabLevel Level,
     int Order,
-    TimeSpan EstimatedTime,
+    int Duration,
     string Description,
     int? ParentGrammarId,
     IReadOnlyList<int> PrerequisiteGrammarIds,

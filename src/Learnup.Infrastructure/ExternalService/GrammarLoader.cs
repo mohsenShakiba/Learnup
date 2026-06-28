@@ -27,7 +27,7 @@ public class GrammarLoader(LearnupDbContext dbContext) : IGrammarLoader
             grammarRequest.Name.Trim(),
             (VocabLevel)grammarRequest.LevelId,
             grammarRequest.Order,
-            TimeSpan.FromMinutes(grammarRequest.EstimatedTimeMinutes),
+            grammarRequest.EstimatedTimeMinutes,
             grammarRequest.Description.Trim(),
             null);
 
