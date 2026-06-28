@@ -12,20 +12,21 @@ public class StoryLoader(LearnupDbContext dbContext) : IStoryLoader
 {
     public async Task<int> LoadAsync(
         StoryRequest storyRequest,
-        int lessonId,
+        int courseId,
+        int lessonOrder,
         CancellationToken cancellationToken = default)
     {
-        var lesson = await dbContext.Lessons
-            .Include(l => l.Course)
-            .Where(currentLesson => currentLesson.Id == lessonId)
+        var course = await dbContext.Courses
+            .Where(currentCourse => currentCourse.Id == courseId)
             .SingleOrDefaultAsync(cancellationToken);
 
-        if (lesson is null)
+        if (course is null)
         {
-            throw new InvalidOperationException($"Lesson with id '{lessonId}' was not found.");
+            throw new InvalidOperationException($"Course with id '{courseId}' was not found.");
         }
 
         ValidateStory(storyRequest);
+        ValidateLessonOrder(lessonOrder);
 
         var words = storyRequest.Words;
         var sentences = storyRequest.Sentences;
@@ -38,7 +39,11 @@ public class StoryLoader(LearnupDbContext dbContext) : IStoryLoader
 
         await using var transaction = await dbContext.Database.BeginTransactionAsync(cancellationToken);
 
-        var vocabIds = await EnsureVocabsAsync(normalizedWords, lesson.Course.LanguageId, cancellationToken);
+        var lesson = new Lesson(storyRequest.Title.Trim(), lessonOrder, courseId);
+        dbContext.Lessons.Add(lesson);
+        await dbContext.SaveChangesAsync(cancellationToken);
+
+        var vocabIds = await EnsureVocabsAsync(normalizedWords, course.LanguageId, cancellationToken);
         var story = new Story(storyRequest.Title.Trim());
 
         foreach (var sentence in sentences.OrderBy(sentence => sentence.Order))
@@ -49,9 +54,9 @@ public class StoryLoader(LearnupDbContext dbContext) : IStoryLoader
         dbContext.Stories.Add(story);
         await dbContext.SaveChangesAsync(cancellationToken);
 
-        dbContext.Set<LessonStory>().Add(new LessonStory(lessonId, story.Id));
+        dbContext.Set<LessonStory>().Add(new LessonStory(lesson.Id, story.Id));
         
-        await AddMissingLessonVocabLinksAsync(lessonId, vocabIds, cancellationToken);
+        await AddMissingLessonVocabLinksAsync(lesson.Id, vocabIds, cancellationToken);
 
         await dbContext.SaveChangesAsync(cancellationToken);
         
@@ -153,6 +158,14 @@ public class StoryLoader(LearnupDbContext dbContext) : IStoryLoader
         if (invalidSentence is not null)
         {
             throw new InvalidOperationException($"Story sentence at order '{invalidSentence.Order}' is invalid.");
+        }
+    }
+
+    private static void ValidateLessonOrder(int lessonOrder)
+    {
+        if (lessonOrder <= 0)
+        {
+            throw new InvalidOperationException("Lesson order must be greater than zero.");
         }
     }
 }

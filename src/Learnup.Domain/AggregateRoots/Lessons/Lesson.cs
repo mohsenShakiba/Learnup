@@ -8,6 +8,33 @@ namespace Learnup.Domain.AggregateRoots.Lessons;
 
 public class Lesson
 {
+    private Lesson()
+    {
+        Title = string.Empty;
+        Stories = [];
+        Grammars = [];
+        Vocabs = [];
+        Users = [];
+        Tests = [];
+    }
+
+    public Lesson(
+        string title,
+        int order,
+        int courseId,
+        LessonStatus status = LessonStatus.Published)
+    {
+        Title = title;
+        Order = order;
+        CourseId = courseId;
+        Status = status;
+        Stories = [];
+        Grammars = [];
+        Vocabs = [];
+        Users = [];
+        Tests = [];
+    }
+
     public int Id { get; private set; }
     public string Title { get; private set; }
     public int Order { get; private set; }
