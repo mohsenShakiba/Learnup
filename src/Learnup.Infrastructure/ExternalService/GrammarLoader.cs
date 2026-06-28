@@ -23,37 +23,17 @@ public class GrammarLoader(LearnupDbContext dbContext) : IGrammarLoader
                 "Unknown grammar level id.");
         }
 
-        Grammar? parentGrammar = null;
-        if (grammarRequest.ParentGrammarId.HasValue)
-        {
-            parentGrammar = await dbContext.Grammars
-                .FirstOrDefaultAsync(
-                    grammar => grammar.Id == grammarRequest.ParentGrammarId.Value,
-                    cancellationToken);
-
-            if (parentGrammar is null)
-            {
-                throw new InvalidOperationException(
-                    $"Parent grammar with id '{grammarRequest.ParentGrammarId.Value}' was not found.");
-            }
-        }
-
         var grammar = new Grammar(
             grammarRequest.Name.Trim(),
             (VocabLevel)grammarRequest.LevelId,
             grammarRequest.Order,
             TimeSpan.FromMinutes(grammarRequest.EstimatedTimeMinutes),
             grammarRequest.Description.Trim(),
-            grammarRequest.ParentGrammarId);
+            null);
 
         await using var transaction = await dbContext.Database.BeginTransactionAsync(cancellationToken);
 
         dbContext.Grammars.Add(grammar);
-
-        if (parentGrammar is not null)
-        {
-            parentGrammar.AddGrammar(grammar);
-        }
 
         await dbContext.SaveChangesAsync(cancellationToken);
 
