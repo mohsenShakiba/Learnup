@@ -2,7 +2,6 @@ using Learnup.Application.Authentication;
 using Learnup.Application.Mediation;
 using Learnup.Application.Persistence;
 using Learnup.Domain.AggregateRoots.LeitnerBoxes;
-using Learnup.Domain.AggregateRoots.Users;
 using Microsoft.EntityFrameworkCore;
 
 namespace Learnup.Application.Features.Public.LeitnerBoxes;

@@ -1,13 +1,15 @@
+using System.Diagnostics;
 using Learnup.Application.ExternalServices;
 using Learnup.Application.Mediation;
 using Learnup.Application.Responses.Public.Files;
 using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.Logging;
 
 namespace Learnup.Application.Features.Public.Files;
 
 public sealed record GetFileById(string Id) : IRequest<FileResponse?>;
 
-internal sealed class GetFileByIdHandler(IFileService fileService, IMemoryCache memoryCache)
+internal sealed class GetFileByIdHandler(IFileService fileService, IMemoryCache memoryCache, ILogger<GetFileByIdHandler> logger)
     : IRequestHandler<GetFileById, FileResponse?>
 {
     private static readonly TimeSpan CacheDuration = TimeSpan.FromDays(1);
@@ -24,6 +26,8 @@ internal sealed class GetFileByIdHandler(IFileService fileService, IMemoryCache 
             return cachedFile?.ToResponse();
         }
 
+        var sw = Stopwatch.StartNew();
+        
         var file = await fileService.GetAsync(request.Id, cancellationToken);
         
         if (file is null)
@@ -42,6 +46,8 @@ internal sealed class GetFileByIdHandler(IFileService fileService, IMemoryCache 
             {
                 AbsoluteExpirationRelativeToNow = CacheDuration
             });
+        
+        logger.LogInformation($"File {request.Id} was cached in {sw.ElapsedMilliseconds} ms.");
 
         return cacheEntry.ToResponse();
     }

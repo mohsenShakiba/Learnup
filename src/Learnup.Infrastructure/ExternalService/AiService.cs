@@ -7,21 +7,21 @@ using Microsoft.Extensions.Logging;
 
 namespace Learnup.Infrastructure.ExternalService;
 
-public class AiService(IConfiguration configuration, IHttpClientFactory httpClientFactory, ILogger<AiService> logger): IAiService
+public class AiService(IConfiguration configuration, IHttpClientFactory httpClientFactory, ILogger<AiService> logger) : IAiService
 {
-    
     private static readonly JsonSerializerOptions JsonOptions = new()
     {
         PropertyNameCaseInsensitive = true
     };
-    
+
 
     public async Task<T?> SendAsync<T>(IEnumerable<AiProxyMessage> messages, CancellationToken cancellationToken = default)
     {
         try
         {
             var response = await SendAsync(messages, cancellationToken);
-            return JsonSerializer.Deserialize<T>(response, JsonOptions);
+            
+            return JsonSerializer.Deserialize<T>(response.Trim("```").Trim("json"), JsonOptions);
         }
         catch (Exception e)
         {
@@ -29,7 +29,7 @@ public class AiService(IConfiguration configuration, IHttpClientFactory httpClie
             return default;
         }
     }
-    
+
     public async Task<string> SendAsync(IEnumerable<AiProxyMessage> messages, CancellationToken cancellationToken = default)
     {
         var apiKey = configuration["OpenAiService:ApiKey"];

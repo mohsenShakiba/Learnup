@@ -5,10 +5,17 @@ namespace Learnup.API.HostedServices;
 
 public class AiProcessorHostedService(
     IServiceScopeFactory serviceScopeFactory,
+    IConfiguration configuration,
     ILogger<AiProcessorHostedService> logger) : BackgroundService
 {
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
+        if (!configuration.GetValue<bool>("HostedServices:AiProcessor:Enabled"))
+        {
+            logger.LogInformation("AI processor hosted service is disabled.");
+            return;
+        }
+
         using var scope = serviceScopeFactory.CreateScope();
         var processors = scope.ServiceProvider.GetServices<IPipeline>().ToArray();
 
