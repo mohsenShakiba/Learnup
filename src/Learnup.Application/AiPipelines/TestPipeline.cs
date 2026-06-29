@@ -2,7 +2,6 @@ using System.Diagnostics;
 using Learnup.Application.ExternalServices;
 using Learnup.Application.Persistence;
 using Learnup.Domain.AggregateRoots.Tests;
-using Learnup.Domain.AggregateRoots.Vocabularies;
 using Learnup.Infrastructure.Prompts;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
