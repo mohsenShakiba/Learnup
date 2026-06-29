@@ -34,18 +34,18 @@ public class LeitnerBox
 
         _boxLevels.Add(new BoxLevel(TimeSpan.FromDays(1), Level.Level_1));
         _boxLevels.Add(new BoxLevel(TimeSpan.FromDays(2), Level.Level_2));
-        _boxLevels.Add(new BoxLevel(TimeSpan.FromDays(4), Level.Level_3));
-        _boxLevels.Add(new BoxLevel(TimeSpan.FromDays(6), Level.Level_4));
+        _boxLevels.Add(new BoxLevel(TimeSpan.FromDays(3), Level.Level_3));
+        _boxLevels.Add(new BoxLevel(TimeSpan.FromDays(5), Level.Level_4));
         _boxLevels.Add(new BoxLevel(TimeSpan.FromDays(8), Level.Level_5));
-        _boxLevels.Add(new BoxLevel(TimeSpan.FromDays(10), Level.Level_6));
-        _boxLevels.Add(new BoxLevel(TimeSpan.FromDays(14), Level.Level_7));
-        _boxLevels.Add(new BoxLevel(TimeSpan.FromDays(18), Level.Level_8));
-        _boxLevels.Add(new BoxLevel(TimeSpan.FromDays(22), Level.Level_9));
-        _boxLevels.Add(new BoxLevel(TimeSpan.FromDays(25), Level.Level_10));
-        _boxLevels.Add(new BoxLevel(TimeSpan.FromDays(30), Level.Level_11));
-        _boxLevels.Add(new BoxLevel(TimeSpan.FromDays(60), Level.Level_12));
-        _boxLevels.Add(new BoxLevel(TimeSpan.FromDays(120), Level.Level_13));
-        _boxLevels.Add(new BoxLevel(TimeSpan.FromDays(240), Level.Level_14));
+        _boxLevels.Add(new BoxLevel(TimeSpan.FromDays(13), Level.Level_6));
+        _boxLevels.Add(new BoxLevel(TimeSpan.FromDays(21), Level.Level_7));
+        _boxLevels.Add(new BoxLevel(TimeSpan.FromDays(30), Level.Level_8));
+        _boxLevels.Add(new BoxLevel(TimeSpan.FromDays(42), Level.Level_9));
+        _boxLevels.Add(new BoxLevel(TimeSpan.FromDays(60), Level.Level_10));
+        _boxLevels.Add(new BoxLevel(TimeSpan.FromDays(90), Level.Level_11));
+        _boxLevels.Add(new BoxLevel(TimeSpan.FromDays(120), Level.Level_12));
+        _boxLevels.Add(new BoxLevel(TimeSpan.FromDays(180), Level.Level_13));
+        _boxLevels.Add(new BoxLevel(TimeSpan.FromDays(270), Level.Level_14));
         _boxLevels.Add(new BoxLevel(TimeSpan.FromDays(365), Level.Level_15));
     }
 
