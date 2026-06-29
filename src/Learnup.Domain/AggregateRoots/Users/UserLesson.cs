@@ -1,7 +1,17 @@
 using Learnup.Domain.AggregateRoots.Lessons;
-using Learnup.Domain.AggregateRoots.Tests;
 
 namespace Learnup.Domain.AggregateRoots.Users;
+
+[Flags]
+public enum UserLessonStatus
+{
+    None = 0,
+    StoryCompleted = 1,
+    GrammarCompleted = 2,
+    GrammarTestCompleted = 4,
+    VocabCompleted = 8,
+    VocabTestCompleted = 16,
+}
 
 public class UserLesson
 {
@@ -15,11 +25,18 @@ public class UserLesson
     public DateTime LastVisitedAt { get; private set; }
     public DateTime? CompletedAt { get; private set; }
 
-    public bool IsStoryCompleted { get; private set; }
-    public bool IsGrammarCompleted { get; private set; }
-    public bool IsVocabCompleted { get; private set; }
-    public bool IsGrammarTestCompleted { get; private set; }
-    public bool IsVocabTestCompleted { get; private set; }
+    public UserLessonStatus Status { get; private set; } = UserLessonStatus.None;
+
+    public bool HasStory { get; private set; }
+    public bool HasGrammar { get; private set; }
+    public bool HasVocab { get; private set; }
+    public bool HasTest { get; private set; }
+
+    public bool IsStoryCompleted => Status.HasFlag(UserLessonStatus.StoryCompleted);
+    public bool IsGrammarCompleted => Status.HasFlag(UserLessonStatus.GrammarCompleted);
+    public bool IsGrammarTestCompleted => Status.HasFlag(UserLessonStatus.GrammarTestCompleted);
+    public bool IsVocabCompleted => Status.HasFlag(UserLessonStatus.VocabCompleted);
+    public bool IsVocabTestCompleted => Status.HasFlag(UserLessonStatus.VocabTestCompleted);
 
     public UserLesson(int userId, int lessonId)
     {
@@ -46,60 +63,82 @@ public class UserLesson
         return IsStoryCompleted && IsGrammarCompleted && IsVocabCompleted;
     }
 
-    public void SetRequirements(int storiesCount, int grammarsCount, int vocabsCount)
+    public void SetRequirements(int storiesCount, int grammarsCount, int vocabsCount, int testsCount)
     {
-        if (storiesCount == 0)
+        if (storiesCount > 0)
         {
-            IsStoryCompleted = true;
+            HasStory = true;
+        }
+        else
+        {
+            Complete(UserLessonStatus.StoryCompleted);
         }
 
-        if (grammarsCount == 0)
+        if (grammarsCount > 0)
         {
-            IsGrammarCompleted = true;
-            IsGrammarTestCompleted = true;
+            HasGrammar = true;
+        }
+        else
+        {
+            Complete(UserLessonStatus.GrammarCompleted | UserLessonStatus.GrammarTestCompleted);
         }
 
-        if (vocabsCount == 0)
+        if (vocabsCount > 0)
         {
-            IsVocabCompleted = true;
-            IsVocabTestCompleted = true;
+            HasVocab = true;
+        }
+        else
+        {
+            Complete(UserLessonStatus.VocabCompleted | UserLessonStatus.VocabTestCompleted);
+        }
+
+        if (testsCount > 0)
+        {
+            HasTest = true;
+        }
+        else
+        {
+            Complete(UserLessonStatus.GrammarTestCompleted | UserLessonStatus.VocabTestCompleted);
         }
     }
 
     public void CompleteStory()
     {
-        IsStoryCompleted = true;
+        Complete(UserLessonStatus.StoryCompleted);
         Touch();
         CompleteIfReady();
     }
     
     public void CompleteGrammar()
     {
-        IsGrammarCompleted = true;
+        Complete(UserLessonStatus.GrammarCompleted);
         Touch();
         CompleteIfReady();
     }
-    
+
     public void CompleteGrammarTest()
     {
-        IsGrammarCompleted = true;
-        IsGrammarTestCompleted = true;
+        Complete(UserLessonStatus.GrammarCompleted | UserLessonStatus.GrammarTestCompleted);
         Touch();
         CompleteIfReady();
     }
     
     public void CompleteVocab()
     {
-        IsVocabCompleted = true;
+        Complete(UserLessonStatus.VocabCompleted);
         Touch();
         CompleteIfReady();
     }
     
     public void CompleteVocabTest()
     {
-        IsVocabCompleted = true;
-        IsVocabTestCompleted = true;
+        Complete(UserLessonStatus.VocabCompleted | UserLessonStatus.VocabTestCompleted);
         Touch();
         CompleteIfReady();
+    }
+
+    private void Complete(UserLessonStatus status)
+    {
+        Status |= status;
     }
 }

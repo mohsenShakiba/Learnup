@@ -20,6 +20,14 @@ public class UserLessonConfiguration : IEntityTypeConfiguration<UserLesson>
 
         builder.Property(ul => ul.CompletedAt);
 
+        builder.Property(ul => ul.Status)
+            .IsRequired();
+
+        builder.Ignore(ul => ul.HasStory);
+        builder.Ignore(ul => ul.HasGrammar);
+        builder.Ignore(ul => ul.HasVocab);
+        builder.Ignore(ul => ul.HasTest);
+
         builder.HasOne(ul => ul.User)
             .WithMany(u => u.Lessons)
             .HasForeignKey(ul => ul.UserId)
