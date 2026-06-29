@@ -1,20 +1,19 @@
 using System.Text;
 using Learnup.API.Requests;
 using Learnup.API.Responses;
-using Learnup.Application.Features.Admin.Grammars;
-using Learnup.Application.ExternalServices;
-using Learnup.Application.Features.Admin;
 using Learnup.Application.Mediation;
 using Learnup.Application.Requests.Admin.Stories;
 using Learnup.Domain.AggregateRoots.Vocabularies;
+using Learnup.Infrastructure.ExternalService;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Learnup.API.Areas.Admin.Controllers;
 
 
 public class ImportController(
-    IVocabLoader vocabLoader,
-    IMediator mediator) : BaseAdminController
+    VocabLoader vocabLoader,
+    StoryLoader storyLoader,
+    GrammarLoader grammarLoader) : BaseAdminController
 {
     [HttpPost("vocabs", Name = "ImportVocabs")]
     [Consumes("multipart/form-data")]
@@ -66,8 +65,10 @@ public class ImportController(
         [FromBody] StoryRequest  request,
         CancellationToken cancellationToken)
     {
-        var storyId = await mediator.Send(
-            new ImportStory(request, courseId, lessonOrder),
+        var storyId = await storyLoader.LoadAsync(
+            request,
+            courseId,
+            lessonOrder,
             cancellationToken);
 
         return Ok(storyId);
@@ -78,59 +79,11 @@ public class ImportController(
         [FromBody] ImportGrammarRequest request,
         CancellationToken cancellationToken)
     {
-        var grammarId = await mediator.Send(
-            new ImportGrammar(request.Grammar),
+        var grammarId = await grammarLoader.LoadAsync(
+            request.Grammar,
             cancellationToken);
 
         return Ok(grammarId);
-    }
-
-    [HttpPost("lesson-grammars", Name = "ImportLessonGrammars")]
-    [Consumes("multipart/form-data")]
-    public async Task<ActionResult<ImportLessonGrammarsResponse>> ImportLessonGrammars(
-        [FromForm] ImportLessonGrammarsRequest request,
-        CancellationToken cancellationToken)
-    {
-        if (request.File.Length == 0)
-        {
-            return BadRequest("CSV file is empty.");
-        }
-
-        if (!Path.GetExtension(request.File.FileName).Equals(".csv", StringComparison.OrdinalIgnoreCase))
-        {
-            return BadRequest("Only CSV files are supported.");
-        }
-
-        await using var stream = request.File.OpenReadStream();
-        using var reader = new StreamReader(stream, Encoding.UTF8, detectEncodingFromByteOrderMarks: true);
-        List<LessonGrammarImportItem> lessonGrammars;
-
-        try
-        {
-            lessonGrammars = await ReadLessonGrammarsAsync(reader, cancellationToken);
-        }
-        catch (FormatException exception)
-        {
-            return BadRequest(exception.Message);
-        }
-
-        if (lessonGrammars.Count == 0)
-        {
-            return BadRequest("CSV file does not contain any lesson grammars.");
-        }
-
-        try
-        {
-            var importedCount = await mediator.Send(
-                new ImportLessonGrammars(lessonGrammars),
-                cancellationToken);
-
-            return Ok(new ImportLessonGrammarsResponse(lessonGrammars.Count, importedCount));
-        }
-        catch (InvalidOperationException exception)
-        {
-            return BadRequest(exception.Message);
-        }
     }
 
     private static async Task<List<VocabImportItem>> ReadVocabsAsync(
@@ -185,43 +138,6 @@ public class ImportController(
         }
 
         return vocabs;
-    }
-
-    private static async Task<List<LessonGrammarImportItem>> ReadLessonGrammarsAsync(
-        TextReader reader,
-        CancellationToken cancellationToken)
-    {
-        var lessonGrammars = new List<LessonGrammarImportItem>();
-        Dictionary<string, int>? headerIndexes = null;
-        var isFirstRow = true;
-        var rowNumber = 0;
-
-        while (await reader.ReadLineAsync(cancellationToken) is { } line)
-        {
-            rowNumber++;
-            var columns = ParseCsvLine(line);
-            if (columns.Count == 0 || columns.All(string.IsNullOrWhiteSpace))
-            {
-                continue;
-            }
-
-            if (isFirstRow && IsLessonGrammarHeaderRow(columns))
-            {
-                headerIndexes = BuildLessonGrammarHeaderIndexes(columns);
-                isFirstRow = false;
-                continue;
-            }
-
-            isFirstRow = false;
-
-            lessonGrammars.Add(new LessonGrammarImportItem(
-                ParseInt(RequireColumn(columns, headerIndexes, "level", 0, rowNumber), "level", rowNumber),
-                ParseInt(RequireColumn(columns, headerIndexes, "lessonorder", 1, rowNumber), "lesson_order", rowNumber),
-                ParseInt(RequireColumn(columns, headerIndexes, "grammarlevel", 2, rowNumber), "grammar_level", rowNumber),
-                ParseInt(RequireColumn(columns, headerIndexes, "grammarorder", 3, rowNumber), "grammar_order", rowNumber)));
-        }
-
-        return lessonGrammars;
     }
 
     private static List<string> ParseCsvLine(string line)
