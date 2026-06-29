@@ -1,6 +1,5 @@
 using Amazon.Runtime;
 using Amazon.S3;
-using Learnup.Application.AiPipelines;
 using Learnup.Application.Authentication;
 using Learnup.Application.ExternalServices;
 using Learnup.Application.Persistence;
@@ -69,13 +68,11 @@ public static class DependencyInjection
         services.AddScoped<IFileService, S3FileService>();
         services.AddScoped<IJwtTokenService, JwtTokenService>();
         services.AddScoped<IOtpSender, ConsoleOtpSender>();
-        services.AddScoped<IAiTextService, OpenAiTextService>();
+        services.AddScoped<IAiService, AiService>();
         services.AddScoped<IVoiceProvider, KokoroVoiceProvider>();
-        services.AddScoped<IVocabTranslationProvider, AiVocabTranslationProvider>();
-        services.AddScoped<ITestProvider, AiTestProvider>();
-        services.AddScoped<IGrammarLoader, GrammarLoader>();
-        services.AddScoped<IVocabLoader, VocabLoader>();
-        services.AddScoped<IStoryLoader, StoryLoader>();
+        services.AddScoped<GrammarLoader>();
+        services.AddScoped<VocabLoader>();
+        services.AddScoped<StoryLoader>();
 
         return services;
     }

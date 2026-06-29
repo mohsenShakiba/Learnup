@@ -59,11 +59,7 @@ public class KokoroVoiceProvider(
                 BucketNames.StoryVoices,
                 "audio/wav"), cancellationToken);
 
-            var captions = response.Timestamps
-                .Select(timestamp => new VoiceCaption(timestamp.Word, timestamp.StartTime, timestamp.EndTime))
-                .ToList();
-
-            return new VoiceResult(fileId, captions);
+            return new VoiceResult(fileId);
         }
         catch (Exception e)
         {

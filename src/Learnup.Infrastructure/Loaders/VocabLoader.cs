@@ -5,7 +5,17 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Learnup.Infrastructure.ExternalService;
 
-public class VocabLoader(LearnupDbContext dbContext) : IVocabLoader
+public sealed record VocabImportItem(
+    string Word,
+    string? Translation,
+    VocabType Type,
+    VocabLevel? Level = null,
+    string? Description = null,
+    string? Example = null,
+    string? ExampleTranslation = null,
+    string? VoiceId = null);
+
+public class VocabLoader(LearnupDbContext dbContext) 
 {
     public async Task<int> LoadAsync(
         IReadOnlyCollection<VocabImportItem> vocabs,

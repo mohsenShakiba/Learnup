@@ -3,6 +3,7 @@ using Learnup.Application.ExternalServices;
 using Learnup.Application.Persistence;
 using Learnup.Domain.AggregateRoots.Tests;
 using Learnup.Domain.AggregateRoots.Vocabularies;
+using Learnup.Infrastructure.Prompts;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
@@ -10,7 +11,7 @@ namespace Learnup.Application.AiPipelines;
 
 public class TestPipeline(
     ILearnupDbContext dbContext,
-    ITestProvider testProvider,
+    IAiService aiService,
     ILogger<TestPipeline> logger) : IPipeline
 {
     public bool Enabled => true;
@@ -51,7 +52,17 @@ public class TestPipeline(
                 .Take(20)
                 .ToList();
 
-            var generatedTests = await testProvider.GenerateTestAsync(grammars, vocabs, cancellationToken);
+            var userMessage = $"""
+                               Words: {string.Join(", ", vocabs)}
+                               Grammars: {string.Join(", ", grammars)}
+                               """;
+
+            var generatedTests =  await aiService.SendAsync<TestGenerationResult[]>(
+                [
+                    new AiProxyMessage("system", VocabTestPrompt.GetPrompt()),
+                    new AiProxyMessage("user", userMessage)
+                ],
+                cancellationToken) ?? [];
 
             foreach (var generatedTest in generatedTests)
             {
@@ -77,4 +88,8 @@ public class TestPipeline(
             logger.LogError(exception, "Error generating test for lesson {LessonId}", targetLesson.Id);
         }
     }
+    
+    record TestGenerationResult(TestQuestionType Type, string Question, TestOptionResult[] Options);
+
+    record TestOptionResult(string Text, bool IsCorrect);
 }

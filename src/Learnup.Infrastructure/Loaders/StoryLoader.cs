@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Learnup.Infrastructure.ExternalService;
 
-public class StoryLoader(LearnupDbContext dbContext) : IStoryLoader
+public class StoryLoader(LearnupDbContext dbContext) 
 {
     public async Task<int> LoadAsync(
         StoryRequest storyRequest,

@@ -6,8 +6,7 @@ public interface IVoiceProvider
 }
 
 public record VoiceOptions(string VoiceId, double PlaybackSpeed = 1);
-public record VoiceResult(string VoiceId, List<VoiceCaption> Captions);
-public record VoiceCaption(string Word, float Start, float End);
+public record VoiceResult(string VoiceId);
 
 public static class VoiceIds
 {

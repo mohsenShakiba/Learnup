@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Learnup.Infrastructure.ExternalService;
 
-public class GrammarLoader(LearnupDbContext dbContext) : IGrammarLoader
+public class GrammarLoader(LearnupDbContext dbContext) 
 {
     public async Task<int> LoadAsync(
         GrammarRequest grammarRequest,

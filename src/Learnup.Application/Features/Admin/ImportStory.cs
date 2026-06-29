@@ -9,7 +9,7 @@ public sealed record ImportStory(
     int CourseId,
     int LessonOrder) : IRequest<int>;
 
-internal sealed class ImportStoryHandler(IStoryLoader storyLoader) : IRequestHandler<ImportStory, int>
+internal sealed class ImportStoryHandler(StoryLoader storyLoader) : IRequestHandler<ImportStory, int>
 {
     public Task<int> Handle(ImportStory request, CancellationToken cancellationToken)
     {
