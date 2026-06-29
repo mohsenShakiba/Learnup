@@ -33,6 +33,7 @@ public class OpenAiTextService(IConfiguration configuration, IHttpClientFactory 
         var client = httpClientFactory.CreateClient();
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"{baseUrl.TrimEnd('/')}/chat/completions");
+        
         request.Headers.Authorization = CreateAuthorizationHeader(apiKey);
 
         var body = new

@@ -72,8 +72,7 @@ public static class DependencyInjection
         services.AddScoped<IAiTextService, OpenAiTextService>();
         services.AddScoped<IVoiceProvider, KokoroVoiceProvider>();
         services.AddScoped<IVocabTranslationProvider, AiVocabTranslationProvider>();
-        services.AddScoped<IVocabTestProvider, AiVocabTestProvider>();
-        services.AddScoped<IGrammarTestProvider, AiGrammarTestProvider>();
+        services.AddScoped<ITestProvider, AiTestProvider>();
         services.AddScoped<IGrammarLoader, GrammarLoader>();
         services.AddScoped<IVocabLoader, VocabLoader>();
         services.AddScoped<IStoryLoader, StoryLoader>();

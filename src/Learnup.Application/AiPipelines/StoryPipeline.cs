@@ -8,7 +8,7 @@ namespace Learnup.Application.AiPipelines;
 
 public class StoryPipeline(ILearnupDbContext dbContext, IVoiceProvider voiceProvider, ILogger<StoryPipeline> logger): IPipeline
 {
-    public bool Enabled => true;
+    public bool Enabled => false;
     
     public async Task ProcessAsync(CancellationToken cancellationToken = default)
     {
