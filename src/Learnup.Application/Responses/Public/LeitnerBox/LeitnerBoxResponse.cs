@@ -19,4 +19,7 @@ public sealed record DueLeitnerBoxItemResponse(
     int VocabId,
     string Word,
     string? Translation,
+    string? Description,
+    string? Example,
+    string? ExampleTranslation,
     DateTime? NextReviewAt);
