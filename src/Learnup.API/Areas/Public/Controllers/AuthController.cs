@@ -29,4 +29,18 @@ public class AuthController(IMediator mediator) : BasePublicController
             ? Unauthorized()
             : Ok(response);
     }
+
+    [HttpPost("complete-signup", Name = "CompleteSignup")]
+    public async Task<ActionResult<VerifyOtpResponse>> CompleteSignup(
+        CompleteSignupRequest request,
+        CancellationToken cancellationToken)
+    {
+        var response = await mediator.Send(
+            new CompleteSignup(request.MobileNumber, request.Code, request.DisplayName, request.AvatarUrl),
+            cancellationToken);
+
+        return response is null
+            ? Unauthorized()
+            : Ok(response);
+    }
 }
