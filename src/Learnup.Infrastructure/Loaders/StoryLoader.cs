@@ -90,7 +90,7 @@ public class StoryLoader(LearnupDbContext dbContext)
 
         var newVocabs = normalizedWords
             .Where(word => !existingWordSet.Contains(word))
-            .Select(word => new Vocab(languageId, word, VocabType.Unknown, VocabLevel.Unknown))
+            .Select(word => new Vocab(languageId, word, VocabLevel.Unknown))
             .ToList();
 
         if (newVocabs.Count > 0)

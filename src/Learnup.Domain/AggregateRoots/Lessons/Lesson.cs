@@ -50,4 +50,9 @@ public class Lesson
 
     public int CourseId { get; private set; }
     public Course Course { get; private set; } = null!;
+
+    public  void MarkAsCompleted()
+    {
+        Status = LessonStatus.Completed;
+    }
 }

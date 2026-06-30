@@ -36,8 +36,6 @@ internal sealed class GetDueWordsByBoxLevelIdHandler(ILearnupDbContext dbContext
                 item.Vocab.Word,
                 item.Vocab.Translation,
                 item.Vocab.Description,
-                item.Vocab.Example,
-                item.Vocab.ExampleTranslation,
                 item.NextReviewAt))
             .ToList();
     }

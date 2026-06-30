@@ -11,9 +11,7 @@ public sealed record GetVocabByWord(string Word) : IRequest<List<VocabResponse>>
 internal sealed class GetVocabByWordHandler(ILearnupDbContext dbContext)
     : IRequestHandler<GetVocabByWord, List<VocabResponse>>
 {
-    public async Task<List<VocabResponse>> Handle(
-        GetVocabByWord request,
-        CancellationToken cancellationToken)
+    public async Task<List<VocabResponse>> Handle(GetVocabByWord request, CancellationToken cancellationToken)
     {
         var word = request.Word.Trim().ToLower();
 
@@ -24,7 +22,8 @@ internal sealed class GetVocabByWordHandler(ILearnupDbContext dbContext)
 
         var vocabs = await dbContext.Vocabs
             .AsNoTracking()
-            .Where(vocab => vocab.Word.ToLower() == word)
+            .Include(v => v.TypeTranslations)
+            .Where(vocab => vocab.Word.ToLower() == word.ToLower())
             .ToListAsync(cancellationToken);
 
         return vocabs.Select(v => v.ToResponse()).ToList();

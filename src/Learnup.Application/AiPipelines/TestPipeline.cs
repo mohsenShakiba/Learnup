@@ -1,6 +1,7 @@
 using System.Diagnostics;
 using Learnup.Application.ExternalServices;
 using Learnup.Application.Persistence;
+using Learnup.Domain.AggregateRoots.Lessons;
 using Learnup.Domain.AggregateRoots.Tests;
 using Learnup.Infrastructure.Prompts;
 using Microsoft.EntityFrameworkCore;
@@ -13,23 +14,25 @@ public class TestPipeline(
     IAiService aiService,
     ILogger<TestPipeline> logger) : IPipeline
 {
-    public bool Enabled => true;
+    public bool Enabled => false;
 
     public async Task ProcessAsync(CancellationToken cancellationToken = default)
     {
         var targetLesson = await dbContext.Lessons
-            .FirstOrDefaultAsync(l => l.Id == 40, cancellationToken: cancellationToken);
+            .OrderBy(l => l.Id)
+            .FirstOrDefaultAsync(l => l.Status == LessonStatus.Pending, cancellationToken: cancellationToken);
 
         if (targetLesson is null)
         {
             return;
         }
 
-        var previousLessons = await dbContext.Lessons
-            .Include(l => l.Grammars).ThenInclude(g => g.Grammar)
-            .Include(l => l.Vocabs).ThenInclude(lv => lv.Vocab)
-            .Where(l => l.Order < targetLesson.Order && l.CourseId <= targetLesson.CourseId)
-            .ToListAsync(cancellationToken);
+        var previousLessons = await GetPreviousLessonsAsync(targetLesson, cancellationToken);
+
+        if (previousLessons.Count > 3)
+        {
+            previousLessons = previousLessons.Where(l => l.Id != targetLesson.Id).ToList();
+        }
 
         try
         {
@@ -56,7 +59,7 @@ public class TestPipeline(
                                Grammars: {string.Join(", ", grammars)}
                                """;
 
-            var generatedTests =  await aiService.SendAsync<TestGenerationResult[]>(
+            var generatedTests = await aiService.SendAsync<TestGenerationResult[]>(
                 [
                     new AiProxyMessage("system", VocabTestPrompt.GetPrompt()),
                     new AiProxyMessage("user", userMessage)
@@ -70,6 +73,8 @@ public class TestPipeline(
                 test.Publish(generatedTest.Type, generatedTest.Question, options);
                 dbContext.Tests.Add(test);
             }
+
+            targetLesson.MarkAsCompleted();
 
             await dbContext.SaveChangesAsync(cancellationToken);
 
@@ -87,8 +92,16 @@ public class TestPipeline(
             logger.LogError(exception, "Error generating test for lesson {LessonId}", targetLesson.Id);
         }
     }
-    
-    record TestGenerationResult(TestQuestionType Type, string Question, TestOptionResult[] Options);
 
+    private async Task<List<Lesson>> GetPreviousLessonsAsync(Lesson lesson, CancellationToken cancellationToken)
+    {
+        return await dbContext.Lessons
+            .Include(l => l.Grammars).ThenInclude(g => g.Grammar)
+            .Include(l => l.Vocabs).ThenInclude(lv => lv.Vocab)
+            .Where(l => l.Order <= lesson.Order && l.CourseId <= lesson.CourseId)
+            .ToListAsync(cancellationToken);
+    }
+
+    record TestGenerationResult(TestQuestionType Type, string Question, TestOptionResult[] Options);
     record TestOptionResult(string Text, bool IsCorrect);
 }

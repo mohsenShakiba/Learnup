@@ -4,16 +4,7 @@ using Learnup.Domain.AggregateRoots.Vocabularies;
 
 namespace Learnup.Application.Features.Public.Vocabs;
 
-public sealed record CreateVocab(
-    int LanguageId,
-    string Word,
-    string? Translation,
-    VocabType Type,
-    VocabLevel Level,
-    string? Description,
-    string? Example,
-    string? ExampleTranslation,
-    string? VoiceId) : IRequest<int>;
+public sealed record CreateVocab(int LanguageId, string Word) : IRequest<int>;
 
 internal sealed class CreateVocabHandler(ILearnupDbContext dbContext)
     : IRequestHandler<CreateVocab, int>
@@ -27,18 +18,10 @@ internal sealed class CreateVocabHandler(ILearnupDbContext dbContext)
             throw new ArgumentException("Word is required.", nameof(request.Word));
         }
 
-        var vocab = new Vocab(
-            request.LanguageId,
-            word,
-            request.Translation,
-            request.Type,
-            request.Level,
-            request.Description,
-            request.Example,
-            request.ExampleTranslation,
-            request.VoiceId);
+        var vocab = new Vocab(request.LanguageId, word, VocabLevel.Unknown);
 
         dbContext.Vocabs.Add(vocab);
+        
         await dbContext.SaveChangesAsync(cancellationToken);
 
         return vocab.Id;

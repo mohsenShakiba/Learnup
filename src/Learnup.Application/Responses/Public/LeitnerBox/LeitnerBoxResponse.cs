@@ -20,6 +20,4 @@ public sealed record DueLeitnerBoxItemResponse(
     string Word,
     string? Translation,
     string? Description,
-    string? Example,
-    string? ExampleTranslation,
     DateTime? NextReviewAt);

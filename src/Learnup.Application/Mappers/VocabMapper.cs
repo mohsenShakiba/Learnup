@@ -13,10 +13,12 @@ public static class VocabMapper
             vocab.Translation,
             vocab.VoiceId,
             vocab.Description,
-            vocab.Example,
-            vocab.ExampleTranslation,
             vocab.Level,
-            vocab.Status,
-            vocab.Type,
-            vocab.LanguageId);
+            vocab.TypeTranslations.Select(ToResponse).ToList()
+        );
+
+    public static VocabTranslationResponse ToResponse(this VocabTypeTranslation type)
+    {
+        return new VocabTranslationResponse(type.Id, type.Translation, type.Description, type.Example, type.ExampleTranslation, type.Type);
+    }
 }

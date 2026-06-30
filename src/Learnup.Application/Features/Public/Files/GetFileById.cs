@@ -27,15 +27,16 @@ internal sealed class GetFileByIdHandler(IFileService fileService, IMemoryCache 
         }
 
         var sw = Stopwatch.StartNew();
-        
+
         var file = await fileService.GetAsync(request.Id, cancellationToken);
-        
+
         if (file is null)
         {
             return null;
         }
 
         var memoryStream = new MemoryStream();
+
         await file.Content.CopyToAsync(memoryStream, cancellationToken);
         await file.Content.DisposeAsync();
 
@@ -46,7 +47,7 @@ internal sealed class GetFileByIdHandler(IFileService fileService, IMemoryCache 
             {
                 AbsoluteExpirationRelativeToNow = CacheDuration
             });
-        
+
         logger.LogInformation($"File {request.Id} was cached in {sw.ElapsedMilliseconds} ms.");
 
         return cacheEntry.ToResponse();

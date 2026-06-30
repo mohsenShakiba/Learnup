@@ -8,14 +8,10 @@ namespace Learnup.Infrastructure.ExternalService;
 public sealed record VocabImportItem(
     string Word,
     string? Translation,
-    VocabType Type,
     VocabLevel? Level = null,
-    string? Description = null,
-    string? Example = null,
-    string? ExampleTranslation = null,
-    string? VoiceId = null);
+    string? Description = null);
 
-public class VocabLoader(LearnupDbContext dbContext) 
+public class VocabLoader(LearnupDbContext dbContext)
 {
     public async Task<int> LoadAsync(
         IReadOnlyCollection<VocabImportItem> vocabs,
@@ -48,9 +44,6 @@ public class VocabLoader(LearnupDbContext dbContext)
                 Word = vocab.Word.Trim(),
                 Translation = NormalizeOptional(vocab.Translation),
                 Description = NormalizeOptional(vocab.Description),
-                Example = NormalizeOptional(vocab.Example),
-                ExampleTranslation = NormalizeOptional(vocab.ExampleTranslation),
-                VoiceId = NormalizeOptional(vocab.VoiceId),
                 Level = vocab.Level ?? defaultLevel
             })
             .Where(vocab => !string.IsNullOrWhiteSpace(vocab.Word))
@@ -86,41 +79,30 @@ public class VocabLoader(LearnupDbContext dbContext)
 
         var existingVocabMap = existingVocabs
             .ToDictionary(
-                vocab => (Word: vocab.Word.ToLower(), vocab.Level),
+                vocab => vocab.Word.ToLower(),
                 vocab => vocab);
 
         var updatedCount = 0;
 
         foreach (var vocab in normalizedVocabs)
         {
-            if (!existingVocabMap.TryGetValue((vocab.Word.ToLower(), vocab.Level!.Value), out var existingVocab))
+            if (!existingVocabMap.TryGetValue(vocab.Word.ToLower(), out var existingVocab))
             {
                 continue;
             }
 
-            existingVocab.UpdateImportDetails(
-                vocab.Translation,
-                vocab.Type,
-                vocab.Description,
-                vocab.Example,
-                vocab.ExampleTranslation,
-                vocab.VoiceId);
+            existingVocab.SetTranslation(vocab.Translation ?? string.Empty, vocab.Description);
 
             updatedCount++;
         }
 
         var newVocabs = normalizedVocabs
-            .Where(vocab => !existingVocabMap.ContainsKey((vocab.Word.ToLower(), vocab.Level!.Value)))
+            .Where(vocab => !existingVocabMap.ContainsKey(vocab.Word.ToLower()))
             .Select(vocab => new Vocab(
                 languageId,
                 vocab.Word,
-                vocab.Translation,
-                vocab.Type,
-                vocab.Level!.Value,
-                vocab.Description,
-                vocab.Example,
-                vocab.ExampleTranslation,
-                vocab.VoiceId))
+                vocab.Level!.Value
+            ))
             .ToList();
 
         if (newVocabs.Count == 0 && updatedCount == 0)

@@ -8,17 +8,14 @@ public sealed record VocabResponse(
     string? Translation,
     string? VoiceId,
     string? Description,
-    string? Example,
-    string? ExampleTranslation,
     VocabLevel Level,
-    VocabStatus Status,
-    VocabType Type,
-    int LanguageId);
+    List<VocabTranslationResponse> TypeTranslations);
 
 public sealed record VocabTranslationResponse(
     int Id,
-    string Translation,
+    string? Translation,
     string? Description,
-    VocabType Type,
-    string Example,
-    string ExampleTranslation);
+    string? Example,
+    string? ExampleTranslation,
+    VocabType Type
+  );

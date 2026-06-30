@@ -19,7 +19,7 @@ internal sealed class GetLessonByIdHandler(ILearnupDbContext dbContext, IIdentit
             .AsNoTracking()
             .Include(l => l.Stories).ThenInclude(ls => ls.Story).ThenInclude(s => s.Items)
             .Include(l => l.Grammars).ThenInclude(lg => lg.Grammar).ThenInclude(g => g.Lessons)
-            .Include(l => l.Vocabs).ThenInclude(lv => lv.Vocab)
+            .Include(l => l.Vocabs).ThenInclude(lv => lv.Vocab).ThenInclude(v => v.TypeTranslations)
             .Include(l => l.Tests).ThenInclude(t => t.Options)
             .Include(l => l.Tests).ThenInclude(t => t.UserTestResults.Where(r => r.UserId == identityProvider.UserId))
             .Where(l => l.Id == request.Id)
