@@ -14,7 +14,7 @@ public class VocabPipeline(
     IAiService aiService,
     ILogger<VocabPipeline> logger) : IPipeline
 {
-    public bool Enabled => true;
+    public bool Enabled => false;
 
     public async Task ProcessAsync(CancellationToken cancellationToken = default)
     {

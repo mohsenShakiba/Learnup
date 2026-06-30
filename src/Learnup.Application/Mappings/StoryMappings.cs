@@ -10,7 +10,9 @@ public static class StoryMappings
         return new StoryResponse(
             story.Id,
             story.Title,
+            story.Description,
             story.CoverId,
+            story.Duration,
             true,
             story.Items
                 .OrderBy(item => item.Order)

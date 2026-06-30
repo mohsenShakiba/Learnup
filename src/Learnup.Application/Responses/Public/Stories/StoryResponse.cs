@@ -3,7 +3,9 @@ namespace Learnup.Application.Responses.Public.Stories;
 public sealed record StoryResponse(
     int Id,
     string Title,
+    string? Description,
     string? CoverId,
+    int? Duration,
     bool IsCompleted,
     IReadOnlyList<StoryItemResponse> Items);
 
