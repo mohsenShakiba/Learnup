@@ -50,6 +50,8 @@ public class VocabPipeline(
 
                     vocab.AddType(typeTranslation);
                 }
+                
+                vocab.MarkAsPublished();
 
                 await dbContext.SaveChangesAsync(cancellationToken);
 

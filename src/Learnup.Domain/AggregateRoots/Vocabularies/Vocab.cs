@@ -45,6 +45,16 @@ public class Vocab
         Description = description;
     }
 
+    public void MarkAsPublished()
+    {
+        Status = VocabStatus.Published;
+    }
+
+    public void SetVoice(string voiceId)
+    {
+        VoiceId = voiceId;
+    }
+    
     public void AddType(VocabSense vocabSense)
     {
         _senses.Add(vocabSense);
