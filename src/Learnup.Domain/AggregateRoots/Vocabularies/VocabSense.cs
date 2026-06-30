@@ -1,6 +1,6 @@
 ﻿namespace Learnup.Domain.AggregateRoots.Vocabularies;
 
-public class VocabTypeTranslation
+public class VocabSense
 {
     public int Id { get; private set; }
     
@@ -13,7 +13,7 @@ public class VocabTypeTranslation
     public int VocabId { get; private set; }
     public Vocab Vocab { get; private set; }
 
-    public VocabTypeTranslation(int vocabId, string translation, string? description, string example, string exampleTranslation, VocabType type)
+    public VocabSense(int vocabId, string translation, string? description, string example, string exampleTranslation, VocabType type)
     {
         Translation = translation;
         Description = description;

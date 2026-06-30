@@ -22,7 +22,7 @@ internal sealed class GetVocabByWordHandler(ILearnupDbContext dbContext)
 
         var vocabs = await dbContext.Vocabs
             .AsNoTracking()
-            .Include(v => v.TypeTranslations)
+            .Include(v => v.Senses)
             .Where(vocab => vocab.Word.ToLower() == word.ToLower())
             .ToListAsync(cancellationToken);
 

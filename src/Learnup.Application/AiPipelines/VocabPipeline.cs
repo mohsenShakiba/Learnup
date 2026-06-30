@@ -45,7 +45,7 @@ public class VocabPipeline(
 
                 foreach (var type in translation.Types)
                 {
-                    var typeTranslation = new VocabTypeTranslation(vocab.Id, type.Translation, type.Description, type.Example,
+                    var typeTranslation = new VocabSense(vocab.Id, type.Translation, type.Description, type.Example,
                         type.ExampleTranslation, type.Type);
 
                     vocab.AddType(typeTranslation);

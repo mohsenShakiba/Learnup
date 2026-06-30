@@ -9,9 +9,9 @@ public sealed record VocabResponse(
     string? VoiceId,
     string? Description,
     VocabLevel Level,
-    List<VocabTranslationResponse> TypeTranslations);
+    List<VocabSenseResponse> Senses);
 
-public sealed record VocabTranslationResponse(
+public sealed record VocabSenseResponse(
     int Id,
     string? Translation,
     string? Description,

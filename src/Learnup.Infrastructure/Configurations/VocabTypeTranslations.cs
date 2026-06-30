@@ -4,16 +4,16 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Learnup.Infrastructure.Configurations;
 
-public class VocabTypeTranslations: IEntityTypeConfiguration<VocabTypeTranslation>
+public class VocabTypeTranslations: IEntityTypeConfiguration<VocabSense>
 {
-    public void Configure(EntityTypeBuilder<VocabTypeTranslation> builder)
+    public void Configure(EntityTypeBuilder<VocabSense> builder)
     {
-        builder.ToTable("VocabTypeTranslation");
+        builder.ToTable("VocabSense");
 
         builder.HasKey(v => v.Id);
 
         builder.HasOne(v => v.Vocab)
-            .WithMany(v => v.TypeTranslations)
+            .WithMany(v => v.Senses)
             .OnDelete(DeleteBehavior.Cascade);
         
         builder.Property(v => v.Translation)

@@ -17,8 +17,8 @@ public class Vocab
     public int LanguageId { get; private set; }
     public Language Language { get; private set; } = null!;
 
-    private List<VocabTypeTranslation> _typeTranslations = [];
-    public IReadOnlyList<VocabTypeTranslation> TypeTranslations => _typeTranslations.AsReadOnly();
+    private List<VocabSense> _senses = [];
+    public IReadOnlyList<VocabSense> Senses => _senses.AsReadOnly();
 
     public Vocab(int languageId, string word, VocabLevel level)
     {
@@ -45,8 +45,8 @@ public class Vocab
         Description = description;
     }
 
-    public void AddType(VocabTypeTranslation vocabTypeTranslation)
+    public void AddType(VocabSense vocabSense)
     {
-        _typeTranslations.Add(vocabTypeTranslation);
+        _senses.Add(vocabSense);
     }
 }

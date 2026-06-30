@@ -14,11 +14,11 @@ public static class VocabMapper
             vocab.VoiceId,
             vocab.Description,
             vocab.Level,
-            vocab.TypeTranslations.Select(ToResponse).ToList()
+            vocab.Senses.Select(ToResponse).ToList()
         );
 
-    public static VocabTranslationResponse ToResponse(this VocabTypeTranslation type)
+    public static VocabSenseResponse ToResponse(this VocabSense type)
     {
-        return new VocabTranslationResponse(type.Id, type.Translation, type.Description, type.Example, type.ExampleTranslation, type.Type);
+        return new VocabSenseResponse(type.Id, type.Translation, type.Description, type.Example, type.ExampleTranslation, type.Type);
     }
 }

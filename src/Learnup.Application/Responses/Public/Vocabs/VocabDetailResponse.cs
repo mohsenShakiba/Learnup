@@ -11,4 +11,4 @@ public sealed record VocabDetailResponse(
     VocabLevel Level,
     int LanguageId,
     string LanguageName,
-    IReadOnlyList<VocabTranslationResponse> Translations);
+    IReadOnlyList<VocabSenseResponse> Translations);
