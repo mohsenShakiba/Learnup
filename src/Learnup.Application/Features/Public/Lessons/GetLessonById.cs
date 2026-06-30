@@ -23,6 +23,7 @@ internal sealed class GetLessonByIdHandler(ILearnupDbContext dbContext, IIdentit
             .Include(l => l.Tests).ThenInclude(t => t.Options)
             .Include(l => l.Tests).ThenInclude(t => t.UserTestResults.Where(r => r.UserId == identityProvider.UserId))
             .Where(l => l.Id == request.Id)
+            .AsSplitQuery()
             .FirstOrDefaultAsync(cancellationToken);
 
         if (lesson is null)
@@ -44,13 +45,13 @@ internal sealed class GetLessonByIdHandler(ILearnupDbContext dbContext, IIdentit
         {
             userLesson.Touch();
         }
-        
+
         var nextLessonId = await dbContext.Lessons
             .Where(l => l.CourseId == lesson.CourseId && l.Order > lesson.Order)
             .OrderBy(l => l.Order)
             .Select(l => l.Id)
             .FirstOrDefaultAsync(cancellationToken);
-        
+
         await dbContext.SaveChangesAsync(cancellationToken);
 
         return lesson.ToDetailResponse(nextLessonId);
