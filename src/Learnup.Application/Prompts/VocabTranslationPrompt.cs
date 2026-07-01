@@ -24,7 +24,7 @@ public static class VocabTranslationPrompt
                          "Description": "string | null",
                          "Example": string,
                          "ExampleTranslation": string,
-                         "Types": "Noun" | "Verb" | "Adjective" | "Adverb" 
+                         "Type": "Noun" | "Verb" | "Adjective" | "Adverb" 
                        }
                    ]
                }

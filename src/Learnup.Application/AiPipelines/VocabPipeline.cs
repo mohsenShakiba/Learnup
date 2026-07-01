@@ -14,7 +14,7 @@ public class VocabPipeline(
     IAiService aiService,
     ILogger<VocabPipeline> logger) : IPipeline
 {
-    public bool Enabled => false;
+    public bool Enabled => true;
 
     public async Task ProcessAsync(CancellationToken cancellationToken = default)
     {
@@ -50,7 +50,7 @@ public class VocabPipeline(
 
                     vocab.AddType(typeTranslation);
                 }
-                
+
                 vocab.MarkAsPublished();
 
                 await dbContext.SaveChangesAsync(cancellationToken);
