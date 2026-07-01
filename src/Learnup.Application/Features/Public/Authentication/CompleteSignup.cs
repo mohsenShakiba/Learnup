@@ -8,16 +8,29 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Learnup.Application.Features.Public.Authentication;
 
-public sealed record VerifyOtp(string MobileNumber, string Code) : IRequest<VerifyOtpResponse?>;
+public sealed record CompleteSignup(
+    string MobileNumber,
+    string Code,
+    string DisplayName,
+    string? AvatarUrl) : IRequest<VerifyOtpResponse?>;
 
-internal sealed class VerifyOtpHandler(ILearnupDbContext dbContext, IJwtTokenService jwtTokenService)
-    : IRequestHandler<VerifyOtp, VerifyOtpResponse?>
+internal sealed class CompleteSignupHandler(ILearnupDbContext dbContext, IJwtTokenService jwtTokenService)
+    : IRequestHandler<CompleteSignup, VerifyOtpResponse?>
 {
-    public async Task<VerifyOtpResponse?> Handle(VerifyOtp request, CancellationToken cancellationToken)
+    public async Task<VerifyOtpResponse?> Handle(CompleteSignup request, CancellationToken cancellationToken)
     {
         var mobileNumber = AuthHelper.NormalizeMobileNumber(request.MobileNumber);
         var code = AuthHelper.NormalizeCode(request.Code);
+        var displayName = request.DisplayName.Trim();
+        var avatarUrl = string.IsNullOrWhiteSpace(request.AvatarUrl)
+            ? null
+            : request.AvatarUrl.Trim();
         var now = DateTime.UtcNow;
+
+        if (string.IsNullOrWhiteSpace(displayName))
+        {
+            throw new ArgumentException("Display name is required.", nameof(request.DisplayName));
+        }
 
         var otp = await dbContext.UserOtps
             .Where(item => item.MobileNumber == mobileNumber && item.ConsumedAt == null)
@@ -34,9 +47,11 @@ internal sealed class VerifyOtpHandler(ILearnupDbContext dbContext, IJwtTokenSer
 
         if (user is null)
         {
-            return VerifyOtpResponse.SignupRequired();
+            user = new User(mobileNumber, now);
+            dbContext.Users.Add(user);
         }
 
+        user.UpdateProfile(displayName, avatarUrl);
         user.RecordLogin(now);
         otp.Consume(now);
 
@@ -45,6 +60,4 @@ internal sealed class VerifyOtpHandler(ILearnupDbContext dbContext, IJwtTokenSer
         var token = jwtTokenService.CreateToken(user);
         return VerifyOtpResponse.SignedIn(token.AccessToken, token.ExpiresAt);
     }
-
- 
 }
