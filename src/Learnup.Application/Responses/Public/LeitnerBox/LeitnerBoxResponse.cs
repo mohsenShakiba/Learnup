@@ -1,4 +1,5 @@
 using Learnup.Domain.AggregateRoots.Users;
+using Learnup.Application.Responses.Public.Vocabs;
 
 namespace Learnup.Application.Responses.Public.LeitnerBox;
 
@@ -20,4 +21,6 @@ public sealed record DueLeitnerBoxItemResponse(
     string Word,
     string? Translation,
     string? Description,
+    string? VoiceId,
+    List<VocabSenseResponse> Senses,
     DateTime? NextReviewAt);

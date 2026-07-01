@@ -1,4 +1,5 @@
 using Learnup.Application.Authentication;
+using Learnup.Application.Mappers;
 using Learnup.Application.Mediation;
 using Learnup.Application.Persistence;
 using Learnup.Application.Responses.Public.LeitnerBox;
@@ -18,6 +19,7 @@ internal sealed class GetDueWordsByBoxLevelIdHandler(ILearnupDbContext dbContext
             .Include(b => b.BoxLevels)
             .Include(b => b.Items)
             .ThenInclude(i => i.Vocab)
+            .ThenInclude(v => v.Senses)
             .FirstOrDefaultAsync(b => b.UserId == identityProvider.UserId, cancellationToken);
 
         if (box is null || box.BoxLevels.All(level => level.Id != request.BoxLevelId))
@@ -36,6 +38,8 @@ internal sealed class GetDueWordsByBoxLevelIdHandler(ILearnupDbContext dbContext
                 item.Vocab.Word,
                 item.Vocab.Translation,
                 item.Vocab.Description,
+                item.Vocab.VoiceId,
+                item.Vocab.Senses.Select(sense => sense.ToResponse()).ToList(),
                 item.NextReviewAt))
             .ToList();
     }
