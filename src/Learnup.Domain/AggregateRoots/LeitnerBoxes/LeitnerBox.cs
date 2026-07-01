@@ -51,6 +51,11 @@ public class LeitnerBox
 
     public void AddItem(int vocabId)
     {
+        if (_items.Any(item => item.VocabId == vocabId))
+        {
+            return;
+        }
+
         var firstLevel = _boxLevels.FirstOrDefault(level => level.Level == Level.Level_1)
             ?? throw new InvalidOperationException("Leitner box does not contain level 1.");
 

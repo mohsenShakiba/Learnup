@@ -9,6 +9,7 @@ public sealed record VocabResponse(
     string? VoiceId,
     string? Description,
     VocabLevel Level,
+    bool IsInLeitnerBox,
     List<VocabSenseResponse> Senses);
 
 public sealed record VocabSenseResponse(

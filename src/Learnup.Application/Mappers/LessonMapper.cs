@@ -27,7 +27,10 @@ public static class LessonMapper
             userLesson?.IsVocabTestCompleted ?? false);
     }
 
-    public static LessonDetailResponse ToDetailResponse(this Lesson lesson, int? nextLessonId)
+    public static LessonDetailResponse ToDetailResponse(
+        this Lesson lesson,
+        int? nextLessonId,
+        IReadOnlySet<int> leitnerVocabIds)
     {
         return new(
             lesson.Id,
@@ -38,7 +41,7 @@ public static class LessonMapper
             lesson.Users.FirstOrDefault()?.ToResponse() ?? new UserLessonResponse(UserLessonStatus.None, false, false, false, false, false),
             lesson.Stories.Select(s => s.Story.ToResponse()).ToList(),
             lesson.Grammars.Select(g => g.Grammar.ToResponse()).ToList(),
-            lesson.Vocabs.Select(v => v.Vocab.ToResponse()).ToList(),
+            lesson.Vocabs.Select(v => v.Vocab.ToResponse(leitnerVocabIds.Contains(v.VocabId))).ToList(),
             lesson.Tests.Select(t => t.ToResponse()).ToList());
     }
 

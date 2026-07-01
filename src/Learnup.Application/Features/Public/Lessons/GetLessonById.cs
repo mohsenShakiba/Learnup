@@ -52,8 +52,18 @@ internal sealed class GetLessonByIdHandler(ILearnupDbContext dbContext, IIdentit
             .Select(l => l.Id)
             .FirstOrDefaultAsync(cancellationToken);
 
+        var lessonVocabIds = lesson.Vocabs.Select(lessonVocab => lessonVocab.VocabId).ToList();
+        var leitnerVocabIds = await dbContext.LeitnerBoxes
+            .AsNoTracking()
+            .Where(box => box.UserId == identityProvider.UserId)
+            .SelectMany(box => box.Items)
+            .Where(item => lessonVocabIds.Contains(item.VocabId))
+            .Select(item => item.VocabId)
+            .Distinct()
+            .ToListAsync(cancellationToken);
+
         await dbContext.SaveChangesAsync(cancellationToken);
 
-        return lesson.ToDetailResponse(nextLessonId);
+        return lesson.ToDetailResponse(nextLessonId, leitnerVocabIds.ToHashSet());
     }
 }

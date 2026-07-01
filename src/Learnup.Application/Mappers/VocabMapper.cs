@@ -6,7 +6,8 @@ namespace Learnup.Application.Mappers;
 public static class VocabMapper
 {
     public static VocabResponse ToResponse(
-        this Vocab vocab) =>
+        this Vocab vocab,
+        bool isInLeitnerBox = false) =>
         new(
             vocab.Id,
             vocab.Word,
@@ -14,6 +15,7 @@ public static class VocabMapper
             vocab.VoiceId,
             vocab.Description,
             vocab.Level,
+            isInLeitnerBox,
             vocab.Senses.Select(ToResponse).ToList()
         );
 
