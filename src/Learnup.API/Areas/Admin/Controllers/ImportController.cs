@@ -3,6 +3,7 @@ using Learnup.API.Requests;
 using Learnup.API.Responses;
 using Learnup.Application.Mediation;
 using Learnup.Application.Persistence;
+using Learnup.Application.Requests.Admin.Placement;
 using Learnup.Application.Requests.Admin.Stories;
 using Learnup.Domain.AggregateRoots.Lessons;
 using Learnup.Domain.AggregateRoots.Vocabularies;
@@ -16,6 +17,7 @@ public class ImportController(
     VocabLoader vocabLoader,
     StoryLoader storyLoader,
     GrammarLoader grammarLoader,
+    PlacementTestLoader placementTestLoader,
     ILearnupDbContext dbContext) : BaseAdminController
 {
     [HttpPost("vocabs", Name = "ImportVocabs")]
@@ -75,6 +77,22 @@ public class ImportController(
             cancellationToken);
 
         return Ok(storyId);
+    }
+
+    [HttpPost("placement-test", Name = "ImportPlacementTest")]
+    public async Task<ActionResult<int>> ImportPlacementTest(
+        [FromBody] PlacementTestRequest request,
+        CancellationToken cancellationToken)
+    {
+        try
+        {
+            var placementTestId = await placementTestLoader.LoadAsync(request, cancellationToken);
+            return Ok(new { placementTestId });
+        }
+        catch (Exception exception) when (exception is InvalidOperationException or FormatException)
+        {
+            return BadRequest(exception.Message);
+        }
     }
 
     [HttpPost("grammars")]

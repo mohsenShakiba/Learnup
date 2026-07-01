@@ -4,6 +4,7 @@ using Learnup.Domain.AggregateRoots.Grammars;
 using Learnup.Domain.AggregateRoots.LeitnerBoxes;
 using Learnup.Domain.AggregateRoots.Lessons;
 using Learnup.Domain.AggregateRoots.MotivationalSentences;
+using Learnup.Domain.AggregateRoots.Placement;
 using Learnup.Domain.AggregateRoots.Stories;
 using Learnup.Domain.AggregateRoots.Subscriptions;
 using Learnup.Domain.AggregateRoots.Tests;
@@ -33,6 +34,11 @@ public interface ILearnupDbContext
     DbSet<UserLesson> UserLessons { get; }
     DbSet<UserBook> UserBooks { get; }
     DbSet<UserTestResult> UserTestResults { get; }
+    DbSet<UserPlacementResult> UserPlacementResults { get; }
+    DbSet<UserPlacementAnswer> UserPlacementAnswers { get; }
+    DbSet<PlacementTest> PlacementTests { get; }
+    DbSet<PlacementQuestion> PlacementQuestions { get; }
+    DbSet<PlacementOption> PlacementOptions { get; }
     DbSet<LeitnerBox> LeitnerBoxes { get; }
     DbSet<Subscription> Subscriptions { get; }
     DbSet<SubscriptionFeature> SubscriptionFeatures { get; }
