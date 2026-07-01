@@ -6,10 +6,11 @@ using Microsoft.Extensions.Logging;
 
 namespace Learnup.Application.AiPipelines;
 
-public class StoryPipeline(ILearnupDbContext dbContext, IVoiceProvider voiceProvider, ILogger<StoryPipeline> logger): IPipeline
+public class StoryPipeline(ILearnupDbContext dbContext, IVoiceProvider voiceProvider, ILogger<StoryPipeline> logger) : IPipeline
 {
     public bool Enabled => false;
-    
+
+
     public async Task ProcessAsync(CancellationToken cancellationToken = default)
     {
         var stories = await dbContext.Stories
