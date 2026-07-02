@@ -13,6 +13,26 @@ public sealed record VocabImportItem(
 
 public class VocabLoader(LearnupDbContext dbContext)
 {
+    public async Task<int> LoadCsvAsync(
+        Stream stream,
+        string fileName,
+        int defaultLevelId,
+        int languageId,
+        CancellationToken cancellationToken = default)
+    {
+        CsvImportReader.EnsureCsvFile(stream, fileName);
+
+        using var reader = CsvImportReader.CreateReader(stream);
+        var vocabs = await ReadVocabsAsync(reader, cancellationToken);
+
+        if (vocabs.Count == 0)
+        {
+            throw new FormatException("CSV file does not contain any vocab words.");
+        }
+
+        return await LoadAsync(vocabs, defaultLevelId, languageId, cancellationToken);
+    }
+
     public async Task<int> LoadAsync(
         IReadOnlyCollection<VocabImportItem> vocabs,
         int defaultLevelId,
@@ -121,5 +141,57 @@ public class VocabLoader(LearnupDbContext dbContext)
         return string.IsNullOrWhiteSpace(value)
             ? null
             : value.Trim();
+    }
+
+    private static Task<List<VocabImportItem>> ReadVocabsAsync(
+        TextReader reader,
+        CancellationToken cancellationToken)
+    {
+        return CsvImportReader.ReadAsync(
+            reader,
+            IsHeaderRow,
+            columns => CsvImportReader.BuildHeaderIndexes(
+                columns,
+                new Dictionary<string, string>
+                {
+                    ["typeid"] = "type",
+                    ["vocabtype"] = "type",
+                    ["levelid"] = "level",
+                    ["vocablevel"] = "level",
+                    ["exampletranslation"] = "exampleTranslation",
+                    ["voiceref"] = "voiceId"
+                }),
+            MapRow,
+            cancellationToken);
+    }
+
+    private static VocabImportItem? MapRow(
+        IReadOnlyList<string> columns,
+        IReadOnlyDictionary<string, int>? headerIndexes,
+        int rowNumber)
+    {
+        var word = CsvImportReader.GetColumn(columns, headerIndexes, "word", 0);
+        if (string.IsNullOrWhiteSpace(word))
+        {
+            return null;
+        }
+
+        var translation = CsvImportReader.RequireColumn(columns, headerIndexes, "translation", 1, rowNumber);
+        var level = CsvImportReader.ParseOptionalEnum<VocabLevel>(
+            CsvImportReader.GetColumn(columns, headerIndexes, "level", 6),
+            "level",
+            rowNumber);
+
+        return new VocabImportItem(word, translation, level);
+    }
+
+    private static bool IsHeaderRow(IReadOnlyList<string> columns)
+    {
+        var headers = columns
+            .Select(CsvImportReader.NormalizeHeader)
+            .ToList();
+
+        return headers.FirstOrDefault() == "word" ||
+               headers.Count(header => header is "translation" or "type" or "typeid" or "vocabtype") >= 2;
     }
 }

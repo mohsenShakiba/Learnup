@@ -24,7 +24,7 @@ internal sealed class GetCurrentLessonProgressHandler(ILearnupDbContext dbContex
             return null;
 
         var lesson = currentUserLesson.Lesson;
-        
+
         int? nextLessonId = null;
         if (currentUserLesson.IsCompleted())
         {
@@ -33,11 +33,6 @@ internal sealed class GetCurrentLessonProgressHandler(ILearnupDbContext dbContex
                 .OrderBy(l => l.Order)
                 .Select(l => l.Id)
                 .FirstOrDefaultAsync(cancellationToken);
-        }
-
-        if (nextLessonId is null)
-        {
-            return null;
         }
 
         return new CurrentLessonProgressResponse(

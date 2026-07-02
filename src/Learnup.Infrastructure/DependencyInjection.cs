@@ -73,6 +73,7 @@ public static class DependencyInjection
         services.AddScoped<GrammarLoader>();
         services.AddScoped<VocabLoader>();
         services.AddScoped<StoryLoader>();
+        services.AddScoped<LessonGrammarLoader>();
         services.AddScoped<PlacementTestLoader>();
 
         return services;
