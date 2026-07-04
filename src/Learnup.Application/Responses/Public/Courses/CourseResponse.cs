@@ -7,6 +7,7 @@ public sealed record CourseResponse(
     string Slug,
     string Title,
     string Description,
+string Brief,
     int Order,
     int TotalLessonsCount,
     int TotalStories,
@@ -14,5 +15,4 @@ public sealed record CourseResponse(
     int TotalVocabs,
     int CompletedLessonsCount,
     int LanguageId,
-    string? CoverId,
     DateTime? LastVisitedAt);

@@ -13,6 +13,7 @@ public static class CourseMapper
             course.Slug,
             course.Title,
             course.Description,
+            course.Brief,
             course.Order,
             course.Lessons.Count,
             course.Lessons.Sum(lesson => lesson.Stories.Count),
@@ -22,7 +23,6 @@ public static class CourseMapper
                 .SelectMany(lesson => lesson.Users)
                 .Count(userLesson => userLesson.CompletedAt != null),
             course.LanguageId,
-            course.CoverId,
             course.Lessons
                 .SelectMany(lesson => lesson.Users)
                 .OrderByDescending(userLesson => userLesson.LastVisitedAt)

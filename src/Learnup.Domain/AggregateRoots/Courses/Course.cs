@@ -10,8 +10,8 @@ public class Course
     public string Slug { get; private set; }
     public string Title { get; private set; }
     public string Description { get; private set; }
+    public string Brief { get; private set; }
     public int Order { get; private set; }
-    public string? CoverId { get; private set; }
 
     public int LanguageId { get; private set; }
     public Language Language { get; private set; } = null!;

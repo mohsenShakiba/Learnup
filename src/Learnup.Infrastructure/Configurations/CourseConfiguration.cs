@@ -19,12 +19,16 @@ public class CourseConfiguration : IEntityTypeConfiguration<Course>
         builder.Property(c => c.Code)
             .HasMaxLength(20)
             .IsRequired();
-        
+
         builder.Property(c => c.Title)
             .HasMaxLength(200)
             .IsRequired();
-        
+
         builder.Property(c => c.Description)
+            .HasMaxLength(1024)
+            .IsRequired();
+
+        builder.Property(c => c.Brief)
             .HasMaxLength(1024)
             .IsRequired();
 
@@ -35,7 +39,7 @@ public class CourseConfiguration : IEntityTypeConfiguration<Course>
             .WithMany()
             .HasForeignKey(c => c.LanguageId)
             .OnDelete(DeleteBehavior.Restrict);
-        
+
         builder.HasMany(c => c.Lessons)
             .WithOne(l => l.Course)
             .OnDelete(DeleteBehavior.Cascade);

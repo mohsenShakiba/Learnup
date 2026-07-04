@@ -29,6 +29,8 @@ public sealed record LessonDetailResponse(
 public sealed record CurrentLessonProgressResponse(
     int LessonId,
     string Title,
+string CourseCode,
+string CourseSlug,
     int Order,
     int CourseId,
     bool IsStoryCompleted,

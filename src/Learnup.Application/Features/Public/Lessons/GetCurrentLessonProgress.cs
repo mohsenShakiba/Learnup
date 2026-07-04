@@ -15,7 +15,9 @@ internal sealed class GetCurrentLessonProgressHandler(ILearnupDbContext dbContex
     {
         var currentUserLesson = await dbContext.UserLessons
             .AsNoTracking()
+            .AsSplitQuery()
             .Include(ul => ul.Lesson)
+            .ThenInclude(l => l.Course)
             .Where(ul => ul.UserId == identityProvider.UserId && ul.CompletedAt == null)
             .OrderByDescending(ul => ul.LastVisitedAt)
             .FirstOrDefaultAsync(cancellationToken);
@@ -38,6 +40,8 @@ internal sealed class GetCurrentLessonProgressHandler(ILearnupDbContext dbContex
         return new CurrentLessonProgressResponse(
             lesson.Id,
             lesson.Title,
+lesson.Course.Code,
+lesson.Course.Slug,
             lesson.Order,
             lesson.CourseId,
             currentUserLesson.IsStoryCompleted,
