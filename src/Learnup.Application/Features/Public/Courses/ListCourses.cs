@@ -16,6 +16,13 @@ internal sealed class ListCoursesHandler(ILearnupDbContext dbContext, IIdentityP
     {
         var courses = await dbContext.Courses
             .AsNoTracking()
+            .AsSplitQuery()
+            .Include(course => course.Lessons)
+            .ThenInclude(lesson => lesson.Stories)
+            .Include(course => course.Lessons)
+            .ThenInclude(lesson => lesson.Grammars)
+            .Include(course => course.Lessons)
+            .ThenInclude(lesson => lesson.Vocabs)
             .Include(course => course.Lessons)
             .ThenInclude(lesson => lesson.Users.Where(userLesson => userLesson.UserId == identityProvider.UserId))
             .Where(course => course.LanguageId == request.LanguageId)
