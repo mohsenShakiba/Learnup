@@ -8,9 +8,8 @@ public enum UserLessonStatus
     None = 0,
     StoryCompleted = 1,
     GrammarCompleted = 2,
-    GrammarTestCompleted = 4,
-    VocabCompleted = 8,
-    VocabTestCompleted = 16,
+    VocabCompleted = 4,
+    TestCompleted = 8
 }
 
 public class UserLesson
@@ -34,9 +33,8 @@ public class UserLesson
 
     public bool IsStoryCompleted => Status.HasFlag(UserLessonStatus.StoryCompleted);
     public bool IsGrammarCompleted => Status.HasFlag(UserLessonStatus.GrammarCompleted);
-    public bool IsGrammarTestCompleted => Status.HasFlag(UserLessonStatus.GrammarTestCompleted);
     public bool IsVocabCompleted => Status.HasFlag(UserLessonStatus.VocabCompleted);
-    public bool IsVocabTestCompleted => Status.HasFlag(UserLessonStatus.VocabTestCompleted);
+    public bool IsTestCompleted => Status.HasFlag(UserLessonStatus.TestCompleted);
 
     public UserLesson(int userId, int lessonId)
     {
@@ -80,7 +78,7 @@ public class UserLesson
         }
         else
         {
-            Complete(UserLessonStatus.GrammarCompleted | UserLessonStatus.GrammarTestCompleted);
+            Complete(UserLessonStatus.GrammarCompleted);
         }
 
         if (vocabsCount > 0)
@@ -89,7 +87,7 @@ public class UserLesson
         }
         else
         {
-            Complete(UserLessonStatus.VocabCompleted | UserLessonStatus.VocabTestCompleted);
+            Complete(UserLessonStatus.VocabCompleted);
         }
 
         if (testsCount > 0)
@@ -98,47 +96,17 @@ public class UserLesson
         }
         else
         {
-            Complete(UserLessonStatus.GrammarTestCompleted | UserLessonStatus.VocabTestCompleted);
+            Complete(UserLessonStatus.TestCompleted);
         }
     }
 
-    public void CompleteStory()
-    {
-        Complete(UserLessonStatus.StoryCompleted);
-        Touch();
-        CompleteIfReady();
-    }
-    
-    public void CompleteGrammar()
-    {
-        Complete(UserLessonStatus.GrammarCompleted);
-        Touch();
-        CompleteIfReady();
-    }
 
-    public void CompleteGrammarTest()
-    {
-        Complete(UserLessonStatus.GrammarCompleted | UserLessonStatus.GrammarTestCompleted);
-        Touch();
-        CompleteIfReady();
-    }
-    
-    public void CompleteVocab()
-    {
-        Complete(UserLessonStatus.VocabCompleted);
-        Touch();
-        CompleteIfReady();
-    }
-    
-    public void CompleteVocabTest()
-    {
-        Complete(UserLessonStatus.VocabCompleted | UserLessonStatus.VocabTestCompleted);
-        Touch();
-        CompleteIfReady();
-    }
-
-    private void Complete(UserLessonStatus status)
+    public void Complete(UserLessonStatus status)
     {
         Status |= status;
+        Touch();
+        CompleteIfReady();
     }
+
+
 }

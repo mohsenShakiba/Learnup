@@ -1,6 +1,7 @@
 using Learnup.Application.Features.Public.Lessons;
 using Learnup.Application.Mediation;
 using Learnup.Application.Responses.Public.Lessons;
+using Learnup.Domain.AggregateRoots.Users;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Learnup.API.Areas.Public.Controllers;
@@ -42,7 +43,7 @@ public class LessonsController(IMediator mediator) : BasePublicController
     [HttpPost("{id:int}/section-completed", Name = "OnLessonSectionCompleted")]
     public async Task<IActionResult> CompleteSection(
         int id,
-        [FromQuery] StorySection section,
+        [FromQuery] UserLessonStatus section,
         CancellationToken cancellationToken
     )
     {

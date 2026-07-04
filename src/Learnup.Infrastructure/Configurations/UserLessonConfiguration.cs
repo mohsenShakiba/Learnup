@@ -20,10 +20,11 @@ public class UserLessonConfiguration : IEntityTypeConfiguration<UserLesson>
 
         builder.Property(ul => ul.Status).IsRequired();
 
-        builder.Ignore(ul => ul.HasStory);
-        builder.Ignore(ul => ul.HasGrammar);
-        builder.Ignore(ul => ul.HasVocab);
-        builder.Ignore(ul => ul.HasTest);
+        builder
+            .HasOne(ul => ul.Lesson)
+            .WithMany(l => l.Users)
+            .HasForeignKey(ul => ul.LessonId)
+            .OnDelete(DeleteBehavior.Cascade);
 
         builder
             .HasOne(ul => ul.User)
@@ -31,10 +32,6 @@ public class UserLessonConfiguration : IEntityTypeConfiguration<UserLesson>
             .HasForeignKey(ul => ul.UserId)
             .OnDelete(DeleteBehavior.Cascade);
 
-        builder
-            .HasOne(ul => ul.Lesson)
-            .WithMany(l => l.Users)
-            .HasForeignKey(ul => ul.LessonId)
-            .OnDelete(DeleteBehavior.Cascade);
+
     }
 }

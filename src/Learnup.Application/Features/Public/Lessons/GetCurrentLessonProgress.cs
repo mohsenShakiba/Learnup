@@ -41,8 +41,9 @@ internal sealed class GetCurrentLessonProgressHandler(ILearnupDbContext dbContex
             lesson.Order,
             lesson.CourseId,
             currentUserLesson.IsStoryCompleted,
-            currentUserLesson.IsGrammarTestCompleted,
-            currentUserLesson.IsVocabTestCompleted,
+            currentUserLesson.IsGrammarCompleted,
+            currentUserLesson.IsVocabCompleted,
+            currentUserLesson.IsTestCompleted,
             nextLessonId);
     }
 }

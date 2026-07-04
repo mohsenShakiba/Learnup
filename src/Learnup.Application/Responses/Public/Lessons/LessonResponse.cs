@@ -10,11 +10,8 @@ public sealed record LessonResponse(
     string Title,
     int Order,
     int CourseId,
-    bool IsStoryCompleted,
-    bool IsGrammarCompleted,
-    bool IsVocabCompleted)
+    bool IsCompleted)
 {
-    public bool IsCompleted => IsStoryCompleted && IsGrammarCompleted && IsVocabCompleted;
 }
 
 public sealed record LessonDetailResponse(
@@ -37,4 +34,5 @@ public sealed record CurrentLessonProgressResponse(
     bool IsStoryCompleted,
     bool IsGrammarCompleted,
     bool IsVocabCompleted,
+    bool IsTestCompleted,
     int? NextLessonId);
