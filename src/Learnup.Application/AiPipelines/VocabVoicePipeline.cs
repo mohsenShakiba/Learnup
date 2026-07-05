@@ -16,7 +16,7 @@ public class VocabVoicePipeline(
 {
     private const string SlowDownFilter = "atempo=0.70";
 
-    public bool Enabled => true;
+    public bool Enabled => false;
 
     public async Task ProcessAsync(CancellationToken cancellationToken = default)
     {

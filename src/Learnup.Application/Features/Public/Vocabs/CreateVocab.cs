@@ -4,7 +4,7 @@ using Learnup.Domain.AggregateRoots.Vocabularies;
 
 namespace Learnup.Application.Features.Public.Vocabs;
 
-public sealed record CreateVocab(int LanguageId, string Word) : IRequest<int>;
+public sealed record CreateVocab(int LanguageId, string Word, string? Translation) : IRequest<int>;
 
 internal sealed class CreateVocabHandler(ILearnupDbContext dbContext)
     : IRequestHandler<CreateVocab, int>
@@ -20,8 +20,12 @@ internal sealed class CreateVocabHandler(ILearnupDbContext dbContext)
 
         var vocab = new Vocab(request.LanguageId, word, VocabLevel.Unknown);
 
+        vocab.MarkAsUserCreated();
+
+        vocab.SetTranslation(request.Translation ?? "", null);
+
         dbContext.Vocabs.Add(vocab);
-        
+
         await dbContext.SaveChangesAsync(cancellationToken);
 
         return vocab.Id;

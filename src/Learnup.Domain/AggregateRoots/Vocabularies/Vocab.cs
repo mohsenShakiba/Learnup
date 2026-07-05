@@ -50,11 +50,16 @@ public class Vocab
         Status = VocabStatus.Published;
     }
 
+    public void MarkAsUserCreated()
+    {
+        Status = VocabStatus.UserCreated;
+    }
+
     public void SetVoice(string voiceId)
     {
         VoiceId = voiceId;
     }
-    
+
     public void AddType(VocabSense vocabSense)
     {
         _senses.Add(vocabSense);
