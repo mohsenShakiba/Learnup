@@ -10,6 +10,7 @@ public class Ebook
     public string FileName { get; private set; }
     public string? CoverId { get; private set; }
     public DateTime UploadedAt { get; private set; }
+    public EbookSource Source { get; private set; }
 
     public ICollection<UserBook> Users { get; private set; } = new List<UserBook>();
 
@@ -19,12 +20,13 @@ public class Ebook
         FileName = string.Empty;
     }
 
-    public Ebook(string title, string fileName, string? coverId = null, string? author = null)
+    public Ebook(string title, string fileName, string? coverId = null, string? author = null, EbookSource source = EbookSource.System)
     {
         Title = title;
         Author = author;
         FileName = fileName;
         CoverId = coverId;
         UploadedAt = DateTime.UtcNow;
+        Source = source;
     }
 }

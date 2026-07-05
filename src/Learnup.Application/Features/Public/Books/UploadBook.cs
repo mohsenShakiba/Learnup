@@ -56,7 +56,8 @@ internal sealed class UploadBookHandler(
         var ebook = new Ebook(
             request.Title.Trim(),
             bookFileId,
-            coverFileId);
+            coverFileId,
+            source: EbookSource.User);
 
         var userBook = new UserBook(identityProvider.UserId, ebook);
 

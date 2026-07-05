@@ -28,5 +28,10 @@ public class EbookConfiguration : IEntityTypeConfiguration<Ebook>
 
         builder.Property(ebook => ebook.UploadedAt)
             .IsRequired();
+
+        builder.Property(ebook => ebook.Source)
+            .IsRequired()
+            .HasConversion<string>()
+            .HasMaxLength(50);
     }
 }

@@ -65,6 +65,14 @@ public class BooksControllers(IMediator mediator) : BasePublicController
             : Ok(book);
     }
 
+    [HttpDelete("{id:int}", Name = "DeleteUserBook")]
+    public async Task<IActionResult> Delete(int id, CancellationToken cancellationToken)
+    {
+        await mediator.Send(new DeleteUserBook(id), cancellationToken);
+
+        return NoContent();
+    }
+
     [HttpPut("book/{id:int}", Name = "UpdateUserBookProgress")]
     public async Task<IActionResult> UpdateUserBookProgress(
         int id,
