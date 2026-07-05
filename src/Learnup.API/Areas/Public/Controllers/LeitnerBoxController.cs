@@ -25,6 +25,14 @@ public class LeitnerBoxController(IMediator mediator) : BasePublicController
         return NoContent();
     }
 
+    [HttpDelete("vocab/{vocabId}", Name = "RemoveVocabFromLeitnerBox")]
+    public async Task<IActionResult> RemoveVocab(int vocabId, CancellationToken cancellationToken)
+    {
+        var command = new RemoveVocabFromLeitnerBox(vocabId);
+        await mediator.Send(command, cancellationToken);
+        return NoContent();
+    }
+
     [HttpPost("item/{id:int}/review", Name = "ReviewLeitnerBoxItem")]
     public async Task<IActionResult> ReviewItem(
         int id,

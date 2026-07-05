@@ -4,4 +4,4 @@ namespace Learnup.API.Requests;
 
 public sealed record CreateVocabRequest(
     int LanguageId,
-    string Word);
+    string Word, string? Translation);

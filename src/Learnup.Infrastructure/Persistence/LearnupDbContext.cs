@@ -44,6 +44,7 @@ public class LearnupDbContext(DbContextOptions<LearnupDbContext> options)
     public DbSet<PlacementQuestion> PlacementQuestions => Set<PlacementQuestion>();
     public DbSet<PlacementOption> PlacementOptions => Set<PlacementOption>();
     public DbSet<LeitnerBox> LeitnerBoxes => Set<LeitnerBox>();
+    public DbSet<LeitnerBoxItem> LeitnerBoxItems => Set<LeitnerBoxItem>();
     public DbSet<Subscription> Subscriptions => Set<Subscription>();
     public DbSet<SubscriptionFeature> SubscriptionFeatures => Set<SubscriptionFeature>();
     public DbSet<UserSubscription> UserSubscriptions => Set<UserSubscription>();

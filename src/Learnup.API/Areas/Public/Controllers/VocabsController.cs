@@ -11,7 +11,7 @@ public class VocabsController(IMediator mediator) : BasePublicController
     [HttpPost(Name = "CreateVocab")]
     public async Task<ActionResult<int>> Create([FromBody] CreateVocabRequest request, CancellationToken cancellationToken)
     {
-        var command = new CreateVocab(request.LanguageId, request.Word);
+        var command = new CreateVocab(request.LanguageId, request.Word, request.Translation);
         var vocabId = await mediator.Send(command, cancellationToken);
         return Ok(vocabId);
     }

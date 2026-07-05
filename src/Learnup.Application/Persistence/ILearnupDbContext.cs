@@ -40,6 +40,7 @@ public interface ILearnupDbContext
     DbSet<PlacementQuestion> PlacementQuestions { get; }
     DbSet<PlacementOption> PlacementOptions { get; }
     DbSet<LeitnerBox> LeitnerBoxes { get; }
+    DbSet<LeitnerBoxItem> LeitnerBoxItems { get; }
     DbSet<Subscription> Subscriptions { get; }
     DbSet<SubscriptionFeature> SubscriptionFeatures { get; }
     DbSet<UserSubscription> UserSubscriptions { get; }

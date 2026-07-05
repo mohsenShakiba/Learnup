@@ -65,6 +65,15 @@ public class LeitnerBox
         firstLevel.AddItem(item);
     }
 
+    public void RemoveItem(int vocabId)
+    {
+        var item = _items.FirstOrDefault(i => i.VocabId == vocabId);
+        if (item is null) return;
+
+        item.BoxLevel.RemoveItem(item);
+        _items.Remove(item);
+    }
+
     public static LeitnerBox CreateWithLevels(int userId)
     {
         var box = new LeitnerBox(userId);
