@@ -18,9 +18,7 @@ internal sealed class CreateVocabHandler(ILearnupDbContext dbContext)
             throw new ArgumentException("Word is required.", nameof(request.Word));
         }
 
-        var vocab = new Vocab(request.LanguageId, word, VocabLevel.Unknown);
-
-        vocab.MarkAsUserCreated();
+        var vocab = new Vocab(request.LanguageId, word, VocabLevel.Unknown, VocabSource.User);
 
         vocab.SetTranslation(request.Translation ?? "", null);
 

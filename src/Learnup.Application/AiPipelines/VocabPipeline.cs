@@ -19,7 +19,7 @@ public class VocabPipeline(
     public async Task ProcessAsync(CancellationToken cancellationToken = default)
     {
         var vocabs = await dbContext.Vocabs
-            .Where(translation => translation.Status == VocabStatus.UserCreated)
+            .Where(translation => translation.Status == VocabStatus.Pending)
             .Take(10)
             .ToListAsync(cancellationToken);
 

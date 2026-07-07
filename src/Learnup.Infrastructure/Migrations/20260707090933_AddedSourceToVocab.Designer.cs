@@ -3,6 +3,7 @@ using System;
 using Learnup.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Learnup.Infrastructure.Migrations
 {
     [DbContext(typeof(LearnupDbContext))]
-    partial class LearnupDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260707090933_AddedSourceToVocab")]
+    partial class AddedSourceToVocab
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -21,67 +24,6 @@ namespace Learnup.Infrastructure.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
-
-            modelBuilder.Entity("Learnup.Domain.AggregateRoots.Conversations.ChatMessage", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Content")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<int>("ConversationId")
-                        .HasColumnType("integer");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("Role")
-                        .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("character varying(20)");
-
-                    b.Property<int>("TokenCount")
-                        .HasColumnType("integer");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ConversationId");
-
-                    b.ToTable("ChatMessage", (string)null);
-                });
-
-            modelBuilder.Entity("Learnup.Domain.AggregateRoots.Conversations.Conversation", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("Title")
-                        .HasMaxLength(200)
-                        .HasColumnType("character varying(200)");
-
-                    b.Property<DateTime>("UpdatedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<int>("UserId")
-                        .HasColumnType("integer");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("Conversation", (string)null);
-                });
 
             modelBuilder.Entity("Learnup.Domain.AggregateRoots.Courses.Course", b =>
                 {
@@ -1171,28 +1113,6 @@ namespace Learnup.Infrastructure.Migrations
                     b.ToTable("VocabSense", (string)null);
                 });
 
-            modelBuilder.Entity("Learnup.Domain.AggregateRoots.Conversations.ChatMessage", b =>
-                {
-                    b.HasOne("Learnup.Domain.AggregateRoots.Conversations.Conversation", "Conversation")
-                        .WithMany("Messages")
-                        .HasForeignKey("ConversationId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Conversation");
-                });
-
-            modelBuilder.Entity("Learnup.Domain.AggregateRoots.Conversations.Conversation", b =>
-                {
-                    b.HasOne("Learnup.Domain.AggregateRoots.Users.User", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("User");
-                });
-
             modelBuilder.Entity("Learnup.Domain.AggregateRoots.Courses.Course", b =>
                 {
                     b.HasOne("Learnup.Domain.AggregateRoots.Languages.Language", "Language")
@@ -1548,11 +1468,6 @@ namespace Learnup.Infrastructure.Migrations
                         .IsRequired();
 
                     b.Navigation("Vocab");
-                });
-
-            modelBuilder.Entity("Learnup.Domain.AggregateRoots.Conversations.Conversation", b =>
-                {
-                    b.Navigation("Messages");
                 });
 
             modelBuilder.Entity("Learnup.Domain.AggregateRoots.Courses.Course", b =>

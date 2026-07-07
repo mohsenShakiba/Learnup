@@ -1,4 +1,5 @@
 using Learnup.Application.Persistence;
+using Learnup.Domain.AggregateRoots.Conversations;
 using Learnup.Domain.AggregateRoots.Courses;
 using Learnup.Domain.AggregateRoots.Ebooks;
 using Learnup.Domain.AggregateRoots.Grammars;
@@ -33,6 +34,9 @@ public class LearnupDbContext(DbContextOptions<LearnupDbContext> options)
     public DbSet<Test> Tests => Set<Test>();
     public DbSet<TestOption> TestOptions => Set<TestOption>();
     public DbSet<User> Users => Set<User>();
+    public DbSet<UserTokenUsage> UserTokenUsages => Set<UserTokenUsage>();
+    public DbSet<Conversation> Conversations => Set<Conversation>();
+    public DbSet<ChatMessage> ChatMessages => Set<ChatMessage>();
     public DbSet<UserOtp> UserOtps => Set<UserOtp>();
     public DbSet<UserStreak> UserStreaks => Set<UserStreak>();
     public DbSet<UserLesson> UserLessons => Set<UserLesson>();

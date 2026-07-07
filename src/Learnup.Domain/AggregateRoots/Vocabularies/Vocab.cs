@@ -13,6 +13,7 @@ public class Vocab
 
     public VocabLevel Level { get; private set; }
     public VocabStatus Status { get; private set; }
+    public VocabSource Source { get; private set; }
 
     public int LanguageId { get; private set; }
     public Language Language { get; private set; } = null!;
@@ -20,15 +21,16 @@ public class Vocab
     private List<VocabSense> _senses = [];
     public IReadOnlyList<VocabSense> Senses => _senses.AsReadOnly();
 
-    public Vocab(int languageId, string word, VocabLevel level)
+    public Vocab(int languageId, string word, VocabLevel level, VocabSource source = VocabSource.System)
     {
         Word = word;
         Level = level;
         LanguageId = languageId;
         Status = VocabStatus.Pending;
+        Source = source;
     }
 
-    public Vocab(int languageId, string word, string? translation, VocabLevel level, string? description, string? voiceId)
+    public Vocab(int languageId, string word, string? translation, VocabLevel level, string? description, string? voiceId, VocabSource source = VocabSource.System)
     {
         Word = word;
         Translation = translation;
@@ -37,6 +39,7 @@ public class Vocab
         Description = description;
         VoiceId = voiceId;
         Status = VocabStatus.Pending;
+        Source = source;
     }
 
     public void SetTranslation(string translation, string? description)
@@ -48,11 +51,6 @@ public class Vocab
     public void MarkAsPublished()
     {
         Status = VocabStatus.Published;
-    }
-
-    public void MarkAsUserCreated()
-    {
-        Status = VocabStatus.UserCreated;
     }
 
     public void SetVoice(string voiceId)

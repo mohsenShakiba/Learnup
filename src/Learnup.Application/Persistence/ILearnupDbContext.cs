@@ -1,3 +1,4 @@
+using Learnup.Domain.AggregateRoots.Conversations;
 using Learnup.Domain.AggregateRoots.Courses;
 using Learnup.Domain.AggregateRoots.Ebooks;
 using Learnup.Domain.AggregateRoots.Grammars;
@@ -29,6 +30,9 @@ public interface ILearnupDbContext
     DbSet<Test> Tests { get; }
     DbSet<TestOption> TestOptions { get; }
     DbSet<User> Users { get; }
+    DbSet<UserTokenUsage> UserTokenUsages { get; }
+    DbSet<Conversation> Conversations { get; }
+    DbSet<ChatMessage> ChatMessages { get; }
     DbSet<UserOtp> UserOtps { get; }
     DbSet<UserStreak> UserStreaks { get; }
     DbSet<UserLesson> UserLessons { get; }

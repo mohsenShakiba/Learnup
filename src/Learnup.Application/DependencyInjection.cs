@@ -1,6 +1,7 @@
 using System.Reflection;
 using Learnup.Application.AiPipelines;
 using Learnup.Application.Authentication;
+using Learnup.Application.Features.Public.Ai;
 using Learnup.Application.Mediation;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -12,6 +13,7 @@ public static class DependencyInjection
     {
         services.AddMemoryCache();
         services.AddScoped<IMediator, Mediator>();
+        services.AddScoped<IChatStreamService, ChatStreamService>();
         services.AddAiProcessors(typeof(DependencyInjection).Assembly);
         
         services.AddMediatorHandlers(typeof(DependencyInjection).Assembly);
