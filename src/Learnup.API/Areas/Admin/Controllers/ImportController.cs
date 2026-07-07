@@ -37,17 +37,74 @@ public class ImportController(
     }
 
     [HttpPost("stories/{courseId:int}/{lessonOrder:int}", Name = "ImportStory")]
+    [Consumes("multipart/form-data")]
     public async Task<ActionResult<int>> ImportStory(
         int courseId,
         int lessonOrder,
-        [FromBody] StoryRequest request,
+        [FromForm] ImportStoryRequest request,
         CancellationToken cancellationToken)
     {
-        return Ok(await storyLoader.LoadAsync(
-            request,
-            courseId,
-            lessonOrder,
-            cancellationToken));
+        StoryRequest storyRequest;
+
+        await using (var stream = request.File.OpenReadStream())
+        using (var reader = new StreamReader(stream))
+        {
+            var content = await reader.ReadToEndAsync(cancellationToken);
+            storyRequest = ParseStory(content);
+        }
+
+        try
+        {
+            return Ok(await storyLoader.LoadAsync(
+                storyRequest,
+                courseId,
+                lessonOrder,
+                cancellationToken));
+        }
+        catch (Exception exception) when (exception is InvalidOperationException or FormatException)
+        {
+            return BadRequest(exception.Message);
+        }
+    }
+
+    // Expected txt format:
+    //   line 1: story title
+    //   line 2: comma separated words
+    //   line 3+: one sentence per line
+    // Order and person are inferred from the sentence position, speakers are
+    // assumed to alternate. Translation and description are intentionally left null.
+    private static StoryRequest ParseStory(string content)
+    {
+        var lines = content
+            .Split('\n')
+            .Select(line => line.Trim('\r', ' ', '\t'))
+            .Where(line => !string.IsNullOrWhiteSpace(line))
+            .ToList();
+
+        if (lines.Count < 3)
+        {
+            throw new FormatException(
+                "Story file must contain a title, a line of words and at least one sentence.");
+        }
+
+        var title = lines[0];
+
+        var words = lines[1]
+            .Split(',')
+            .Select(word => word.Trim())
+            .Where(word => !string.IsNullOrWhiteSpace(word))
+            .ToList();
+
+        var sentences = lines
+            .Skip(2)
+            .Select((text, index) => new StoryItemRequest(
+                Order: index + 1,
+                Text: text,
+                Person: index % 2 == 0 ? 1 : 2,
+                Translation: null))
+            .ToList();
+
+        return new StoryRequest(title, words, sentences);
     }
 
     [HttpPost("placement-test", Name = "ImportPlacementTest")]

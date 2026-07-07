@@ -48,7 +48,7 @@ public class StoryLoader(LearnupDbContext dbContext)
 
         foreach (var sentence in sentences.OrderBy(sentence => sentence.Order))
         {
-            story.Items.Add(new StoryItem(sentence.Text.Trim(), sentence.Translation.Trim(), sentence.Person, sentence.Order));
+            story.Items.Add(new StoryItem(sentence.Text.Trim(), sentence.Translation?.Trim(), sentence.Person, sentence.Order));
         }
 
         dbContext.Stories.Add(story);
@@ -151,9 +151,7 @@ public class StoryLoader(LearnupDbContext dbContext)
         }
 
         var invalidSentence = story.Sentences
-            .FirstOrDefault(sentence =>
-                string.IsNullOrWhiteSpace(sentence.Text) ||
-                string.IsNullOrWhiteSpace(sentence.Translation));
+            .FirstOrDefault(sentence => string.IsNullOrWhiteSpace(sentence.Text));
 
         if (invalidSentence is not null)
         {

@@ -12,7 +12,7 @@ public sealed record StoryResponse(
 public sealed record StoryItemResponse(
     int Id,
     string Content,
-    string Translation,
+    string? Translation,
     int Order,
     int Person,
     string? VoiceId);

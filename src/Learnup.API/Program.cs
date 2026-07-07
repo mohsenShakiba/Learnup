@@ -65,9 +65,13 @@ var app = builder.Build();
 
 app.UseCors(c =>
 {
-    c.AllowAnyOrigin();
+    // SignalR sends credentials, so we can't use AllowAnyOrigin() (the browser
+    // rejects "Access-Control-Allow-Origin: *" together with credentials).
+    // Reflect the request origin instead and allow credentials.
+    c.SetIsOriginAllowed(_ => true);
     c.AllowAnyMethod();
     c.AllowAnyHeader();
+    c.AllowCredentials();
 });
 
 app.UseSwagger();
