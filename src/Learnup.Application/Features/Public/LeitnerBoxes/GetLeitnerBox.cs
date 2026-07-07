@@ -25,7 +25,6 @@ internal sealed class GetLeitnerBoxHandler(ILearnupDbContext dbContext, IIdentit
 
         if (box is null)
         {
-            
             box = LeitnerBox.CreateWithLevels(identityProvider.UserId);
             dbContext.LeitnerBoxes.Add(box);
         }

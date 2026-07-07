@@ -15,6 +15,18 @@ public sealed class S3FileStorageOptions
     public bool ForcePathStyle { get; set; }
 }
 
+public sealed class FileStorageOptions
+{
+    public const string SectionName = "FileStorage";
+
+    public string Provider { get; set; } = FileStorageProviders.S3;
+}
+
+public static class FileStorageProviders
+{
+    public const string S3 = "S3";
+    public const string OS = "OS";
+}
 
 internal sealed class S3FileService(IAmazonS3 s3Client)
     : IFileService
@@ -33,7 +45,7 @@ internal sealed class S3FileService(IAmazonS3 s3Client)
             ContentType = request.ContentType,
         }, cancellationToken);
 
-        return $"{request.BucketName}/{request.FileName}";
+        return FileIdHelper.GetFileId(request.BucketName, request.FileName);
     }
 
     private async Task EnsureBucketExistsAsync(
@@ -67,7 +79,7 @@ internal sealed class S3FileService(IAmazonS3 s3Client)
         string fileId,
         CancellationToken cancellationToken)
     {
-        var parsedFileId = ParseFileId(fileId);
+        var parsedFileId = FileIdHelper.Parse(fileId);
         if (parsedFileId is null)
         {
             return null;
@@ -92,12 +104,16 @@ internal sealed class S3FileService(IAmazonS3 s3Client)
         }
     }
 
-    private static string GetFileId(string bucketName, string key)
+}
+
+internal static class FileIdHelper
+{
+    public static string GetFileId(string bucketName, string key)
     {
         return $"{bucketName}/{key}";
     }
 
-    private static ParsedFileId? ParseFileId(string fileId)
+    public static ParsedFileId? Parse(string fileId)
     {
         var parts = fileId.Split('/', 2, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
         if (parts.Length != 2 || string.IsNullOrWhiteSpace(parts[0]) || string.IsNullOrWhiteSpace(parts[1]))
@@ -107,6 +123,6 @@ internal sealed class S3FileService(IAmazonS3 s3Client)
 
         return new ParsedFileId(parts[0], parts[1]);
     }
-
-    private readonly record struct ParsedFileId(string BucketName, string Key);
 }
+
+internal readonly record struct ParsedFileId(string BucketName, string Key);
