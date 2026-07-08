@@ -30,4 +30,13 @@ public static class StoryMappings
             storyItem.Person,
             storyItem.VoiceId);
     }
+
+    public static StoryItemExpressionResponse ToResponse(this StoryItemExpression expression)
+    {
+        return new StoryItemExpressionResponse(
+            expression.Id,
+            expression.Phrase,
+            expression.Meaning,
+            expression.Translation);
+    }
 }

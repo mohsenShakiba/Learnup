@@ -16,4 +16,17 @@ public class StoriesController(IMediator mediator) : BasePublicController
             ? NotFound()
             : Ok(story);
     }
+
+    [HttpGet("{id:int}/items/{itemId:int}/expressions", Name = "GetStoryItemExpressions")]
+    public async Task<ActionResult<IReadOnlyList<StoryItemExpressionResponse>>> GetItemExpressions(
+        int id,
+        int itemId,
+        CancellationToken cancellationToken)
+    {
+        var expressions = await mediator.Send(new GetStoryItemExpressions(id, itemId), cancellationToken);
+
+        return expressions is null
+            ? NotFound()
+            : Ok(expressions);
+    }
 }

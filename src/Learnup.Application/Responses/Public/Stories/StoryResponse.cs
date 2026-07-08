@@ -17,4 +17,10 @@ public sealed record StoryItemResponse(
     int Person,
     string? VoiceId);
 
+public sealed record StoryItemExpressionResponse(
+    int Id,
+    string Phrase,
+    string Meaning,
+    string? Translation);
+
 
