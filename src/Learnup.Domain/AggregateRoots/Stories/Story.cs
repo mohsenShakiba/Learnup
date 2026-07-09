@@ -11,6 +11,12 @@ public class Story
     public StoryStatus Status { get; private set; }
     public int? Duration { get; private set; }
 
+    /// <summary>
+    /// Stored audio file id for the whole conversation, generated in a single voice pass.
+    /// The word-by-word timestamps are stored in a JSON file next to this audio.
+    /// </summary>
+    public string? VoiceId { get; private set; }
+
     public List<StoryItem> Items { get; private set; }
     public List<LessonStory> Lessons { get; private set; }
 
@@ -24,6 +30,11 @@ public class Story
     {
         Title = title;
         Items = [];
+    }
+
+    public void SetVoice(string voiceId)
+    {
+        VoiceId = voiceId;
     }
 
     public void MarkAsVoiced()

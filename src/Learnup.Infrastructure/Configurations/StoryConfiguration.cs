@@ -16,6 +16,9 @@ public class StoryConfiguration : IEntityTypeConfiguration<Story>
             .HasMaxLength(200)
             .IsRequired();
 
+        builder.Property(s => s.VoiceId)
+            .HasMaxLength(300);
+
         builder.HasMany(s => s.Items)
             .WithOne(si => si.Story)
             .HasForeignKey(si => si.StoryId)

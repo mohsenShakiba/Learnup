@@ -1,4 +1,4 @@
-namespace Learnup.Application.Responses.Public.Stories;
+]namespace Learnup.Application.Responses.Public.Stories;
 
 public sealed record StoryResponse(
     int Id,

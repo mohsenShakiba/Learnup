@@ -107,6 +107,8 @@ internal sealed class OsFileService(IOptions<OsFileStorageOptions> options, ILog
             ".jpg" or ".jpeg" => "image/jpeg",
             ".png" => "image/png",
             ".wav" => "audio/wav",
+            ".mp3" => "audio/mpeg",
+            ".json" => "application/json",
             _ => "application/octet-stream"
         };
     }

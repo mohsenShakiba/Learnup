@@ -9,7 +9,18 @@ public interface IVoiceProvider
 /// Marker interface for the ElevenLabs-backed voice provider, allowing pipelines to opt into
 /// ElevenLabs specifically while <see cref="IVoiceProvider"/> remains the default (Kokoro) provider.
 /// </summary>
-public interface IElevenLabsVoiceProvider : IVoiceProvider;
+public interface IElevenLabsVoiceProvider : IVoiceProvider
+{
+    /// <summary>
+    /// Generates a single audio file for an entire conversation in one API call and, alongside
+    /// the audio, stores a JSON file with word-by-word timestamps. The JSON is stored next to the
+    /// audio (same bucket and base file name, with a <c>.json</c> extension).
+    /// </summary>
+    Task<ConversationVoiceResult> GetConversationVoiceAsync(
+        string text,
+        VoiceOptions? options = null,
+        CancellationToken cancellationToken = default);
+}
 
 public record VoiceOptions(string VoiceId, double PlaybackSpeed = 1);
 
@@ -19,6 +30,17 @@ public record VoiceResult(string VoiceId, IReadOnlyList<VoiceSentence>? Sentence
 
 /// <summary>A sentence and its start/end offset (seconds) within the generated audio.</summary>
 public record VoiceSentence(string Text, double Start, double End);
+
+/// <param name="AudioFileId">Stored audio file id for the whole conversation.</param>
+/// <param name="TimestampsFileId">Stored JSON file id (sitting next to the audio) holding word-by-word timings.</param>
+/// <param name="Words">Word-by-word timings within the audio.</param>
+public record ConversationVoiceResult(
+    string AudioFileId,
+    string TimestampsFileId,
+    IReadOnlyList<VoiceWord> Words);
+
+/// <summary>A word and its start/end offset (seconds) within the generated audio.</summary>
+public record VoiceWord(string Text, double Start, double End);
 
 public static class VoiceIds
 {

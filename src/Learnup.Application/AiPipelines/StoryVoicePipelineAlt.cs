@@ -1,3 +1,4 @@
+using System.Text;
 using Learnup.Application.ExternalServices;
 using Learnup.Application.Persistence;
 using Learnup.Domain.AggregateRoots.Stories;
@@ -21,29 +22,47 @@ public class StoryVoicePipelineAlt(ILearnupDbContext dbContext, IElevenLabsVoice
 
         foreach (var story in stories)
         {
-            foreach (var item in story.Items)
+            try
             {
-                try
+                var conversation = BuildConversationText(story);
+                if (string.IsNullOrWhiteSpace(conversation))
                 {
-                    var voiceId = item.Person == 1 ? ElevenLabsVoiceIds.Brian : ElevenLabsVoiceIds.Lily;
-                    var option = new VoiceOptions(voiceId, PlaybackSpeed);
-                    var result = await voiceProvider.GetVoiceAsync(item.Content, option, cancellationToken: cancellationToken);
-                    item.SetVoice(result.VoiceId);
+                    continue;
+                }
 
-                    if (result.Sentences is { Count: > 0 })
-                    {
-                        item.SetVoiceTimings(result.Sentences.Select(s => (s.Text, s.Start, s.End)));
-                    }
-                }
-                catch
-                {
-                    // do nothing
-                }
+                var option = new VoiceOptions(ElevenLabsVoiceIds.Brian, PlaybackSpeed);
+                var result = await voiceProvider.GetConversationVoiceAsync(conversation, option, cancellationToken);
+
+                story.SetVoice(result.AudioFileId);
+                story.MarkAsVoiced();
             }
-
-            story.MarkAsVoiced();
+            catch
+            {
+                // do nothing
+            }
         }
 
         await dbContext.SaveChangesAsync(cancellationToken);
+    }
+
+    /// <summary>
+    /// Concatenates the conversation's lines (in order) into a single block of text so the whole
+    /// conversation can be voiced in one ElevenLabs call.
+    /// </summary>
+    private static string BuildConversationText(Story story)
+    {
+        var builder = new StringBuilder();
+
+        foreach (var item in story.Items.OrderBy(i => i.Order))
+        {
+            if (string.IsNullOrWhiteSpace(item.Content))
+            {
+                continue;
+            }
+
+            builder.AppendLine(item.Content.Trim());
+        }
+
+        return builder.ToString().Trim();
     }
 }
