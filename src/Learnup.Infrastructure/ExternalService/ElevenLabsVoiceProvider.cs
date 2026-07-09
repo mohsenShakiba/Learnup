@@ -52,13 +52,12 @@ public class ElevenLabsVoiceProvider(
     }
 
     public async Task<ConversationVoiceResult> GetConversationVoiceAsync(
-        string text,
-        VoiceOptions? options,
+        IReadOnlyList<VoiceTurn> turns,
         CancellationToken cancellationToken = default)
     {
         try
         {
-            var response = await RequestTimestampsAsync(text, options, cancellationToken);
+            var response = await RequestDialogueTimestampsAsync(turns, cancellationToken);
 
             var audioBytes = Convert.FromBase64String(response.AudioBase64);
 
@@ -73,7 +72,7 @@ public class ElevenLabsVoiceProvider(
                 BucketNames.StoryVoices,
                 "audio/mpeg"), cancellationToken);
 
-            var words = BuildWords(response.Alignment);
+            var words = BuildWords(response.Alignment, TurnBoundaries(response.VoiceSegments));
 
             var timestampsBytes = JsonSerializer.SerializeToUtf8Bytes(
                 new
@@ -107,25 +106,11 @@ public class ElevenLabsVoiceProvider(
         VoiceOptions? options,
         CancellationToken cancellationToken)
     {
-        var apiKey = configuration.GetConnectionString("ElevenLabsApiKey")
-                     ?? configuration["ElevenLabs:ApiKey"];
-
-        if (string.IsNullOrWhiteSpace(apiKey))
-        {
-            throw new InvalidOperationException("ElevenLabs API key is not set");
-        }
-
-        var baseUrl = configuration.GetConnectionString("ElevenLabsUrl")
-                      ?? configuration["ElevenLabs:BaseUrl"]
-                      ?? DefaultBaseUrl;
-
         var voiceId = options?.VoiceId ?? ElevenLabsVoiceIds.Sarah;
 
-        var client = httpClientFactory.CreateClient();
-        client.BaseAddress = new Uri(baseUrl);
-        client.DefaultRequestHeaders.Add("xi-api-key", apiKey);
+        var client = CreateClient();
 
-        using var httpResponse = await client.PostAsJsonAsync(
+        var httpResponse = await client.PostAsJsonAsync(
             $"/v1/text-to-speech/{voiceId}/with-timestamps",
             new
             {
@@ -140,21 +125,85 @@ public class ElevenLabsVoiceProvider(
             },
             cancellationToken: cancellationToken);
 
-        if (!httpResponse.IsSuccessStatusCode)
+        return await ReadTimestampedResponseAsync(
+            httpResponse,
+            $"voice '{voiceId}' (model '{ModelId}')",
+            cancellationToken);
+    }
+
+    /// <summary>
+    /// Calls ElevenLabs' text-to-dialogue "with timestamps" endpoint, which renders a multi-speaker
+    /// conversation into a single audio track. Each turn carries its own voice id, so alternating
+    /// turns can use different voices. Returns the base64 audio together with the per-character
+    /// alignment (same shape as the single-voice endpoint).
+    /// </summary>
+    private async Task<TimestampedResponse> RequestDialogueTimestampsAsync(
+        IReadOnlyList<VoiceTurn> turns,
+        CancellationToken cancellationToken)
+    {
+        var client = CreateClient();
+
+        var httpResponse = await client.PostAsJsonAsync(
+            "/v1/text-to-dialogue/with-timestamps",
+            new
+            {
+                inputs = turns.Select(t => new { text = t.Text, voice_id = t.VoiceId }),
+                model_id = ModelId,
+            },
+            cancellationToken: cancellationToken);
+
+        var voiceIds = string.Join(", ", turns.Select(t => t.VoiceId).Distinct());
+
+        return await ReadTimestampedResponseAsync(
+            httpResponse,
+            $"voices '{voiceIds}' (model '{ModelId}')",
+            cancellationToken);
+    }
+
+    private HttpClient CreateClient()
+    {
+        var apiKey = configuration.GetConnectionString("ElevenLabsApiKey")
+                     ?? configuration["ElevenLabs:ApiKey"];
+
+        if (string.IsNullOrWhiteSpace(apiKey))
         {
-            var error = await httpResponse.Content.ReadAsStringAsync(cancellationToken);
-            throw new InvalidOperationException(
-                $"ElevenLabs returned {(int)httpResponse.StatusCode} {httpResponse.StatusCode} for voice '{voiceId}' (model '{ModelId}'): {error}");
+            throw new InvalidOperationException("ElevenLabs API key is not set");
         }
 
-        var response = await httpResponse.Content.ReadFromJsonAsync<TimestampedResponse>(cancellationToken);
+        var baseUrl = configuration.GetConnectionString("ElevenLabsUrl")
+                      ?? configuration["ElevenLabs:BaseUrl"]
+                      ?? DefaultBaseUrl;
 
-        if (response is null || string.IsNullOrEmpty(response.AudioBase64))
+        var client = httpClientFactory.CreateClient();
+        client.BaseAddress = new Uri(baseUrl);
+        client.DefaultRequestHeaders.Add("xi-api-key", apiKey);
+
+        return client;
+    }
+
+    private static async Task<TimestampedResponse> ReadTimestampedResponseAsync(
+        HttpResponseMessage httpResponse,
+        string requestDescription,
+        CancellationToken cancellationToken)
+    {
+        using (httpResponse)
         {
-            throw new InvalidOperationException("ElevenLabs returned an empty audio response");
-        }
+            if (!httpResponse.IsSuccessStatusCode)
+            {
+                var error = await httpResponse.Content.ReadAsStringAsync(cancellationToken);
+                throw new InvalidOperationException(
+                    $"ElevenLabs returned {(int)httpResponse.StatusCode} {httpResponse.StatusCode} for {requestDescription}: {error}");
+            }
 
-        return response;
+            var response = await httpResponse.Content.ReadFromJsonAsync<TimestampedResponse>(cancellationToken);
+
+            if (response is null || string.IsNullOrEmpty(response.AudioBase64))
+            {
+                throw new InvalidOperationException("ElevenLabs returned an empty audio response");
+            }
+
+            return response;
+        }
     }
 
     /// <summary>
@@ -222,11 +271,30 @@ public class ElevenLabsVoiceProvider(
     }
 
     /// <summary>
+    /// The character index (into the alignment) at which each dialogue turn after the first begins.
+    /// The dialogue endpoint concatenates each turn's alignment with no separating whitespace, so
+    /// these indices are where one speaker's last word would otherwise be glued to the next
+    /// speaker's first word; <see cref="BuildWords"/> forces a word break at each of them.
+    /// </summary>
+    private static IReadOnlySet<int> TurnBoundaries(IReadOnlyList<VoiceSegment>? segments)
+    {
+        if (segments is not { Count: > 1 })
+        {
+            return new HashSet<int>();
+        }
+
+        // Skip the first segment: index 0 is not a boundary between two turns.
+        return segments.Skip(1).Select(s => s.CharacterStartIndex).ToHashSet();
+    }
+
+    /// <summary>
     /// Groups ElevenLabs' per-character alignment into words. A word runs from its first
     /// non-whitespace character to the last character before the next whitespace; attached
     /// punctuation stays with the word. Its start/end are those characters' timings (seconds).
+    /// A turn boundary (see <paramref name="turnBoundaries"/>) also ends the current word so that
+    /// two adjacent speakers' words are never merged into one.
     /// </summary>
-    private static IReadOnlyList<VoiceWord> BuildWords(Alignment? alignment)
+    private static IReadOnlyList<VoiceWord> BuildWords(Alignment? alignment, IReadOnlySet<int> turnBoundaries)
     {
         if (alignment?.Characters is not { Count: > 0 } characters
             || alignment.StartTimes is not { } starts
@@ -243,6 +311,12 @@ public class ElevenLabsVoiceProvider(
 
         for (var i = 0; i < count; i++)
         {
+            // A new turn starts here: flush the previous speaker's word before the new one begins.
+            if (turnBoundaries.Contains(i))
+            {
+                AppendWord(words, text, wordStart, wordEnd);
+            }
+
             // Each alignment entry is a single-character string (occasionally longer).
             var token = characters[i];
             if (string.IsNullOrEmpty(token))
@@ -287,7 +361,15 @@ public class ElevenLabsVoiceProvider(
         [property: JsonPropertyName("audio_base64")]
         string AudioBase64,
         [property: JsonPropertyName("alignment")]
-        Alignment? Alignment);
+        Alignment? Alignment,
+        [property: JsonPropertyName("voice_segments")]
+        List<VoiceSegment>? VoiceSegments = null);
+
+    private record VoiceSegment(
+        [property: JsonPropertyName("character_start_index")]
+        int CharacterStartIndex,
+        [property: JsonPropertyName("character_end_index")]
+        int CharacterEndIndex);
 
     private record Alignment(
         [property: JsonPropertyName("characters")]

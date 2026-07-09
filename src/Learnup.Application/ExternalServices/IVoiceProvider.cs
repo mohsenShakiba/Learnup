@@ -5,12 +5,14 @@ public interface IVoiceProvider
     Task<VoiceResult> GetVoiceAsync(string content, VoiceOptions? options = null, CancellationToken cancellationToken = default);
 
     Task<ConversationVoiceResult> GetConversationVoiceAsync(
-        string text,
-        VoiceOptions? options = null,
+        IReadOnlyList<VoiceTurn> turns,
         CancellationToken cancellationToken = default);
 }
 
 public record VoiceOptions(string VoiceId, double PlaybackSpeed = 1);
+
+/// <summary>A single dialogue turn: the text spoken and the voice that speaks it.</summary>
+public record VoiceTurn(string Text, string VoiceId);
 
 /// <param name="VoiceId">Stored audio file id.</param>
 /// <param name="Sentences">Sentence-level timings within the audio, when the provider supports them.</param>

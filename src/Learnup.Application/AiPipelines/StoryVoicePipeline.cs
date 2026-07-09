@@ -1,4 +1,3 @@
-using System.Text;
 using Learnup.Application.ExternalServices;
 using Learnup.Application.Persistence;
 using Learnup.Domain.AggregateRoots.Stories;
@@ -8,7 +7,9 @@ namespace Learnup.Application.AiPipelines;
 
 public class StoryVoicePipeline(ILearnupDbContext dbContext, IVoiceProvider voiceProvider) : IPipeline
 {
-    private const double PlaybackSpeed = 0.9;
+    // Two-speaker conversations: odd-numbered speakers get a male voice, the rest a female voice.
+    private const string MaleVoiceId = ElevenLabsVoiceIds.Brian;
+    private const string FemaleVoiceId = ElevenLabsVoiceIds.Sarah;
 
     public bool Enabled => true;
 
@@ -25,14 +26,13 @@ public class StoryVoicePipeline(ILearnupDbContext dbContext, IVoiceProvider voic
         {
             try
             {
-                var conversation = BuildConversationText(story);
-                if (string.IsNullOrWhiteSpace(conversation))
+                var turns = BuildConversationTurns(story);
+                if (turns.Count == 0)
                 {
                     continue;
                 }
 
-                var option = new VoiceOptions(ElevenLabsVoiceIds.Brian, PlaybackSpeed);
-                var result = await voiceProvider.GetConversationVoiceAsync(conversation, option, cancellationToken);
+                var result = await voiceProvider.GetConversationVoiceAsync(turns, cancellationToken);
 
                 story.SetVoice(result.AudioFileId);
                 story.MarkAsVoiced();
@@ -47,9 +47,9 @@ public class StoryVoicePipeline(ILearnupDbContext dbContext, IVoiceProvider voic
         await dbContext.SaveChangesAsync(cancellationToken);
     }
 
-    private static string BuildConversationText(Story story)
+    private static List<VoiceTurn> BuildConversationTurns(Story story)
     {
-        var builder = new StringBuilder();
+        var turns = new List<VoiceTurn>();
 
         foreach (var item in story.Items.OrderBy(i => i.Order))
         {
@@ -58,9 +58,11 @@ public class StoryVoicePipeline(ILearnupDbContext dbContext, IVoiceProvider voic
                 continue;
             }
 
-            builder.AppendLine(item.Content.Trim());
+            // Person alternates between 1 and 2; odd speakers are male, even speakers female.
+            var voiceId = item.Person % 2 == 1 ? MaleVoiceId : FemaleVoiceId;
+            turns.Add(new VoiceTurn(item.Content.Trim(), voiceId));
         }
 
-        return builder.ToString().Trim();
+        return turns;
     }
 }
