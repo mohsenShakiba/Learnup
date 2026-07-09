@@ -3,5 +3,6 @@
 public enum StoryStatus
 {
     Pending = 0,
-    Completed = 1,
+    Translated = 1,
+    Voiced = 2,
 }

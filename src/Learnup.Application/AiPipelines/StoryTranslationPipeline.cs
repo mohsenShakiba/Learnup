@@ -8,40 +8,24 @@ using Microsoft.Extensions.Logging;
 
 namespace Learnup.Application.AiPipelines;
 
-public class StoryPipeline(
+public class StoryTranslationPipeline(
     ILearnupDbContext dbContext,
-    IVoiceProvider voiceProvider,
     IAiService aiService,
-    ILogger<StoryPipeline> logger) : IPipeline
+    ILogger<StoryTranslationPipeline> logger) : IPipeline
 {
-    public bool Enabled => true;
+    public bool Enabled => false;
 
     public async Task ProcessAsync(CancellationToken cancellationToken = default)
     {
         var stories = await dbContext.Stories
-            .Where(s => s.Id == 231)
             .Include(s => s.Items)
             .ThenInclude(i => i.Expressions)
-            .Where(s => s.Status == StoryStatus.Pending)
+            .Where(s => s.Status == StoryStatus.Voiced)
             .Take(10)
             .ToListAsync(cancellationToken);
 
         foreach (var story in stories)
         {
-            foreach (var item in story.Items)
-            {
-                try
-                {
-                    var option = item.Person == 1 ? new VoiceOptions(VoiceIds.Heart, 0.8) : new VoiceOptions(VoiceIds.Bella, 0.8);
-                    var result = await voiceProvider.GetVoiceAsync(item.Content, option, cancellationToken: cancellationToken);
-                    item.SetVoice(result.VoiceId);
-                }
-                catch
-                {
-                    // do nothing
-                }
-            }
-
             try
             {
                 await TranslateAsync(story, cancellationToken);

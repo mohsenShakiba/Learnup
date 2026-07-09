@@ -5,11 +5,11 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Learnup.Application.AiPipelines;
 
-public class StoryVoicePipeline(ILearnupDbContext dbContext, IVoiceProvider voiceProvider) : IPipeline
+public class StoryVoicePipelineAlt(ILearnupDbContext dbContext, IElevenLabsVoiceProvider voiceProvider) : IPipeline
 {
     private const double PlaybackSpeed = 0.9;
 
-    public bool Enabled => false;
+    public bool Enabled => true;
 
     public async Task ProcessAsync(CancellationToken cancellationToken = default)
     {
@@ -25,10 +25,15 @@ public class StoryVoicePipeline(ILearnupDbContext dbContext, IVoiceProvider voic
             {
                 try
                 {
-                    var voiceId = item.Person == 1 ? VoiceIds.Bella : VoiceIds.Bella;
+                    var voiceId = item.Person == 1 ? ElevenLabsVoiceIds.Brian : ElevenLabsVoiceIds.Lily;
                     var option = new VoiceOptions(voiceId, PlaybackSpeed);
                     var result = await voiceProvider.GetVoiceAsync(item.Content, option, cancellationToken: cancellationToken);
                     item.SetVoice(result.VoiceId);
+
+                    if (result.Sentences is { Count: > 0 })
+                    {
+                        item.SetVoiceTimings(result.Sentences.Select(s => (s.Text, s.Start, s.End)));
+                    }
                 }
                 catch
                 {

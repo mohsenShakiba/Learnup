@@ -47,6 +47,7 @@ public static class DependencyInjection
         services.AddScoped<IOtpSender, ConsoleOtpSender>();
         services.AddScoped<IAiService, AiService>();
         services.AddScoped<IVoiceProvider, KokoroVoiceProvider>();
+        services.AddScoped<IElevenLabsVoiceProvider, ElevenLabsVoiceProvider>();
         services.AddScoped<GrammarLoader>();
         services.AddScoped<VocabLoader>();
         services.AddScoped<StoryLoader>();

@@ -125,6 +125,7 @@ public class LessonGrammarLoader(LearnupDbContext dbContext)
             .Where(mapping => lessonIds.Contains(mapping.LessonId) && grammarIds.Contains(mapping.GrammarId))
             .Select(mapping => new { mapping.LessonId, mapping.GrammarId })
             .ToListAsync(cancellationToken);
+
         var existingMappingSet = existingMappings
             .Select(mapping => (mapping.LessonId, mapping.GrammarId))
             .ToHashSet();

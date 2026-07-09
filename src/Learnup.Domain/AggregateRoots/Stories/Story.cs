@@ -26,8 +26,13 @@ public class Story
         Items = [];
     }
 
+    public void MarkAsVoiced()
+    {
+        Status = StoryStatus.Voiced;
+    }
+
     public void MarkAsCompleted()
     {
-        Status = StoryStatus.Completed;
+        Status = StoryStatus.Translated;
     }
 }

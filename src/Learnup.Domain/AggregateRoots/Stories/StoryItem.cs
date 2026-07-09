@@ -13,12 +13,14 @@ public class StoryItem
     public Story Story { get; private set; } = null!;
 
     public List<StoryItemExpression> Expressions { get; private set; }
+    public List<StoryItemVoiceTiming> VoiceTimings { get; private set; }
 
     private StoryItem()
     {
         Content = string.Empty;
         Translation = string.Empty;
         Expressions = [];
+        VoiceTimings = [];
     }
 
     public StoryItem(string content, string? translation, int person, int order)
@@ -28,11 +30,27 @@ public class StoryItem
         Order = order;
         Person = person;
         Expressions = [];
+        VoiceTimings = [];
     }
 
     public void SetVoice(string voiceId)
     {
         VoiceId = voiceId;
+    }
+
+    /// <summary>
+    /// Replaces the sentence-level voice timings for this item. Each tuple is a sentence's
+    /// text with its start/end offset (seconds) into the generated audio.
+    /// </summary>
+    public void SetVoiceTimings(IEnumerable<(string Text, double Start, double End)> sentences)
+    {
+        VoiceTimings.Clear();
+
+        var order = 0;
+        foreach (var sentence in sentences)
+        {
+            VoiceTimings.Add(new StoryItemVoiceTiming(sentence.Text, sentence.Start, sentence.End, order++));
+        }
     }
 
     public void SetTranslation(string translation)
