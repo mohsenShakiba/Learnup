@@ -37,13 +37,17 @@ public class Story
         VoiceId = voiceId;
     }
 
+    public bool IsTranslated => Status.HasFlag(StoryStatus.Translated);
+
+    public bool IsVoiced => Status.HasFlag(StoryStatus.Voiced);
+
     public void MarkAsVoiced()
     {
-        Status = StoryStatus.Voiced;
+        Status |= StoryStatus.Voiced;
     }
 
-    public void MarkAsCompleted()
+    public void MarkAsTranslated()
     {
-        Status = StoryStatus.Translated;
+        Status |= StoryStatus.Translated;
     }
 }

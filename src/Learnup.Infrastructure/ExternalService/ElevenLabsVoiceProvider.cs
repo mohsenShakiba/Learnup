@@ -13,7 +13,7 @@ public class ElevenLabsVoiceProvider(
     IConfiguration configuration,
     ILogger<ElevenLabsVoiceProvider> logger,
     IFileService fileService)
-    : IElevenLabsVoiceProvider
+    : IVoiceProvider
 {
     private const string DefaultBaseUrl = "https://api.elevenlabs.io";
     private const string ModelId = "eleven_v3";

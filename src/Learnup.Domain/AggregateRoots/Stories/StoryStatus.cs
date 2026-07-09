@@ -1,5 +1,6 @@
 ﻿namespace Learnup.Domain.AggregateRoots.Stories;
 
+[Flags]
 public enum StoryStatus
 {
     Pending = 0,

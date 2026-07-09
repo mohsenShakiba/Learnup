@@ -3,19 +3,7 @@
 public interface IVoiceProvider
 {
     Task<VoiceResult> GetVoiceAsync(string content, VoiceOptions? options = null, CancellationToken cancellationToken = default);
-}
 
-/// <summary>
-/// Marker interface for the ElevenLabs-backed voice provider, allowing pipelines to opt into
-/// ElevenLabs specifically while <see cref="IVoiceProvider"/> remains the default (Kokoro) provider.
-/// </summary>
-public interface IElevenLabsVoiceProvider : IVoiceProvider
-{
-    /// <summary>
-    /// Generates a single audio file for an entire conversation in one API call and, alongside
-    /// the audio, stores a JSON file with word-by-word timestamps. The JSON is stored next to the
-    /// audio (same bucket and base file name, with a <c>.json</c> extension).
-    /// </summary>
     Task<ConversationVoiceResult> GetConversationVoiceAsync(
         string text,
         VoiceOptions? options = null,

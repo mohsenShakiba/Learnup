@@ -20,7 +20,8 @@ public class StoryTranslationPipeline(
         var stories = await dbContext.Stories
             .Include(s => s.Items)
             .ThenInclude(i => i.Expressions)
-            .Where(s => s.Status == StoryStatus.Voiced)
+            .Where(s => !s.Status.HasFlag(StoryStatus.Translated))
+            .Where(s => s.Id == 1)
             .Take(10)
             .ToListAsync(cancellationToken);
 
@@ -39,7 +40,7 @@ public class StoryTranslationPipeline(
                 logger.LogError(exception, "Error translating story {StoryId}", story.Id);
             }
 
-            story.MarkAsCompleted();
+            story.MarkAsTranslated();
         }
 
         await dbContext.SaveChangesAsync(cancellationToken);
