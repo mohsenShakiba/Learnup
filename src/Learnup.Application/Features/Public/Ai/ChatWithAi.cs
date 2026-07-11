@@ -1,3 +1,5 @@
+using System.Diagnostics;
+using System.Text;
 using Learnup.Application.Authentication;
 using Learnup.Application.ExternalServices;
 using Learnup.Application.Mediation;
@@ -5,6 +7,7 @@ using Learnup.Application.Persistence;
 using Learnup.Application.Responses.Public.Ai;
 using Learnup.Domain.AggregateRoots.Chats;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 
 namespace Learnup.Application.Features.Public.Ai;
 
@@ -13,11 +16,15 @@ public sealed record ChatWithAi(int? ChatId, string Message) : IRequest<ChatResp
 internal sealed class ChatWithAiHandler(
     IAiService aiService,
     ILearnupDbContext dbContext,
-    IIdentityProvider identityProvider)
+    IIdentityProvider identityProvider,
+    ILogger<ChatWithAiHandler> logger)
     : IRequestHandler<ChatWithAi, ChatResponse>
 {
+    private static readonly TimeSpan LongResponseLogThreshold = TimeSpan.FromSeconds(10);
+
     public async Task<ChatResponse> Handle(ChatWithAi request, CancellationToken cancellationToken)
     {
+        var totalStopwatch = Stopwatch.StartNew();
         var message = request.Message.Trim();
 
         if (string.IsNullOrWhiteSpace(message))
@@ -40,15 +47,95 @@ internal sealed class ChatWithAiHandler(
 
         chat.AddMessage(ChatRole.User, message);
 
-        var completion = await aiService.CompleteAsync(proxyMessages, cancellationToken);
+        var builder = new StringBuilder();
+        AiTokenUsage? usage = null;
+        var generatedTokenCount = 0;
 
-        chat.AddMessage(ChatRole.Assistant, completion.Content, completion.Usage.CompletionTokens);
+        await using var enumerator = aiService
+            .StreamAsync(proxyMessages, CancellationToken.None)
+            .GetAsyncEnumerator(CancellationToken.None);
 
-        await ChatSupport.RecordTokenUsageAsync(dbContext, userId, completion.Usage, cancellationToken);
+        while (await MoveNextWithLongWaitLogAsync(enumerator, totalStopwatch, chat.Id, userId, generatedTokenCount))
+        {
+            var chunk = enumerator.Current;
 
-        await dbContext.SaveChangesAsync(cancellationToken);
+            if (chunk.Usage is not null)
+            {
+                usage = chunk.Usage;
+            }
 
-        return new ChatResponse(chat.Id, completion.Content, completion.Usage.TotalTokens);
+            if (string.IsNullOrEmpty(chunk.ContentDelta))
+            {
+                continue;
+            }
+
+            generatedTokenCount++;
+            builder.Append(chunk.ContentDelta);
+
+            if (generatedTokenCount == 1)
+            {
+                logger.LogInformation(
+                    "AI chat first token generated for chat {ChatId}, user {UserId} after {ElapsedMilliseconds} ms.",
+                    chat.Id,
+                    userId,
+                    totalStopwatch.ElapsedMilliseconds);
+            }
+            else
+            {
+                logger.LogDebug(
+                    "AI chat token {TokenNumber} generated for chat {ChatId}, user {UserId} after {ElapsedMilliseconds} ms.",
+                    generatedTokenCount,
+                    chat.Id,
+                    userId,
+                    totalStopwatch.ElapsedMilliseconds);
+            }
+        }
+
+        var content = builder.ToString();
+        var resolvedUsage = usage ?? AiTokenUsage.Empty;
+
+        chat.AddMessage(ChatRole.Assistant, content, resolvedUsage.CompletionTokens);
+
+        await ChatSupport.RecordTokenUsageAsync(dbContext, userId, resolvedUsage, CancellationToken.None);
+
+        await dbContext.SaveChangesAsync(CancellationToken.None);
+
+        logger.LogInformation(
+            "AI chat response completed for chat {ChatId}, user {UserId} in {ElapsedMilliseconds} ms with {GeneratedTokenCount} generated tokens.",
+            chat.Id,
+            userId,
+            totalStopwatch.ElapsedMilliseconds,
+            generatedTokenCount);
+
+        return new ChatResponse(chat.Id, content, resolvedUsage.TotalTokens);
+    }
+
+    private async Task<bool> MoveNextWithLongWaitLogAsync(
+        IAsyncEnumerator<AiStreamChunk> enumerator,
+        Stopwatch totalStopwatch,
+        int chatId,
+        int userId,
+        int generatedTokenCount)
+    {
+        var moveNextTask = enumerator.MoveNextAsync().AsTask();
+
+        while (true)
+        {
+            var delayTask = Task.Delay(LongResponseLogThreshold);
+            var completedTask = await Task.WhenAny(moveNextTask, delayTask);
+
+            if (completedTask == moveNextTask)
+            {
+                return await moveNextTask;
+            }
+
+            logger.LogWarning(
+                "AI chat response is taking longer than {ElapsedMilliseconds} ms for chat {ChatId}, user {UserId}; generated {GeneratedTokenCount} tokens so far.",
+                totalStopwatch.ElapsedMilliseconds,
+                chatId,
+                userId,
+                generatedTokenCount);
+        }
     }
 
     private async Task<Chat> ResolveChatAsync(
