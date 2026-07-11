@@ -1,4 +1,5 @@
 using Learnup.Application.Persistence;
+using Learnup.Domain.AggregateRoots.AudioBooks;
 using Learnup.Domain.AggregateRoots.Chats;
 using Learnup.Domain.AggregateRoots.Courses;
 using Learnup.Domain.AggregateRoots.Ebooks;
@@ -21,6 +22,9 @@ public class LearnupDbContext(DbContextOptions<LearnupDbContext> options)
     : DbContext(options), ILearnupDbContext
 {
     public DbSet<Course> Courses => Set<Course>();
+    public DbSet<AudioBooks> AudioBooks => Set<AudioBooks>();
+    public DbSet<AudioBookListItem> AudioBookListItems => Set<AudioBookListItem>();
+    public DbSet<AudioBookListItemExpression> AudioBookListItemExpressions => Set<AudioBookListItemExpression>();
     public DbSet<Ebook> Ebooks => Set<Ebook>();
     public DbSet<Grammar> Grammars => Set<Grammar>();
     public DbSet<GrammarLesson> GrammarLessons => Set<GrammarLesson>();

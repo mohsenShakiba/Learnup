@@ -1,5 +1,6 @@
 using Learnup.Domain.AggregateRoots.Chats;
 using Learnup.Domain.AggregateRoots.Courses;
+using Learnup.Domain.AggregateRoots.AudioBooks;
 using Learnup.Domain.AggregateRoots.Ebooks;
 using Learnup.Domain.AggregateRoots.Grammars;
 using Learnup.Domain.AggregateRoots.LeitnerBoxes;
@@ -18,6 +19,9 @@ namespace Learnup.Application.Persistence;
 public interface ILearnupDbContext
 {
     DbSet<Course> Courses { get; }
+    DbSet<AudioBooks> AudioBooks { get; }
+    DbSet<AudioBookListItem> AudioBookListItems { get; }
+    DbSet<AudioBookListItemExpression> AudioBookListItemExpressions { get; }
     DbSet<Ebook> Ebooks { get; }
     DbSet<Grammar> Grammars { get; }
     DbSet<GrammarLesson> GrammarLessons { get; }

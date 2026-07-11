@@ -1,4 +1,5 @@
 using Learnup.API.Requests;
+using Learnup.Application.Requests.Admin.AudioBooks;
 using Learnup.Application.Requests.Admin.Placement;
 using Learnup.Application.Requests.Admin.Conversations;
 using Learnup.Infrastructure.ExternalService;
@@ -8,6 +9,7 @@ namespace Learnup.API.Areas.Admin.Controllers;
 
 public class ImportController(
     VocabLoader vocabLoader,
+    AudioBookLoader audioBookLoader,
     ConversationLoader conversationLoader,
     GrammarLoader grammarLoader,
     LessonGrammarLoader lessonGrammarLoader,
@@ -31,6 +33,31 @@ public class ImportController(
                 cancellationToken));
         }
         catch (Exception exception) when (exception is FormatException or InvalidOperationException or ArgumentOutOfRangeException)
+        {
+            return BadRequest(exception.Message);
+        }
+    }
+
+    [HttpPost("audio-books", Name = "ImportAudioBook")]
+    [Consumes("multipart/form-data")]
+    public async Task<ActionResult<int>> ImportAudioBook(
+        [FromForm] ImportAudioBookRequest request,
+        CancellationToken cancellationToken)
+    {
+        AudioBookImportRequest audioBookRequest;
+
+        await using (var stream = request.File.OpenReadStream())
+        using (var reader = new StreamReader(stream))
+        {
+            var content = await reader.ReadToEndAsync(cancellationToken);
+            audioBookRequest = ParseAudioBook(content);
+        }
+
+        try
+        {
+            return Ok(await audioBookLoader.LoadAsync(audioBookRequest, cancellationToken));
+        }
+        catch (Exception exception) when (exception is InvalidOperationException or FormatException)
         {
             return BadRequest(exception.Message);
         }
@@ -105,6 +132,142 @@ public class ImportController(
             .ToList();
 
         return new ConversationRequest(title, words, sentences);
+    }
+
+    private static AudioBookImportRequest ParseAudioBook(string content)
+    {
+        var lines = content
+            .Replace("\r\n", "\n")
+            .Replace('\r', '\n')
+            .Split('\n')
+            .Select(line => line.Trim())
+            .ToList();
+
+        var separatorIndex = lines.FindIndex(line => line.Length >= 5 && line.All(character => character == '-'));
+
+        if (separatorIndex < 0)
+        {
+            throw new FormatException("Audio book file must contain a dashed separator line before the book content.");
+        }
+
+        var headerLines = lines.Take(separatorIndex).ToList();
+        var contentLines = lines.Skip(separatorIndex + 1).ToList();
+        var metadata = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+        var descriptionLines = new List<string>();
+        var isReadingDescription = false;
+
+        foreach (var line in headerLines)
+        {
+            if (string.IsNullOrWhiteSpace(line))
+            {
+                continue;
+            }
+
+            if (line.StartsWith("توضیح:", StringComparison.Ordinal))
+            {
+                isReadingDescription = true;
+                descriptionLines.Add(line["توضیح:".Length..].Trim());
+                continue;
+            }
+
+            if (isReadingDescription)
+            {
+                descriptionLines.Add(line);
+                continue;
+            }
+
+            var colonIndex = line.IndexOf(':');
+            if (colonIndex <= 0)
+            {
+                continue;
+            }
+
+            var key = line[..colonIndex].Trim();
+            var value = line[(colonIndex + 1)..].Trim();
+
+            if (!string.IsNullOrWhiteSpace(key))
+            {
+                metadata[key] = value;
+            }
+        }
+
+        var title = GetRequiredValue(metadata, "Title");
+        var body = NormalizeParagraphs(contentLines);
+
+        if (string.IsNullOrWhiteSpace(body))
+        {
+            throw new FormatException("Audio book content is required after the dashed separator line.");
+        }
+
+        return new AudioBookImportRequest(
+            title,
+            NormalizeParagraphs(descriptionLines),
+            GetOptionalValue(metadata, "Author"),
+            GetOptionalValue(metadata, "First published", "Year"),
+            GetOptionalValue(metadata, "Level (approx.)", "Level"),
+            GetOptionalValue(metadata, "Word count"),
+            GetOptionalValue(metadata, "Source"),
+            body,
+            SplitIntoParagraphItems(contentLines));
+    }
+
+    private static string GetRequiredValue(Dictionary<string, string> metadata, string key)
+    {
+        return metadata.TryGetValue(key, out var value) && !string.IsNullOrWhiteSpace(value)
+            ? value
+            : throw new FormatException($"Audio book metadata '{key}' is required.");
+    }
+
+    private static string? GetOptionalValue(Dictionary<string, string> metadata, params string[] keys)
+    {
+        foreach (var key in keys)
+        {
+            if (metadata.TryGetValue(key, out var value) && !string.IsNullOrWhiteSpace(value))
+            {
+                return value;
+            }
+        }
+
+        return null;
+    }
+
+    private static string NormalizeParagraphs(IEnumerable<string> lines)
+    {
+        return string.Join(
+            Environment.NewLine + Environment.NewLine,
+            SplitIntoParagraphItems(lines));
+    }
+
+    private static IReadOnlyList<string> SplitIntoParagraphItems(IEnumerable<string> lines)
+    {
+        var items = new List<string>();
+        var currentLines = new List<string>();
+
+        foreach (var line in lines)
+        {
+            if (string.IsNullOrWhiteSpace(line))
+            {
+                AddCurrentParagraph();
+                continue;
+            }
+
+            currentLines.Add(line.Trim());
+        }
+
+        AddCurrentParagraph();
+
+        return items;
+
+        void AddCurrentParagraph()
+        {
+            if (currentLines.Count == 0)
+            {
+                return;
+            }
+
+            items.Add(string.Join(' ', currentLines));
+            currentLines.Clear();
+        }
     }
 
     [HttpPost("placement-test", Name = "ImportPlacementTest")]
