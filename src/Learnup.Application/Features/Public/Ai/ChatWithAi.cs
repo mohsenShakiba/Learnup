@@ -33,7 +33,7 @@ internal sealed class ChatWithAiHandler(
         {
             throw new ArgumentException("Message is required.", nameof(request.Message));
         }
-        
+
         var tokenUsage = await dbContext.UserTokenUsages
             .FirstOrDefaultAsync(entry => entry.UserId == identityProvider.UserId, cancellationToken);
 
@@ -42,7 +42,7 @@ internal sealed class ChatWithAiHandler(
             tokenUsage = new UserTokenUsage(identityProvider.UserId);
             dbContext.UserTokenUsages.Add(tokenUsage);
         }
-        
+
         if (tokenUsage.TotalTokens >= tokenUsage.AvailableTokens)
         {
             throw new TokenUsageExceedException();
@@ -59,6 +59,7 @@ internal sealed class ChatWithAiHandler(
             .FirstOrDefaultAsync(cancellationToken);
 
         var history = chat.Messages.OrderBy(m => m.Id).ToList();
+
         var proxyMessages = ChatSupport.BuildMessages(displayName, history, message);
 
         chat.AddMessage(ChatRole.User, message);
