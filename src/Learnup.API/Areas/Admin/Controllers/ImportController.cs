@@ -192,7 +192,8 @@ public class ImportController(
         }
 
         var title = GetRequiredValue(metadata, "Title");
-        var body = NormalizeParagraphs(contentLines);
+        var items = SplitIntoAudioBookItems(contentLines);
+        var body = NormalizeParagraphs(items.Select(item => item.Sentence));
 
         if (string.IsNullOrWhiteSpace(body))
         {
@@ -208,7 +209,7 @@ public class ImportController(
             GetOptionalValue(metadata, "Word count"),
             GetOptionalValue(metadata, "Source"),
             body,
-            SplitIntoParagraphItems(contentLines));
+            items);
     }
 
     private static string GetRequiredValue(Dictionary<string, string> metadata, string key)
@@ -257,7 +258,6 @@ public class ImportController(
         AddCurrentParagraph();
 
         return items;
-
         void AddCurrentParagraph()
         {
             if (currentLines.Count == 0)
@@ -268,6 +268,42 @@ public class ImportController(
             items.Add(string.Join(' ', currentLines));
             currentLines.Clear();
         }
+    }
+
+    private static IReadOnlyList<AudioBookImportItemRequest> SplitIntoAudioBookItems(IEnumerable<string> lines)
+    {
+        var nonEmptyLines = lines
+            .Select(line => line.Trim())
+            .Where(line => !string.IsNullOrWhiteSpace(line))
+            .ToList();
+
+        var items = new List<AudioBookImportItemRequest>();
+
+        for (var index = 0; index < nonEmptyLines.Count; index++)
+        {
+            var sentence = nonEmptyLines[index];
+            string? translation = null;
+
+            if (index + 1 < nonEmptyLines.Count && ContainsPersianLetter(nonEmptyLines[index + 1]))
+            {
+                translation = nonEmptyLines[index + 1];
+                index++;
+            }
+
+            items.Add(new AudioBookImportItemRequest(sentence, translation));
+        }
+
+        return items;
+    }
+
+    private static bool ContainsPersianLetter(string value)
+    {
+        return value.Any(character =>
+            character is >= '\u0600' and <= '\u06FF'
+            or >= '\u0750' and <= '\u077F'
+            or >= '\u08A0' and <= '\u08FF'
+            or >= '\uFB50' and <= '\uFDFF'
+            or >= '\uFE70' and <= '\uFEFF');
     }
 
     [HttpPost("placement-test", Name = "ImportPlacementTest")]

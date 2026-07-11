@@ -31,7 +31,6 @@ public static class AudioBookMappings
             audioBook.Year,
             audioBook.WordCount,
             audioBook.Source,
-            audioBook.Content,
             audioBook.CoverId,
             audioBook.VoiceId,
             audioBook.TimingJsonId,

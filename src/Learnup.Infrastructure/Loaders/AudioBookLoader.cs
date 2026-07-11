@@ -19,12 +19,20 @@ public class AudioBookLoader(LearnupDbContext dbContext)
             Normalize(request.Level),
             Normalize(request.Year),
             Normalize(request.WordCount),
-            Normalize(request.Source),
-            request.Content.Trim());
+            Normalize(request.Source));
 
-        foreach (var item in request.Items.Select((text, index) => new AudioBookListItem(text.Trim(), null, index + 1)))
+        foreach (var item in request.Items.Select((item, index) =>
+                     new AudioBookListItem(
+                         item.Sentence.Trim(),
+                         Normalize(item.Translation),
+                         index + 1)))
         {
             audioBook.AddItem(item);
+        }
+
+        if (request.Items.Count > 0 && request.Items.All(item => !string.IsNullOrWhiteSpace(item.Translation)))
+        {
+            audioBook.MarkAsTranslated();
         }
 
         dbContext.AudioBooks.Add(audioBook);

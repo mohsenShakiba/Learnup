@@ -10,7 +10,6 @@ public class AudioBooks
     public string? Year { get; private set; }
     public string? WordCount { get; private set; }
     public string? Source { get; private set; }
-    public string? Content { get; private set; }
     public AudioBookStatus Status { get; private set; }
     
     public string? CoverId { get; private set; }
@@ -31,8 +30,7 @@ public class AudioBooks
         string? level,
         string? year,
         string? wordCount,
-        string? source,
-        string content)
+        string? source)
     {
         Title = title;
         Description = description;
@@ -41,12 +39,16 @@ public class AudioBooks
         Year = year;
         WordCount = wordCount;
         Source = source;
-        Content = content;
         Items = [];
     }
 
     public void AddItem(AudioBookListItem item)
     {
         Items.Add(item);
+    }
+
+    public void MarkAsTranslated()
+    {
+        Status |= AudioBookStatus.Translated;
     }
 }

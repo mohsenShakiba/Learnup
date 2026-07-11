@@ -21,7 +21,6 @@ public sealed record AudioBookDetailResponse(
     string? Year,
     string? WordCount,
     string? Source,
-    string? Content,
     string? CoverId,
     string? VoiceId,
     string? TimingJsonId,

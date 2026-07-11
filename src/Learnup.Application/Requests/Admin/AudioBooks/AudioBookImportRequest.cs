@@ -1,5 +1,9 @@
 namespace Learnup.Application.Requests.Admin.AudioBooks;
 
+public sealed record AudioBookImportItemRequest(
+    string Sentence,
+    string? Translation);
+
 public sealed record AudioBookImportRequest(
     string Title,
     string? Description,
@@ -9,4 +13,4 @@ public sealed record AudioBookImportRequest(
     string? WordCount,
     string? Source,
     string Content,
-    IReadOnlyList<string> Items);
+    IReadOnlyList<AudioBookImportItemRequest> Items);

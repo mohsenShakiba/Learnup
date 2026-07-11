@@ -34,8 +34,6 @@ public class AudioBooksConfiguration : IEntityTypeConfiguration<AudioBooks>
         builder.Property(audioBook => audioBook.Source)
             .HasMaxLength(500);
 
-        builder.Property(audioBook => audioBook.Content);
-
         builder.Property(audioBook => audioBook.Status)
             .IsRequired()
             .HasConversion<string>()
