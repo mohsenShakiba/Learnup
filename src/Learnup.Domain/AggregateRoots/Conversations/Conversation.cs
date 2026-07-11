@@ -1,57 +1,52 @@
+using Learnup.Domain.AggregateRoots.Lessons;
+
 namespace Learnup.Domain.AggregateRoots.Conversations;
 
-using Learnup.Domain.AggregateRoots.Users;
-
-/// <summary>
-/// A chat conversation between a user and the AI assistant.
-/// Owns the ordered list of messages exchanged in both directions.
-/// </summary>
 public class Conversation
 {
     public int Id { get; private set; }
+    public string Title { get; private set; }
+    public string? Description { get; private set; }
+    public ConversationStatus Status { get; private set; }
+    public int? Duration { get; private set; }
 
-    public int UserId { get; private set; }
-    public User User { get; private set; } = null!;
+    /// <summary>
+    /// Stored audio file id for the whole conversation, generated in a single voice pass.
+    /// The word-by-word timestamps are stored in a JSON file next to this audio.
+    /// </summary>
+    public string? VoiceId { get; private set; }
 
-    public string? Title { get; private set; }
-    public DateTime CreatedAt { get; private set; }
-    public DateTime UpdatedAt { get; private set; }
-
-    private readonly List<ChatMessage> _messages = [];
-    public IReadOnlyList<ChatMessage> Messages => _messages.AsReadOnly();
+    public List<ConversationItem> Items { get; private set; }
+    public List<LessonConversation> Lessons { get; private set; }
 
     private Conversation()
     {
+        Title = string.Empty;
+        Items = [];
     }
 
-    public Conversation(int userId)
+    public Conversation(string title)
     {
-        UserId = userId;
-        CreatedAt = DateTime.UtcNow;
-        UpdatedAt = CreatedAt;
+        Title = title;
+        Items = [];
     }
 
-    public ChatMessage AddMessage(ChatRole role, string content, int tokenCount = 0)
+    public void SetVoice(string voiceId)
     {
-        var message = new ChatMessage(this, role, content, tokenCount);
-
-        _messages.Add(message);
-        UpdatedAt = DateTime.UtcNow;
-
-        if (role == ChatRole.User && string.IsNullOrWhiteSpace(Title))
-        {
-            Title = BuildTitle(content);
-        }
-
-        return message;
+        VoiceId = voiceId;
     }
 
-    private static string BuildTitle(string content)
-    {
-        var trimmed = content.Trim();
+    public bool IsTranslated => Status.HasFlag(ConversationStatus.Translated);
 
-        return trimmed.Length <= 50
-            ? trimmed
-            : trimmed[..50] + "…";
+    public bool IsVoiced => Status.HasFlag(ConversationStatus.Voiced);
+
+    public void MarkAsVoiced()
+    {
+        Status |= ConversationStatus.Voiced;
+    }
+
+    public void MarkAsTranslated()
+    {
+        Status |= ConversationStatus.Translated;
     }
 }

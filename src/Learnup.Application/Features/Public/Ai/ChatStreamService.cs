@@ -2,7 +2,7 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using Learnup.Application.ExternalServices;
 using Learnup.Application.Persistence;
-using Learnup.Domain.AggregateRoots.Conversations;
+using Learnup.Domain.AggregateRoots.Chats;
 using Microsoft.EntityFrameworkCore;
 
 namespace Learnup.Application.Features.Public.Ai;
@@ -14,7 +14,7 @@ internal sealed class ChatStreamService(
 {
     public async IAsyncEnumerable<string> StreamAsync(
         int userId,
-        int conversationId,
+        int chatId,
         string message,
         [EnumeratorCancellation] CancellationToken cancellationToken = default)
     {
@@ -25,10 +25,10 @@ internal sealed class ChatStreamService(
             throw new ArgumentException("Message is required.", nameof(message));
         }
 
-        var conversation = await dbContext.Conversations
+        var chat = await dbContext.Chats
                                .Include(c => c.Messages)
-                               .FirstOrDefaultAsync(c => c.Id == conversationId && c.UserId == userId, cancellationToken)
-                           ?? throw new KeyNotFoundException($"Conversation {conversationId} was not found.");
+                               .FirstOrDefaultAsync(c => c.Id == chatId && c.UserId == userId, cancellationToken)
+                           ?? throw new KeyNotFoundException($"Chat {chatId} was not found.");
 
         var displayName = await dbContext.Users
             .AsNoTracking()
@@ -36,11 +36,11 @@ internal sealed class ChatStreamService(
             .Select(user => user.DisplayName)
             .FirstOrDefaultAsync(cancellationToken);
 
-        var history = conversation.Messages.OrderBy(m => m.Id).ToList();
+        var history = chat.Messages.OrderBy(m => m.Id).ToList();
         var proxyMessages = ChatSupport.BuildMessages(displayName, history, trimmed);
 
         // Persist the user's message up front so it isn't lost if the client disconnects mid-stream.
-        conversation.AddMessage(ChatRole.User, trimmed);
+        chat.AddMessage(ChatRole.User, trimmed);
         await dbContext.SaveChangesAsync(cancellationToken);
 
         var builder = new StringBuilder();
@@ -63,7 +63,7 @@ internal sealed class ChatStreamService(
         var reply = builder.ToString();
         var resolvedUsage = usage ?? AiTokenUsage.Empty;
 
-        conversation.AddMessage(ChatRole.Assistant, reply, resolvedUsage.CompletionTokens);
+        chat.AddMessage(ChatRole.Assistant, reply, resolvedUsage.CompletionTokens);
         await ChatSupport.RecordTokenUsageAsync(dbContext, userId, resolvedUsage, cancellationToken);
         await dbContext.SaveChangesAsync(cancellationToken);
     }

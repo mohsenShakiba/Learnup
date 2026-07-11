@@ -1,6 +1,6 @@
 using Learnup.API.Requests;
 using Learnup.Application.Requests.Admin.Placement;
-using Learnup.Application.Requests.Admin.Stories;
+using Learnup.Application.Requests.Admin.Conversations;
 using Learnup.Infrastructure.ExternalService;
 using Microsoft.AspNetCore.Mvc;
 
@@ -8,7 +8,7 @@ namespace Learnup.API.Areas.Admin.Controllers;
 
 public class ImportController(
     VocabLoader vocabLoader,
-    StoryLoader storyLoader,
+    ConversationLoader conversationLoader,
     GrammarLoader grammarLoader,
     LessonGrammarLoader lessonGrammarLoader,
     PlacementTestLoader placementTestLoader) : BaseAdminController
@@ -36,27 +36,27 @@ public class ImportController(
         }
     }
 
-    [HttpPost("stories/{courseId:int}/{lessonOrder:int}", Name = "ImportStory")]
+    [HttpPost("conversations/{courseId:int}/{lessonOrder:int}", Name = "ImportConversation")]
     [Consumes("multipart/form-data")]
-    public async Task<ActionResult<int>> ImportStory(
+    public async Task<ActionResult<int>> ImportConversation(
         int courseId,
         int lessonOrder,
-        [FromForm] ImportStoryRequest request,
+        [FromForm] ImportConversationRequest request,
         CancellationToken cancellationToken)
     {
-        StoryRequest storyRequest;
+        ConversationRequest conversationRequest;
 
         await using (var stream = request.File.OpenReadStream())
         using (var reader = new StreamReader(stream))
         {
             var content = await reader.ReadToEndAsync(cancellationToken);
-            storyRequest = ParseStory(content);
+            conversationRequest = ParseConversation(content);
         }
 
         try
         {
-            return Ok(await storyLoader.LoadAsync(
-                storyRequest,
+            return Ok(await conversationLoader.LoadAsync(
+                conversationRequest,
                 courseId,
                 lessonOrder,
                 cancellationToken));
@@ -68,12 +68,12 @@ public class ImportController(
     }
 
     // Expected txt format:
-    //   line 1: story title
+    //   line 1: conversation title
     //   line 2: comma separated words
     //   line 3+: one sentence per line
     // Order and person are inferred from the sentence position, speakers are
     // assumed to alternate. Translation and description are intentionally left null.
-    private static StoryRequest ParseStory(string content)
+    private static ConversationRequest ParseConversation(string content)
     {
         var lines = content
             .Split('\n')
@@ -84,7 +84,7 @@ public class ImportController(
         if (lines.Count < 3)
         {
             throw new FormatException(
-                "Story file must contain a title, a line of words and at least one sentence.");
+                "Conversation file must contain a title, a line of words and at least one sentence.");
         }
 
         var title = lines[0];
@@ -97,14 +97,14 @@ public class ImportController(
 
         var sentences = lines
             .Skip(2)
-            .Select((text, index) => new StoryItemRequest(
+            .Select((text, index) => new ConversationItemRequest(
                 Order: index + 1,
                 Text: text,
                 Person: index % 2 == 0 ? 1 : 2,
                 Translation: null))
             .ToList();
 
-        return new StoryRequest(title, words, sentences);
+        return new ConversationRequest(title, words, sentences);
     }
 
     [HttpPost("placement-test", Name = "ImportPlacementTest")]

@@ -95,7 +95,7 @@ public class VocabVoicePipeline(
             return await fileService.StoreAsync(new StoreFileRequest(
                 outputFile,
                 $"vocab-{DateTimeOffset.UtcNow:yyyyMMddHHmmss}-{Guid.NewGuid():N}-slow.wav",
-                BucketNames.StoryVoices,
+                BucketNames.ConversationVoices,
                 "audio/wav"), cancellationToken);
         }
         finally

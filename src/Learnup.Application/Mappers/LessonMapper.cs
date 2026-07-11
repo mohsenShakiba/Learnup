@@ -1,6 +1,6 @@
 using Learnup.Application.Mappings;
 using Learnup.Application.Responses.Public.Grammars;
-using Learnup.Application.Responses.Public.Stories;
+using Learnup.Application.Responses.Public.Conversations;
 using Learnup.Application.Responses.Public.Tests;
 using Learnup.Application.Responses.Public.Vocabs;
 using Learnup.Application.Responses.Public.Lessons;
@@ -37,7 +37,7 @@ public static class LessonMapper
             lesson.CourseId,
             nextLessonId,
             lesson.Users.FirstOrDefault()?.ToResponse() ?? new UserLessonResponse(UserLessonStatus.None, false, false, false, false),
-            lesson.Stories.Select(s => s.Story.ToResponse()).ToList(),
+            lesson.Conversations.Select(s => s.Conversation.ToResponse()).ToList(),
             lesson.Grammars.Select(g => g.Grammar.ToResponse()).ToList(),
             lesson.Vocabs.Select(v => v.Vocab.ToResponse(leitnerVocabIds.Contains(v.VocabId))).ToList(),
             lesson.Tests.Select(t => t.ToResponse()).ToList());
@@ -47,7 +47,7 @@ public static class LessonMapper
     {
         return new(
             userLesson.Status,
-            userLesson.IsStoryCompleted,
+            userLesson.IsConversationCompleted,
             userLesson.IsGrammarCompleted,
             userLesson.IsVocabCompleted,
             userLesson.IsTestCompleted);
@@ -70,12 +70,11 @@ public static class LessonMapper
             userTestResult?.IsCorrect);
     }
 
-    private static StoryItemResponse ToResponse(this Domain.AggregateRoots.Stories.StoryItem item) =>
+    private static ConversationItemResponse ToResponse(this Domain.AggregateRoots.Conversations.ConversationItem item) =>
         new(
             item.Id,
             item.Content,
             item.Translation,
             item.Order,
-            item.Person,
-            item.VoiceId);
+            item.Person);
 }

@@ -28,7 +28,7 @@ public class LessonConfiguration : IEntityTypeConfiguration<Lesson>
             .HasForeignKey(l => l.CourseId)
             .OnDelete(DeleteBehavior.Cascade);
 
-        builder.HasMany(l => l.Stories)
+        builder.HasMany(l => l.Conversations)
             .WithOne(ls => ls.Lesson)
             .HasForeignKey(ls => ls.LessonId)
             .OnDelete(DeleteBehavior.Cascade);

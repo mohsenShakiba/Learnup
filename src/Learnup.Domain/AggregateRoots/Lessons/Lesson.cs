@@ -1,6 +1,6 @@
-﻿using Learnup.Domain.AggregateRoots.Courses;
+using Learnup.Domain.AggregateRoots.Courses;
 using Learnup.Domain.AggregateRoots.Grammars;
-using Learnup.Domain.AggregateRoots.Stories;
+using Learnup.Domain.AggregateRoots.Conversations;
 using Learnup.Domain.AggregateRoots.Tests;
 using Learnup.Domain.AggregateRoots.Users;
 
@@ -11,7 +11,7 @@ public class Lesson
     private Lesson()
     {
         Title = string.Empty;
-        Stories = [];
+        Conversations = [];
         Grammars = [];
         Vocabs = [];
         Users = [];
@@ -28,7 +28,7 @@ public class Lesson
         Order = order;
         CourseId = courseId;
         Status = status;
-        Stories = [];
+        Conversations = [];
         Grammars = [];
         Vocabs = [];
         Users = [];
@@ -42,7 +42,7 @@ public class Lesson
 
     public int Duration { get; private set; }
 
-    public List<LessonStory> Stories { get; private set; }
+    public List<LessonConversation> Conversations { get; private set; }
     public List<LessonGrammar> Grammars { get; private set; }
     public List<LessonVocab> Vocabs { get; private set; }
     public List<UserLesson> Users { get; private set; }

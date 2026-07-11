@@ -6,7 +6,7 @@ namespace Learnup.Domain.AggregateRoots.Users;
 public enum UserLessonStatus
 {
     None = 0,
-    StoryCompleted = 1,
+    ConversationCompleted = 1,
     GrammarCompleted = 2,
     VocabCompleted = 4,
     TestCompleted = 8
@@ -26,12 +26,12 @@ public class UserLesson
 
     public UserLessonStatus Status { get; private set; } = UserLessonStatus.None;
 
-    public bool HasStory { get; private set; }
+    public bool HasConversation { get; private set; }
     public bool HasGrammar { get; private set; }
     public bool HasVocab { get; private set; }
     public bool HasTest { get; private set; }
 
-    public bool IsStoryCompleted => Status.HasFlag(UserLessonStatus.StoryCompleted);
+    public bool IsConversationCompleted => Status.HasFlag(UserLessonStatus.ConversationCompleted);
     public bool IsGrammarCompleted => Status.HasFlag(UserLessonStatus.GrammarCompleted);
     public bool IsVocabCompleted => Status.HasFlag(UserLessonStatus.VocabCompleted);
     public bool IsTestCompleted => Status.HasFlag(UserLessonStatus.TestCompleted);
@@ -50,7 +50,7 @@ public class UserLesson
 
     private void CompleteIfReady()
     {
-        if (IsStoryCompleted && IsGrammarCompleted && IsVocabCompleted)
+        if (IsConversationCompleted && IsGrammarCompleted && IsVocabCompleted)
         {
             CompletedAt ??= DateTime.UtcNow;
         }
@@ -58,18 +58,18 @@ public class UserLesson
 
     public bool IsCompleted()
     {
-        return IsStoryCompleted && IsGrammarCompleted && IsVocabCompleted;
+        return IsConversationCompleted && IsGrammarCompleted && IsVocabCompleted;
     }
 
-    public void SetRequirements(int storiesCount, int grammarsCount, int vocabsCount, int testsCount)
+    public void SetRequirements(int conversationsCount, int grammarsCount, int vocabsCount, int testsCount)
     {
-        if (storiesCount > 0)
+        if (conversationsCount > 0)
         {
-            HasStory = true;
+            HasConversation = true;
         }
         else
         {
-            Complete(UserLessonStatus.StoryCompleted);
+            Complete(UserLessonStatus.ConversationCompleted);
         }
 
         if (grammarsCount > 0)

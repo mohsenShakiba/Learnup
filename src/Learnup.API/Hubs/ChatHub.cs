@@ -13,13 +13,13 @@ namespace Learnup.API.Hubs;
 public sealed class ChatHub(IChatStreamService chatStreamService) : Hub
 {
     public IAsyncEnumerable<string> StreamReply(
-        int conversationId,
+        int chatId,
         string message,
         CancellationToken cancellationToken)
     {
         var userId = GetUserId();
 
-        return chatStreamService.StreamAsync(userId, conversationId, message, cancellationToken);
+        return chatStreamService.StreamAsync(userId, chatId, message, cancellationToken);
     }
 
     private int GetUserId()

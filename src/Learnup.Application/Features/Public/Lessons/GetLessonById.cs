@@ -18,7 +18,7 @@ internal sealed class GetLessonByIdHandler(ILearnupDbContext dbContext, IIdentit
         var lesson = await dbContext.Lessons
             .AsNoTracking()
             .Include(l => l.Users.Where(ul => ul.UserId == identityProvider.UserId))
-            .Include(l => l.Stories).ThenInclude(ls => ls.Story).ThenInclude(s => s.Items)
+            .Include(l => l.Conversations).ThenInclude(ls => ls.Conversation).ThenInclude(s => s.Items)
             .Include(l => l.Grammars).ThenInclude(lg => lg.Grammar).ThenInclude(g => g.Lessons)
             .Include(l => l.Vocabs).ThenInclude(lv => lv.Vocab).ThenInclude(v => v.Senses)
             .Include(l => l.Tests).ThenInclude(t => t.Options)
@@ -39,7 +39,7 @@ internal sealed class GetLessonByIdHandler(ILearnupDbContext dbContext, IIdentit
         if (userLesson is null)
         {
             userLesson = new UserLesson(identityProvider.UserId, request.Id);
-            userLesson.SetRequirements(lesson.Stories.Count, lesson.Grammars.Count, lesson.Vocabs.Count, lesson.Tests.Count);
+            userLesson.SetRequirements(lesson.Conversations.Count, lesson.Grammars.Count, lesson.Vocabs.Count, lesson.Tests.Count);
             dbContext.UserLessons.Add(userLesson);
         }
         else

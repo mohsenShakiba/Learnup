@@ -28,7 +28,7 @@ public class AiController(IMediator mediator) : BasePublicController
             return BadRequest("Message is required.");
         }
 
-        var command = new ChatWithAi(request.ConversationId, request.Message);
+        var command = new ChatWithAi(request.ChatId, request.Message);
         var result = await mediator.Send(command, cancellationToken);
         return Ok(result);
     }

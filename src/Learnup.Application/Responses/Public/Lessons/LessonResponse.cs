@@ -1,5 +1,5 @@
 using Learnup.Application.Responses.Public.Grammars;
-using Learnup.Application.Responses.Public.Stories;
+using Learnup.Application.Responses.Public.Conversations;
 using Learnup.Application.Responses.Public.Tests;
 using Learnup.Application.Responses.Public.Vocabs;
 
@@ -21,7 +21,7 @@ public sealed record LessonDetailResponse(
     int CourseId,
     int? NextLessonId,
     UserLessonResponse UserLesson,
-    List<StoryResponse> Stories,
+    List<ConversationResponse> Conversations,
     List<GrammarResponse> Grammars,
     List<VocabResponse> Vocabs,
     List<TestResponse> Tests);
@@ -33,7 +33,7 @@ string CourseCode,
 string CourseSlug,
     int Order,
     int CourseId,
-    bool IsStoryCompleted,
+    bool IsConversationCompleted,
     bool IsGrammarCompleted,
     bool IsVocabCompleted,
     bool IsTestCompleted,

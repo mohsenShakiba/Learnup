@@ -18,7 +18,7 @@ internal sealed class ListCoursesHandler(ILearnupDbContext dbContext, IIdentityP
             .AsNoTracking()
             .AsSplitQuery()
             .Include(course => course.Lessons)
-            .ThenInclude(lesson => lesson.Stories)
+            .ThenInclude(lesson => lesson.Conversations)
             .Include(course => course.Lessons)
             .ThenInclude(lesson => lesson.Grammars)
             .Include(course => course.Lessons)

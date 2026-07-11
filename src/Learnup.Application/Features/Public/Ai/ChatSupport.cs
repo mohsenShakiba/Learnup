@@ -1,7 +1,7 @@
 using Learnup.Application.ExternalServices;
 using Learnup.Application.Persistence;
 using Learnup.Application.Prompts;
-using Learnup.Domain.AggregateRoots.Conversations;
+using Learnup.Domain.AggregateRoots.Chats;
 using Learnup.Domain.AggregateRoots.Users;
 using Microsoft.EntityFrameworkCore;
 
@@ -9,7 +9,7 @@ namespace Learnup.Application.Features.Public.Ai;
 
 /// <summary>
 /// Shared helpers for the chat features: building the provider message list from
-/// conversation history and accumulating per-user token usage.
+/// chat history and accumulating per-user token usage.
 /// </summary>
 internal static class ChatSupport
 {

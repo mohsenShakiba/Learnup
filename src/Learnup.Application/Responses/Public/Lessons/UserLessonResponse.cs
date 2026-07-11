@@ -4,7 +4,7 @@ namespace Learnup.Application.Responses.Public.Lessons;
 
 public record UserLessonResponse(
     UserLessonStatus Status,
-    bool IsStoryCompleted,
+    bool IsConversationCompleted,
     bool IsGrammarCompleted,
     bool IsVocabCompleted,
     bool IsTestCompleted);

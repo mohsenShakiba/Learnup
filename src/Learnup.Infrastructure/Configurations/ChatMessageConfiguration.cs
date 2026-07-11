@@ -1,4 +1,4 @@
-using Learnup.Domain.AggregateRoots.Conversations;
+using Learnup.Domain.AggregateRoots.Chats;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -26,6 +26,6 @@ public class ChatMessageConfiguration : IEntityTypeConfiguration<ChatMessage>
         builder.Property(m => m.CreatedAt)
             .IsRequired();
 
-        builder.HasIndex(m => m.ConversationId);
+        builder.HasIndex(m => m.ChatId);
     }
 }

@@ -16,7 +16,7 @@ public static class CourseMapper
             course.Brief,
             course.Order,
             course.Lessons.Count,
-            course.Lessons.Sum(lesson => lesson.Stories.Count),
+            course.Lessons.Sum(lesson => lesson.Conversations.Count),
             course.Lessons.Sum(lesson => lesson.Grammars.Count),
             course.Lessons.Sum(lesson => lesson.Vocabs.Count),
             course.Lessons

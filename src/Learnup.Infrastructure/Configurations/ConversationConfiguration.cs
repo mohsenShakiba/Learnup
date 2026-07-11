@@ -10,31 +10,18 @@ public class ConversationConfiguration : IEntityTypeConfiguration<Conversation>
     {
         builder.ToTable("Conversation");
 
-        builder.HasKey(c => c.Id);
+        builder.HasKey(s => s.Id);
 
-        builder.Property(c => c.Title)
-            .HasMaxLength(200);
-
-        builder.Property(c => c.CreatedAt)
+        builder.Property(s => s.Title)
+            .HasMaxLength(200)
             .IsRequired();
 
-        builder.Property(c => c.UpdatedAt)
-            .IsRequired();
+        builder.Property(s => s.VoiceId)
+            .HasMaxLength(300);
 
-        builder.HasIndex(c => c.UserId);
-
-        builder.HasOne(c => c.User)
-            .WithMany()
-            .HasForeignKey(c => c.UserId)
+        builder.HasMany(s => s.Items)
+            .WithOne(si => si.Conversation)
+            .HasForeignKey(si => si.ConversationId)
             .OnDelete(DeleteBehavior.Cascade);
-
-        builder.HasMany(c => c.Messages)
-            .WithOne(m => m.Conversation)
-            .HasForeignKey(m => m.ConversationId)
-            .OnDelete(DeleteBehavior.Cascade);
-
-        builder.Metadata
-            .FindNavigation(nameof(Conversation.Messages))!
-            .SetPropertyAccessMode(PropertyAccessMode.Field);
     }
 }

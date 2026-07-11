@@ -1,4 +1,4 @@
-using Learnup.Domain.AggregateRoots.Conversations;
+using Learnup.Domain.AggregateRoots.Chats;
 using Learnup.Domain.AggregateRoots.Courses;
 using Learnup.Domain.AggregateRoots.Ebooks;
 using Learnup.Domain.AggregateRoots.Grammars;
@@ -6,7 +6,7 @@ using Learnup.Domain.AggregateRoots.LeitnerBoxes;
 using Learnup.Domain.AggregateRoots.Lessons;
 using Learnup.Domain.AggregateRoots.MotivationalSentences;
 using Learnup.Domain.AggregateRoots.Placement;
-using Learnup.Domain.AggregateRoots.Stories;
+using Learnup.Domain.AggregateRoots.Conversations;
 using Learnup.Domain.AggregateRoots.Subscriptions;
 using Learnup.Domain.AggregateRoots.Tests;
 using Learnup.Domain.AggregateRoots.Users;
@@ -25,13 +25,13 @@ public interface ILearnupDbContext
     DbSet<MotivationalSentence> MotivationalSentences { get; }
     DbSet<LessonVocab> LessonVocabs { get; }
     DbSet<LessonGrammar> LessonGrammars { get; }
-    DbSet<Story> Stories { get; }
+    DbSet<Conversation> Conversations { get; }
     DbSet<Vocab> Vocabs { get; }
     DbSet<Test> Tests { get; }
     DbSet<TestOption> TestOptions { get; }
     DbSet<User> Users { get; }
     DbSet<UserTokenUsage> UserTokenUsages { get; }
-    DbSet<Conversation> Conversations { get; }
+    DbSet<Chat> Chats { get; }
     DbSet<ChatMessage> ChatMessages { get; }
     DbSet<UserOtp> UserOtps { get; }
     DbSet<UserStreak> UserStreaks { get; }

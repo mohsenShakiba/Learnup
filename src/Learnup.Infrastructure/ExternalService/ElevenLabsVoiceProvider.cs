@@ -37,7 +37,7 @@ public class ElevenLabsVoiceProvider(
             var fileId = await fileService.StoreAsync(new StoreFileRequest(
                 audioStream,
                 fileName,
-                BucketNames.StoryVoices,
+                BucketNames.ConversationVoices,
                 "audio/mpeg"), cancellationToken);
 
             var sentences = BuildSentences(response.Alignment);
@@ -69,7 +69,7 @@ public class ElevenLabsVoiceProvider(
             var audioFileId = await fileService.StoreAsync(new StoreFileRequest(
                 audioStream,
                 $"{baseName}.mp3",
-                BucketNames.StoryVoices,
+                BucketNames.ConversationVoices,
                 "audio/mpeg"), cancellationToken);
 
             var words = BuildWords(response.Alignment, TurnBoundaries(response.VoiceSegments));
@@ -85,7 +85,7 @@ public class ElevenLabsVoiceProvider(
             var timestampsFileId = await fileService.StoreAsync(new StoreFileRequest(
                 timestampsStream,
                 $"{baseName}.json",
-                BucketNames.StoryVoices,
+                BucketNames.ConversationVoices,
                 "application/json"), cancellationToken);
 
             return new ConversationVoiceResult(audioFileId, timestampsFileId, words);

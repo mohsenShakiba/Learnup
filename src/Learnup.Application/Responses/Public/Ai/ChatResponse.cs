@@ -1,6 +1,6 @@
 namespace Learnup.Application.Responses.Public.Ai;
 
 public sealed record ChatResponse(
-    int ConversationId,
+    int ChatId,
     string Reply,
     int TokensUsed);

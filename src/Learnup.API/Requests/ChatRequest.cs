@@ -1,3 +1,3 @@
 namespace Learnup.API.Requests;
 
-public sealed record ChatRequest(int? ConversationId, string Message);
+public sealed record ChatRequest(int? ChatId, string Message);

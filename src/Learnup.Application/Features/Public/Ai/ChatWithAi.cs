@@ -3,12 +3,12 @@ using Learnup.Application.ExternalServices;
 using Learnup.Application.Mediation;
 using Learnup.Application.Persistence;
 using Learnup.Application.Responses.Public.Ai;
-using Learnup.Domain.AggregateRoots.Conversations;
+using Learnup.Domain.AggregateRoots.Chats;
 using Microsoft.EntityFrameworkCore;
 
 namespace Learnup.Application.Features.Public.Ai;
 
-public sealed record ChatWithAi(int? ConversationId, string Message) : IRequest<ChatResponse>;
+public sealed record ChatWithAi(int? ChatId, string Message) : IRequest<ChatResponse>;
 
 internal sealed class ChatWithAiHandler(
     IAiService aiService,
@@ -27,7 +27,7 @@ internal sealed class ChatWithAiHandler(
 
         var userId = identityProvider.UserId;
 
-        var conversation = await ResolveConversationAsync(request.ConversationId, userId, cancellationToken);
+        var chat = await ResolveChatAsync(request.ChatId, userId, cancellationToken);
 
         var displayName = await dbContext.Users
             .AsNoTracking()
@@ -35,37 +35,37 @@ internal sealed class ChatWithAiHandler(
             .Select(user => user.DisplayName)
             .FirstOrDefaultAsync(cancellationToken);
 
-        var history = conversation.Messages.OrderBy(m => m.Id).ToList();
+        var history = chat.Messages.OrderBy(m => m.Id).ToList();
         var proxyMessages = ChatSupport.BuildMessages(displayName, history, message);
 
-        conversation.AddMessage(ChatRole.User, message);
+        chat.AddMessage(ChatRole.User, message);
 
         var completion = await aiService.CompleteAsync(proxyMessages, cancellationToken);
 
-        conversation.AddMessage(ChatRole.Assistant, completion.Content, completion.Usage.CompletionTokens);
+        chat.AddMessage(ChatRole.Assistant, completion.Content, completion.Usage.CompletionTokens);
 
         await ChatSupport.RecordTokenUsageAsync(dbContext, userId, completion.Usage, cancellationToken);
 
         await dbContext.SaveChangesAsync(cancellationToken);
 
-        return new ChatResponse(conversation.Id, completion.Content, completion.Usage.TotalTokens);
+        return new ChatResponse(chat.Id, completion.Content, completion.Usage.TotalTokens);
     }
 
-    private async Task<Conversation> ResolveConversationAsync(
-        int? conversationId,
+    private async Task<Chat> ResolveChatAsync(
+        int? chatId,
         int userId,
         CancellationToken cancellationToken)
     {
-        if (conversationId is not int id)
+        if (chatId is not int id)
         {
-            var conversation = new Conversation(userId);
-            dbContext.Conversations.Add(conversation);
-            return conversation;
+            var chat = new Chat(userId);
+            dbContext.Chats.Add(chat);
+            return chat;
         }
 
-        return await dbContext.Conversations
+        return await dbContext.Chats
                    .Include(c => c.Messages)
                    .FirstOrDefaultAsync(c => c.Id == id && c.UserId == userId, cancellationToken)
-               ?? throw new KeyNotFoundException($"Conversation {id} was not found.");
+               ?? throw new KeyNotFoundException($"Chat {id} was not found.");
     }
 }

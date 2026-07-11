@@ -49,7 +49,7 @@ public static class DependencyInjection
         services.AddScoped<IVoiceProvider, ElevenLabsVoiceProvider>();
         services.AddScoped<GrammarLoader>();
         services.AddScoped<VocabLoader>();
-        services.AddScoped<StoryLoader>();
+        services.AddScoped<ConversationLoader>();
         services.AddScoped<LessonGrammarLoader>();
         services.AddScoped<PlacementTestLoader>();
 
