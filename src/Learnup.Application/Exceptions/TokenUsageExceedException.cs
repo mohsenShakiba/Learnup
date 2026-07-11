@@ -1,6 +1,6 @@
 ﻿namespace Learnup.Application.Exceptions;
 
-public class TokenUsageExceedException
+public class TokenUsageExceedException: Exception
 {
     
 }

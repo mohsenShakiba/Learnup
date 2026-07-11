@@ -1,11 +1,13 @@
 using System.Diagnostics;
 using System.Text;
 using Learnup.Application.Authentication;
+using Learnup.Application.Exceptions;
 using Learnup.Application.ExternalServices;
 using Learnup.Application.Mediation;
 using Learnup.Application.Persistence;
 using Learnup.Application.Responses.Public.Ai;
 using Learnup.Domain.AggregateRoots.Chats;
+using Learnup.Domain.AggregateRoots.Users;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
@@ -30,6 +32,20 @@ internal sealed class ChatWithAiHandler(
         if (string.IsNullOrWhiteSpace(message))
         {
             throw new ArgumentException("Message is required.", nameof(request.Message));
+        }
+        
+        var tokenUsage = await dbContext.UserTokenUsages
+            .FirstOrDefaultAsync(entry => entry.UserId == identityProvider.UserId, cancellationToken);
+
+        if (tokenUsage is null)
+        {
+            tokenUsage = new UserTokenUsage(identityProvider.UserId);
+            dbContext.UserTokenUsages.Add(tokenUsage);
+        }
+        
+        if (tokenUsage.TotalTokens >= tokenUsage.AvailableTokens)
+        {
+            throw new TokenUsageExceedException();
         }
 
         var userId = identityProvider.UserId;

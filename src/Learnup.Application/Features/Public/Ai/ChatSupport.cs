@@ -53,6 +53,6 @@ internal static class ChatSupport
             dbContext.UserTokenUsages.Add(tokenUsage);
         }
 
-        tokenUsage.Add(usage.PromptTokens, usage.CompletionTokens);
+        tokenUsage.Add(usage.PromptTokens, usage.CompletionTokens, DateTime.UtcNow.Date);
     }
 }

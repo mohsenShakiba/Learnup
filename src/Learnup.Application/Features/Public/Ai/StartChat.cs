@@ -15,7 +15,9 @@ internal sealed class StartChatHandler(
 {
     public async Task<ChatSummaryResponse> Handle(StartChat request, CancellationToken cancellationToken)
     {
-        var chat = new Chat(identityProvider.UserId);
+        var userId = identityProvider.UserId;
+
+        var chat = new Chat(userId);
 
         dbContext.Chats.Add(chat);
 

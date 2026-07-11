@@ -1,3 +1,5 @@
+using Learnup.API.Requests;
+using Learnup.Application.Exceptions;
 using Learnup.Application.Features.Public.Ai;
 using Learnup.Application.Mediation;
 using Learnup.Application.Responses.Public.Ai;
@@ -10,8 +12,15 @@ public class ChatsController(IMediator mediator) : BasePublicController
     [HttpPost(Name = "StartChat")]
     public async Task<ActionResult<ChatSummaryResponse>> Start(CancellationToken cancellationToken)
     {
-        var chat = await mediator.Send(new StartChat(), cancellationToken);
-        return Ok(chat);
+        try
+        {
+            var chat = await mediator.Send(new StartChat(), cancellationToken);
+            return Ok(chat);
+        }
+        catch (InvalidOperationException exception)
+        {
+            return BadRequest(exception.Message);
+        }
     }
 
     [HttpGet(Name = "ListChats")]
@@ -29,5 +38,45 @@ public class ChatsController(IMediator mediator) : BasePublicController
         return chat is null
             ? NotFound()
             : Ok(chat);
+    }
+    
+    [HttpPost("Process")]
+    public async Task<ActionResult<SendAiTextResponse>> Send(
+        [FromBody] SendAiTextRequest request,
+        CancellationToken cancellationToken)
+    {
+        var query = new AiTranslate(request.Word, request.Sentence);
+        var result = await mediator.Send(query, cancellationToken);
+        return Ok(result);
+    }
+
+    [HttpPost("Chat", Name = "ChatWithAi")]
+    public async Task<ActionResult<ChatResponse>> Chat(
+        [FromBody] ChatRequest request,
+        CancellationToken cancellationToken)
+    {
+        if (string.IsNullOrWhiteSpace(request.Message))
+        {
+            return BadRequest("Message is required.");
+        }
+
+        try
+        {
+            var command = new ChatWithAi(request.ChatId, request.Message);
+            var result = await mediator.Send(command, cancellationToken);
+            return Ok(result);
+        }
+        catch (TokenUsageExceedException)
+        {
+            return BadRequest("TokenExceed");
+        }
+
+    }
+    
+    [HttpGet("TokenUsage", Name = "GetAvailableTokenUsage")]
+    public async Task<ActionResult<TokenUsageResponse>> GetTokenUsage(CancellationToken cancellationToken)
+    {
+        var result = await mediator.Send(new GetAvailableTokenUsage(), cancellationToken);
+        return Ok(result);
     }
 }
