@@ -23,12 +23,19 @@ public class AiService(IConfiguration configuration, IHttpClientFactory httpClie
         try
         {
             var response = await SendAsync(messages, cancellationToken);
-            
-            return JsonSerializer.Deserialize<T>(response.Trim("```").Trim("json"), JsonOptions);
+            try
+            {
+                return JsonSerializer.Deserialize<T>(response.Trim("```").Trim("json"), JsonOptions);
+            }
+            catch (Exception e)
+            {
+                logger.LogError(e, "Error deserializing ai message {Response}", response);
+                return default;
+            }
         }
         catch (Exception e)
         {
-            logger.LogError(e, "Error generating vocab test for word");
+            logger.LogError(e, "Error requesting ai message {Request}", messages.FirstOrDefault().Content);
             return default;
         }
     }
