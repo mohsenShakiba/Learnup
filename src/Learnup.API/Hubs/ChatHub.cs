@@ -1,25 +1,31 @@
 using System.Security.Claims;
-using Learnup.Application.Features.Public.Ai;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
 
 namespace Learnup.API.Hubs;
 
 /// <summary>
-/// Real-time chat hub. Clients invoke <see cref="StreamReply"/> and consume the returned
-/// stream to receive the assistant's reply token-by-token as it is generated.
+/// Real-time chat hub. Chat requests are submitted over HTTP; authenticated
+/// connections receive queued chat progress events through this hub.
 /// </summary>
 [Authorize]
-public sealed class ChatHub(IChatStreamService chatStreamService) : Hub
+public sealed class ChatHub : Hub
 {
-    public IAsyncEnumerable<string> StreamReply(
-        int chatId,
-        string message,
-        CancellationToken cancellationToken)
+    public const string ChatStarted = "ChatStarted";
+    public const string ChatDelta = "ChatDelta";
+    public const string ChatCompleted = "ChatCompleted";
+    public const string ChatFailed = "ChatFailed";
+
+    public override async Task OnConnectedAsync()
     {
         var userId = GetUserId();
+        await Groups.AddToGroupAsync(Context.ConnectionId, UserGroup(userId));
+        await base.OnConnectedAsync();
+    }
 
-        return chatStreamService.StreamAsync(userId, chatId, message, cancellationToken);
+    public static string UserGroup(int userId)
+    {
+        return $"user:{userId}:chats";
     }
 
     private int GetUserId()

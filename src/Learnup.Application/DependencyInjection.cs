@@ -3,6 +3,7 @@ using Learnup.Application.AiPipelines;
 using Learnup.Application.Authentication;
 using Learnup.Application.Features.Public.Ai;
 using Learnup.Application.Mediation;
+using Learnup.Application.Services;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Learnup.Application;
@@ -13,7 +14,7 @@ public static class DependencyInjection
     {
         services.AddMemoryCache();
         services.AddScoped<IMediator, Mediator>();
-        services.AddScoped<IChatStreamService, ChatStreamService>();
+        services.AddScoped<ChatExecutionService>();
         services.AddAiProcessors(typeof(DependencyInjection).Assembly);
         
         services.AddMediatorHandlers(typeof(DependencyInjection).Assembly);

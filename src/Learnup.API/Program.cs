@@ -1,9 +1,11 @@
 using System.Text;
 using Learnup.API.Authentication;
 using Learnup.API.Hubs;
+using Learnup.API.Services;
 using Learnup.Application;
 using Learnup.Application.Authentication;
 using Learnup.API.HostedServices;
+using Learnup.Application.Services;
 using Learnup.API.SwaggerConfiguration;
 using Learnup.Infrastructure;
 using Learnup.Infrastructure.Authentication;
@@ -55,7 +57,9 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         };
     });
 builder.Services.AddAuthorization();
+builder.Services.AddSingleton<IChatCompletionQueue, ChatCompletionQueue>();
 builder.Services.AddHostedService<AiProcessorHostedService>();
+builder.Services.AddHostedService<ChatCompletionHostedService>();
 builder.Services.AddHostedService<DailyTokenUsageResetHostedService>();
 builder.Services.AddControllers();
 builder.Services.AddSignalR();

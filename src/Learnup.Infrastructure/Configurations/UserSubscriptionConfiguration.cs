@@ -15,16 +15,10 @@ public class UserSubscriptionConfiguration : IEntityTypeConfiguration<UserSubscr
         builder.Property(us => us.StartedAt).IsRequired();
         builder.Property(us => us.ExpiresAt).IsRequired();
         builder.Property(us => us.Status).IsRequired();
-        builder.Property(us => us.CreatedAt).IsRequired();
 
         builder.HasOne(us => us.User)
-            .WithMany()
+            .WithMany(u => u.Subscriptions)
             .HasForeignKey(us => us.UserId)
             .OnDelete(DeleteBehavior.Cascade);
-
-        builder.HasOne(us => us.Subscription)
-            .WithMany(s => s.UserSubscriptions)
-            .HasForeignKey(us => us.SubscriptionId)
-            .OnDelete(DeleteBehavior.Restrict);
     }
 }

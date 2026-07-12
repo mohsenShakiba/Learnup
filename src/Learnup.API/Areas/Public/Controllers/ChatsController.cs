@@ -7,22 +7,9 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Learnup.API.Areas.Public.Controllers;
 
-public class ChatsController(IMediator mediator) : BasePublicController
+public class ChatsController(
+    IMediator mediator) : BasePublicController
 {
-    [HttpPost(Name = "StartChat")]
-    public async Task<ActionResult<ChatSummaryResponse>> Start(CancellationToken cancellationToken)
-    {
-        try
-        {
-            var chat = await mediator.Send(new StartChat(), cancellationToken);
-            return Ok(chat);
-        }
-        catch (InvalidOperationException exception)
-        {
-            return BadRequest(exception.Message);
-        }
-    }
-
     [HttpGet(Name = "ListChats")]
     public async Task<ActionResult<List<ChatSummaryResponse>>> List(CancellationToken cancellationToken)
     {
@@ -45,32 +32,30 @@ public class ChatsController(IMediator mediator) : BasePublicController
         [FromBody] SendAiTextRequest request,
         CancellationToken cancellationToken)
     {
-        var query = new AiTranslate(request.Word, request.Sentence);
-        var result = await mediator.Send(query, cancellationToken);
-        return Ok(result);
-    }
-
-    [HttpPost("Chat", Name = "ChatWithAi")]
-    public async Task<ActionResult<ChatResponse>> Chat(
-        [FromBody] ChatRequest request,
-        CancellationToken cancellationToken)
-    {
-        if (string.IsNullOrWhiteSpace(request.Message))
-        {
-            return BadRequest("Message is required.");
-        }
-
         try
         {
-            var command = new ChatWithAi(request.ChatId, request.Message);
-            var result = await mediator.Send(command, cancellationToken);
+            var query = new AiTranslate(request.Word, request.Sentence);
+            var result = await mediator.Send(query, cancellationToken);
             return Ok(result);
         }
         catch (TokenUsageExceedException)
         {
             return BadRequest("TokenExceed");
         }
+    }
 
+    [HttpPost("Chat", Name = "ChatWithAi")]
+    public async Task<ActionResult<ChatQueuedResponse>> Chat([FromBody] ChatRequest request, CancellationToken cancellationToken)
+    {
+        try
+        {
+            var result = await mediator.Send(new ChatWithAi(request.ChatId, request.Message), cancellationToken);
+            return Accepted(result);
+        }
+        catch (TokenUsageExceedException)
+        {
+            return BadRequest("TokenExceed");
+        }
     }
     
     [HttpGet("TokenUsage", Name = "GetAvailableTokenUsage")]

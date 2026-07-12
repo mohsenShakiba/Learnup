@@ -15,7 +15,6 @@ public class UserSubscription
     public DateTime StartedAt { get; private set; }
     public DateTime ExpiresAt { get; private set; }
     public UserSubscriptionStatus Status { get; private set; }
-    public DateTime CreatedAt { get; private set; }
 
     public UserSubscription(int userId, int subscriptionId, DateTime startedAt, DateTime expiresAt)
     {
@@ -24,6 +23,5 @@ public class UserSubscription
         StartedAt = startedAt;
         ExpiresAt = expiresAt;
         Status = UserSubscriptionStatus.Active;
-        CreatedAt = DateTime.UtcNow;
     }
 }

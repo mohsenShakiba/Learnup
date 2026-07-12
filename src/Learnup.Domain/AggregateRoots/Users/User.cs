@@ -1,4 +1,6 @@
-﻿namespace Learnup.Domain.AggregateRoots.Users;
+﻿using Learnup.Domain.AggregateRoots.Subscriptions;
+
+namespace Learnup.Domain.AggregateRoots.Users;
 
 public class User
 {
@@ -13,6 +15,7 @@ public class User
     public int AvailableLessonCount { get; private set; }
     public int UsedLessonCount { get; private set; }
 
+    public ICollection<UserSubscription> Subscriptions { get; private set; } = new List<UserSubscription>();
     public ICollection<UserLesson> Lessons { get; private set; } = new List<UserLesson>();
     public ICollection<UserBook> Books { get; private set; } = new List<UserBook>();
 
@@ -66,5 +69,4 @@ public class User
     {
         UsedLessonCount += 1;
     }
-
 }

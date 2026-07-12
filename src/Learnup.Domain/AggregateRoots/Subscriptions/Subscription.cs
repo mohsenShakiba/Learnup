@@ -13,5 +13,4 @@ public class Subscription
     public DateTime CreatedAt { get; private set; }
 
     public ICollection<SubscriptionFeature> Features { get; private set; } = new List<SubscriptionFeature>();
-    public ICollection<UserSubscription> UserSubscriptions { get; private set; } = new List<UserSubscription>();
 }
