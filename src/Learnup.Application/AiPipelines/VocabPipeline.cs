@@ -18,7 +18,7 @@ public class VocabPipeline(
     public async Task ProcessAsync(CancellationToken cancellationToken = default)
     {
         var vocabs = await dbContext.Vocabs
-            .Where(translation => translation.Status == VocabStatus.Pending)
+            .Where(translation => !translation.Status.HasFlag(VocabStatus.Translated))
             .Take(10)
             .ToListAsync(cancellationToken);
 
@@ -49,8 +49,6 @@ public class VocabPipeline(
 
                     vocab.AddType(typeTranslation);
                 }
-
-                vocab.MarkAsPublished();
 
                 await dbContext.SaveChangesAsync(cancellationToken);
 

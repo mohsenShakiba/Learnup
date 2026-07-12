@@ -1,7 +1,9 @@
 ﻿namespace Learnup.Domain.AggregateRoots.Vocabularies;
 
+[Flags]
 public enum VocabStatus
 {
     Pending = 0,
-    Published = 1,
+    Translated = 1,
+    Voiced = 2,
 }

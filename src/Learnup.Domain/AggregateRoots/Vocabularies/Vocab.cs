@@ -40,22 +40,47 @@ public class Vocab
         VoiceId = voiceId;
         Status = VocabStatus.Pending;
         Source = source;
+
+        if (!string.IsNullOrWhiteSpace(translation))
+        {
+            MarkAsTranslated();
+        }
+
+        if (!string.IsNullOrWhiteSpace(voiceId))
+        {
+            MarkAsVoiced();
+        }
     }
 
     public void SetTranslation(string translation, string? description)
     {
         Translation = translation;
         Description = description;
+
+        if (!string.IsNullOrWhiteSpace(translation))
+        {
+            MarkAsTranslated();
+        }
     }
 
-    public void MarkAsPublished()
+    public bool IsTranslated => Status.HasFlag(VocabStatus.Translated);
+
+    public bool IsVoiced => Status.HasFlag(VocabStatus.Voiced);
+
+    public void MarkAsTranslated()
     {
-        Status = VocabStatus.Published;
+        Status |= VocabStatus.Translated;
+    }
+
+    public void MarkAsVoiced()
+    {
+        Status |= VocabStatus.Voiced;
     }
 
     public void SetVoice(string voiceId)
     {
         VoiceId = voiceId;
+        MarkAsVoiced();
     }
 
     public void AddType(VocabSense vocabSense)

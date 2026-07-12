@@ -121,7 +121,10 @@ public class VocabLoader(LearnupDbContext dbContext)
             .Select(vocab => new Vocab(
                 languageId,
                 vocab.Word,
-                vocab.Level!.Value
+                vocab.Translation,
+                vocab.Level!.Value,
+                vocab.Description,
+                null
             ))
             .ToList();
 

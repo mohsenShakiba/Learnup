@@ -21,7 +21,8 @@ public class VocabVoicePipeline(
     public async Task ProcessAsync(CancellationToken cancellationToken = default)
     {
         var vocabs = await dbContext.Vocabs
-            .Where(v => v.Status == VocabStatus.Published)
+            .Where(v => v.Status.HasFlag(VocabStatus.Translated))
+            .Where(v => !v.Status.HasFlag(VocabStatus.Voiced))
             .Where(vocab => vocab.VoiceId == null)
             .Take(10)
             .ToListAsync(cancellationToken);
