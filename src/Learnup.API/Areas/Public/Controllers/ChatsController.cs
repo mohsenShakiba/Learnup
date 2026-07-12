@@ -27,10 +27,8 @@ public class ChatsController(
             : Ok(chat);
     }
     
-    [HttpPost("Process")]
-    public async Task<ActionResult<SendAiTextResponse>> Send(
-        [FromBody] SendAiTextRequest request,
-        CancellationToken cancellationToken)
+    [HttpPost("Translate/Ai", Name = "TranslateWithAi")]
+    public async Task<ActionResult<SendAiTextResponse>> TranslateWithAi([FromBody] SendAiTextRequest request, CancellationToken cancellationToken)
     {
         try
         {

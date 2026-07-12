@@ -6,12 +6,12 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Learnup.Application.Features.Public.Vocabs;
 
-public sealed record GetVocabByWord(string Word) : IRequest<List<VocabResponse>>;
+public sealed record SearchVocab(string Word) : IRequest<List<VocabResponse>>;
 
-internal sealed class GetVocabByWordHandler(ILearnupDbContext dbContext)
-    : IRequestHandler<GetVocabByWord, List<VocabResponse>>
+internal sealed class SearchVocabHandler(ILearnupDbContext dbContext)
+    : IRequestHandler<SearchVocab, List<VocabResponse>>
 {
-    public async Task<List<VocabResponse>> Handle(GetVocabByWord request, CancellationToken cancellationToken)
+    public async Task<List<VocabResponse>> Handle(SearchVocab request, CancellationToken cancellationToken)
     {
         var word = request.Word.Trim().ToLower();
 

@@ -11,7 +11,7 @@ public class ConversationVoicePipeline(ILearnupDbContext dbContext, IVoiceProvid
     private const string MaleVoiceId = ElevenLabsVoiceIds.Brian;
     private const string FemaleVoiceId = ElevenLabsVoiceIds.Sarah;
 
-    public bool Enabled => true;
+    public bool Enabled => false;
 
     public async Task ProcessAsync(CancellationToken cancellationToken = default)
     {

@@ -16,10 +16,10 @@ public class VocabsController(IMediator mediator) : BasePublicController
         return Ok(vocabId);
     }
 
-    [HttpGet("{word}", Name = "GetVocabByWord")]
-    public async Task<ActionResult<List<VocabResponse>>> GetByWord(string word, CancellationToken cancellationToken)
+    [HttpGet("{word}", Name = "SearchVocab")]
+    public async Task<ActionResult<List<VocabResponse>>> SearchVocab(string word, CancellationToken cancellationToken)
     {
-        var query = new GetVocabByWord(word);
+        var query = new SearchVocab(word);
         var vocabs = await mediator.Send(query, cancellationToken);
         return Ok(vocabs);
     }

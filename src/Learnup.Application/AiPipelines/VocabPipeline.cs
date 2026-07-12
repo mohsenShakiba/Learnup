@@ -3,7 +3,6 @@ using Learnup.Application.ExternalServices;
 using Learnup.Application.Persistence;
 using Learnup.Application.Prompts;
 using Learnup.Domain.AggregateRoots.Vocabularies;
-using Learnup.Infrastructure.Prompts;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
@@ -14,7 +13,7 @@ public class VocabPipeline(
     IAiService aiService,
     ILogger<VocabPipeline> logger) : IPipeline
 {
-    public bool Enabled => false;
+    public bool Enabled => true;
 
     public async Task ProcessAsync(CancellationToken cancellationToken = default)
     {
