@@ -10,6 +10,9 @@ public class User
     public DateTime? LastLogin { get; private set; }
     public UserStatus Status { get; private set; }
     
+    public int AvailableLessonCount { get; private set; }
+    public int UsedLessonCount { get; private set; }
+
     public ICollection<UserLesson> Lessons { get; private set; } = new List<UserLesson>();
     public ICollection<UserBook> Books { get; private set; } = new List<UserBook>();
 
@@ -25,6 +28,7 @@ public class User
         DisplayName = mobileNumber;
         CreatedAt = createdAt;
         Status = UserStatus.Active;
+        AvailableLessonCount = 10;
     }
 
     public void RecordLogin(DateTime loggedInAt)
@@ -53,5 +57,14 @@ public class User
         AvatarUrl = avatarUrl.Trim();
     }
 
+    public bool CanAccessNewLesson()
+    {
+        return AvailableLessonCount > UsedLessonCount;
+    }
+
+    public void OnLessonViewed()
+    {
+        UsedLessonCount += 1;
+    }
 
 }

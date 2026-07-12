@@ -1,3 +1,4 @@
+using Learnup.Application.Exceptions;
 using Learnup.Application.Features.Public.Lessons;
 using Learnup.Application.Mediation;
 using Learnup.Application.Responses.Public.Lessons;
@@ -9,10 +10,7 @@ namespace Learnup.API.Areas.Public.Controllers;
 public class LessonsController(IMediator mediator) : BasePublicController
 {
     [HttpGet("course/{courseId:int}", Name = "GetLessonsByCourseId")]
-    public async Task<ActionResult<IReadOnlyList<LessonResponse>>> GetByCourseId(
-        int courseId,
-        CancellationToken cancellationToken
-    )
+    public async Task<ActionResult<IReadOnlyList<LessonResponse>>> GetByCourseId(int courseId, CancellationToken cancellationToken)
     {
         var lessons = await mediator.Send(new ListLessons(courseId), cancellationToken);
 
@@ -20,9 +18,7 @@ public class LessonsController(IMediator mediator) : BasePublicController
     }
 
     [HttpGet("current", Name = "GetCurrentLessonProgress")]
-    public async Task<ActionResult<CurrentLessonProgressResponse>> GetCurrent(
-        CancellationToken cancellationToken
-    )
+    public async Task<ActionResult<CurrentLessonProgressResponse>> GetCurrent(CancellationToken cancellationToken)
     {
         var progress = await mediator.Send(new GetCurrentLessonProgress(), cancellationToken);
 
@@ -30,22 +26,21 @@ public class LessonsController(IMediator mediator) : BasePublicController
     }
 
     [HttpGet("{id:int}", Name = "GetLessonById")]
-    public async Task<ActionResult<LessonDetailResponse>> GetById(
-        int id,
-        CancellationToken cancellationToken
-    )
+    public async Task<ActionResult<LessonDetailResponse>> GetById(int id, CancellationToken cancellationToken)
     {
-        var lesson = await mediator.Send(new GetLessonById(id), cancellationToken);
-
-        return lesson is null ? NotFound() : Ok(lesson);
+        try
+        {
+            var lesson = await mediator.Send(new GetLessonById(id), cancellationToken);
+            return lesson is null ? NotFound() : Ok(lesson);
+        }
+        catch (AccessLimitException)
+        {
+            return BadRequest("AccessLimit");
+        }
     }
 
     [HttpPost("{id:int}/section-completed", Name = "OnLessonSectionCompleted")]
-    public async Task<IActionResult> CompleteSection(
-        int id,
-        [FromQuery] UserLessonStatus section,
-        CancellationToken cancellationToken
-    )
+    public async Task<IActionResult> CompleteSection(int id, [FromQuery] UserLessonStatus section, CancellationToken cancellationToken)
     {
         await mediator.Send(new OnLessonSectionCompleted(id, section), cancellationToken);
 

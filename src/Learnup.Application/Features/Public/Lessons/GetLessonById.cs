@@ -1,4 +1,5 @@
 using Learnup.Application.Authentication;
+using Learnup.Application.Exceptions;
 using Learnup.Application.Mappers;
 using Learnup.Application.Mediation;
 using Learnup.Application.Persistence;
@@ -15,6 +16,13 @@ internal sealed class GetLessonByIdHandler(ILearnupDbContext dbContext, IIdentit
 {
     public async Task<LessonDetailResponse?> Handle(GetLessonById request, CancellationToken cancellationToken)
     {
+        var user = await dbContext.Users.FirstOrDefaultAsync(u => u.Id == identityProvider.UserId, cancellationToken);
+
+        if (user is null)
+        {
+            return null;
+        }
+
         var lesson = await dbContext.Lessons
             .AsNoTracking()
             .Include(l => l.Users.Where(ul => ul.UserId == identityProvider.UserId))
@@ -36,15 +44,23 @@ internal sealed class GetLessonByIdHandler(ILearnupDbContext dbContext, IIdentit
             .FirstOrDefaultAsync(userLesson => userLesson.UserId == identityProvider.UserId
                                                && userLesson.LessonId == request.Id, cancellationToken);
 
-        if (userLesson is null)
+        if (userLesson is null && user.AvailableLessonCount > 0)
         {
-            userLesson = new UserLesson(identityProvider.UserId, request.Id);
-            userLesson.SetRequirements(lesson.Conversations.Count, lesson.Grammars.Count, lesson.Vocabs.Count, lesson.Tests.Count);
-            dbContext.UserLessons.Add(userLesson);
+            if (user.CanAccessNewLesson())
+            {
+                user.OnLessonViewed();
+                userLesson = new UserLesson(identityProvider.UserId, request.Id);
+                userLesson.SetRequirements(lesson.Conversations.Count, lesson.Grammars.Count, lesson.Vocabs.Count, lesson.Tests.Count);
+                dbContext.UserLessons.Add(userLesson);
+            }
+            else
+            {
+                throw new AccessLimitException();
+            }
         }
         else
         {
-            userLesson.Touch();
+            userLesson?.Touch();
         }
 
         var nextLessonId = await dbContext.Lessons
