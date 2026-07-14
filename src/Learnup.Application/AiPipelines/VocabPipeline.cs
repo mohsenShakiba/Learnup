@@ -40,7 +40,21 @@ public class VocabPipeline(
                     continue;
                 }
 
+                if (translation.IsPluralForm)
+                {
+                    dbContext.Vocabs.Remove(vocab);
+                    await dbContext.SaveChangesAsync(cancellationToken);
+
+                    logger.LogInformation(
+                        "Plural vocab {Vocab} was removed in {MilliSeconds}",
+                        vocab.Word,
+                        sw.ElapsedMilliseconds);
+
+                    continue;
+                }
+
                 vocab.SetTranslation(translation.Translation, translation.Description);
+                vocab.SetParentVocab(translation.ParentVocab, translation.ParentVocabDescription);
 
                 foreach (var type in translation.Types)
                 {
@@ -68,7 +82,13 @@ public class VocabPipeline(
         }
     }
 
-    record TranslationResult(string Translation, string? Description, List<TypeTranslationResult> Types);
+    record TranslationResult(
+        string Translation,
+        string? Description,
+        bool IsPluralForm,
+        string? ParentVocab,
+        string? ParentVocabDescription,
+        List<TypeTranslationResult> Types);
 
     record TypeTranslationResult(string Translation, string? Description, string Example, string ExampleTranslation, VocabType Type);
 }

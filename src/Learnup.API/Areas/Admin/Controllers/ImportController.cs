@@ -4,6 +4,7 @@ using Learnup.Application.Requests.Admin.Placement;
 using Learnup.Application.Requests.Admin.Conversations;
 using Learnup.Infrastructure.ExternalService;
 using Microsoft.AspNetCore.Mvc;
+using System.Text.RegularExpressions;
 
 namespace Learnup.API.Areas.Admin.Controllers;
 
@@ -96,10 +97,10 @@ public class ImportController(
 
     // Expected txt format:
     //   line 1: conversation title
-    //   line 2: comma separated words
-    //   line 3+: one sentence per line
+    //   line 2+: one sentence per line
     // Order and person are inferred from the sentence position, speakers are
-    // assumed to alternate. Translation and description are intentionally left null.
+    // assumed to alternate. Words are inferred from the sentences.
+    // Translation and description are intentionally left null.
     private static ConversationRequest ParseConversation(string content)
     {
         var lines = content
@@ -108,22 +109,16 @@ public class ImportController(
             .Where(line => !string.IsNullOrWhiteSpace(line))
             .ToList();
 
-        if (lines.Count < 3)
+        if (lines.Count < 2)
         {
             throw new FormatException(
-                "Conversation file must contain a title, a line of words and at least one sentence.");
+                "Conversation file must contain a title and at least one sentence.");
         }
 
         var title = lines[0];
 
-        var words = lines[1]
-            .Split(',')
-            .Select(word => word.Trim())
-            .Where(word => !string.IsNullOrWhiteSpace(word))
-            .ToList();
-
         var sentences = lines
-            .Skip(2)
+            .Skip(1)
             .Select((text, index) => new ConversationItemRequest(
                 Order: index + 1,
                 Text: text,
@@ -131,7 +126,18 @@ public class ImportController(
                 Translation: null))
             .ToList();
 
+        var words = ExtractConversationWords(sentences.Select(sentence => sentence.Text));
+
         return new ConversationRequest(title, words, sentences);
+    }
+
+    private static List<string> ExtractConversationWords(IEnumerable<string> sentences)
+    {
+        return sentences
+            .SelectMany(sentence => Regex.Matches(sentence, @"[\p{L}]+(?:['’][\p{L}]+)?")
+                .Select(match => match.Value))
+            .Distinct(StringComparer.OrdinalIgnoreCase)
+            .ToList();
     }
 
     private static AudioBookImportRequest ParseAudioBook(string content)

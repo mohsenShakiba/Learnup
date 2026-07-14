@@ -14,6 +14,8 @@ public static class VocabMapper
             vocab.Translation,
             vocab.VoiceId,
             vocab.Description,
+            vocab.ParentVocab,
+            vocab.ParentVocabDescription,
             vocab.Level,
             isInLeitnerBox,
             vocab.Senses.Select(ToResponse).ToList()

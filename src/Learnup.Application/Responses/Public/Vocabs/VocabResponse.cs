@@ -8,6 +8,8 @@ public sealed record VocabResponse(
     string? Translation,
     string? VoiceId,
     string? Description,
+    string? ParentVocab,
+    string? ParentVocabDescription,
     VocabLevel Level,
     bool IsInLeitnerBox,
     List<VocabSenseResponse> Senses);

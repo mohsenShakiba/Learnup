@@ -11,12 +11,21 @@ public static class VocabTranslationPrompt
                * If the word has multiple meanings with the same type, comma separate the translations in the same object. 
                * If the word has multiple types e.g Noun, verb, return multiple objects in the array each having a different type and translations.
                * Include a short description only when necessary; otherwise use `null`.
+               * If the word is only the plural form of another vocabulary item, set `IsPluralForm` to `true`.
+               * For example, for `books`, set `IsPluralForm` to `true`.
+               * Only mark plural nouns as plural forms. Do not mark third-person singular verbs like `takes` as plural forms.
+               * If the word is a form of another vocabulary item, set `ParentVocab` to the main/base vocabulary item and set `ParentVocabDescription` to a concise Farsi explanation of the relationship.
+               * For example, for `took`, set `ParentVocab` to `take` and `ParentVocabDescription` to `گذشته ساده فعل take.`
+               * If the word is not a form of another vocabulary item, set both `ParentVocab` and `ParentVocabDescription` to `null`.
 
                Return JSON only. No markdown, explanations, or additional text.
                Schema:
                {
                    "Translation": string,
                    "Description": string | null,
+                   "IsPluralForm": boolean,
+                   "ParentVocab": string | null,
+                   "ParentVocabDescription": string | null,
                    "Types":
                    [
                        {

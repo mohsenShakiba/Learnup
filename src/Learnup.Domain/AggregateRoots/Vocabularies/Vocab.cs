@@ -10,6 +10,8 @@ public class Vocab
     public string? Translation { get; private set; }
     public string? Description { get; private set; }
     public string? VoiceId { get; private set; }
+    public string? ParentVocab { get; private set; }
+    public string? ParentVocabDescription { get; private set; }
 
     public VocabLevel Level { get; private set; }
     public VocabStatus Status { get; private set; }
@@ -61,6 +63,17 @@ public class Vocab
         {
             MarkAsTranslated();
         }
+    }
+
+    public void SetParentVocab(string? parentVocab, string? parentVocabDescription)
+    {
+        ParentVocab = string.IsNullOrWhiteSpace(parentVocab)
+            ? null
+            : parentVocab.Trim();
+
+        ParentVocabDescription = string.IsNullOrWhiteSpace(parentVocabDescription)
+            ? null
+            : parentVocabDescription.Trim();
     }
 
     public bool IsTranslated => Status.HasFlag(VocabStatus.Translated);
