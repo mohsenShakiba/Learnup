@@ -1,18 +1,44 @@
 {
-    "version": "0.2.0",
-    "configurations": [
-        {
-            "name": "Learnup.API (Debug)",
-            "type": "coreclr",
-            "request": "launch",
-            "preLaunchTask": "build",
-            "program": "${workspaceFolder}/src/Learnup.API/bin/Debug/net10.0/Learnup.API.dll",
-            "args": [],
-            "cwd": "${workspaceFolder}/src/Learnup.API",
-            "stopAtEntry": false,
-            "env": {
-                "ASPNETCORE_ENVIRONMENT": "Development"
-            }
-        }
-    ]
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "http-no-ai",
+      "type": "coreclr",
+      "request": "launch",
+      "preLaunchTask": "build",
+      "program": "${workspaceFolder}/src/Learnup.API/bin/Debug/net10.0/Learnup.API.dll",
+      "args": ["--environment", "DevelopmentNoAi"],
+      "cwd": "${workspaceFolder}/src/Learnup.API",
+      "pipeTransport": {
+                "pipeCwd": "${workspaceFolder}",
+                "pipeProgram": "powershell",
+                "pipeArgs": ["-Command"],
+                "debuggerPath": "C:\\Personal_Projects\\netcoredbg-win64\\netcoredbg\\netcoredbg",
+                "debuggerArgs": ["--interpreter=vscode"],
+                "quoteArgs": true
+            },
+    },
+    {
+      "name": "http",
+      "type": "coreclr",
+      "request": "launch",
+      "preLaunchTask": "build",
+      "program": "${workspaceFolder}/src/Learnup.API/bin/Debug/net10.0/Learnup.API.dll",
+      "cwd": "${workspaceFolder}/src/Learnup.API",
+      "args": ["--environment", "Development"],
+      "pipeTransport": {
+                "pipeCwd": "${workspaceFolder}",
+                "pipeProgram": "powershell",
+                "pipeArgs": ["-Command"],
+                "debuggerPath": "C:\\Personal_Projects\\netcoredbg-win64\\netcoredbg\\netcoredbg",
+                "debuggerArgs": ["--interpreter=vscode"],
+                "quoteArgs": true
+              },
+    },
+    {
+      "name": "Attach to .NET Process",
+      "type": "coreclr",
+      "request": "attach"
+    }
+  ]
 }

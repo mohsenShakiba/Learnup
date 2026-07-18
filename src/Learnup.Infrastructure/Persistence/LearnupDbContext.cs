@@ -4,6 +4,7 @@ using Learnup.Domain.AggregateRoots.Chats;
 using Learnup.Domain.AggregateRoots.Courses;
 using Learnup.Domain.AggregateRoots.Ebooks;
 using Learnup.Domain.AggregateRoots.Grammars;
+using Learnup.Domain.AggregateRoots.InvalidData;
 using Learnup.Domain.AggregateRoots.Languages;
 using Learnup.Domain.AggregateRoots.LeitnerBoxes;
 using Learnup.Domain.AggregateRoots.Lessons;
@@ -56,6 +57,7 @@ public class LearnupDbContext(DbContextOptions<LearnupDbContext> options)
     public DbSet<Subscription> Subscriptions => Set<Subscription>();
     public DbSet<SubscriptionFeature> SubscriptionFeatures => Set<SubscriptionFeature>();
     public DbSet<UserSubscription> UserSubscriptions => Set<UserSubscription>();
+    public DbSet<InvalidDataReport> InvalidDataReports => Set<InvalidDataReport>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

@@ -3,6 +3,7 @@ using Learnup.Domain.AggregateRoots.Courses;
 using Learnup.Domain.AggregateRoots.AudioBooks;
 using Learnup.Domain.AggregateRoots.Ebooks;
 using Learnup.Domain.AggregateRoots.Grammars;
+using Learnup.Domain.AggregateRoots.InvalidData;
 using Learnup.Domain.AggregateRoots.LeitnerBoxes;
 using Learnup.Domain.AggregateRoots.Lessons;
 using Learnup.Domain.AggregateRoots.MotivationalSentences;
@@ -52,6 +53,7 @@ public interface ILearnupDbContext
     DbSet<Subscription> Subscriptions { get; }
     DbSet<SubscriptionFeature> SubscriptionFeatures { get; }
     DbSet<UserSubscription> UserSubscriptions { get; }
+    DbSet<InvalidDataReport> InvalidDataReports { get; }
 
     Task<int> SaveChangesAsync(CancellationToken cancellationToken = new CancellationToken());
 }
